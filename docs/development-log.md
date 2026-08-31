@@ -24,3 +24,8 @@
 - Added environment-based service targets for users, content, and interactions.
 - Added health, gateway index, not-found, and error-handling foundations.
 - Verified the service through isolated HTTP smoke tests.
+
+## Environment templates
+
+- Updated repository ignore rules so safe `.env.example` templates are tracked while real environment files remain private.
+- Documented the npm workspace layout and repository privacy boundaries.
