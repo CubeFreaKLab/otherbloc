@@ -1,0 +1,17 @@
+{
+  "name": "otherbloc",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend/*"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace frontend",
+    "build": "npm run build --workspace frontend",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  }
+}

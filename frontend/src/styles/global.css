@@ -1,0 +1,53 @@
+@font-face {
+  font-family: 'Adelle Sans';
+  src: url('/fonts/adelle-sans-regular.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Adelle Sans';
+  src: url('/fonts/adelle-sans-extra-bold.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 800;
+}
+
+@font-face {
+  font-family: 'Prumo Display';
+  src: url('/fonts/prumo-display-bold.otf') format('opentype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+}
+
+:root {
+  font-family: 'Adelle Sans', Arial, sans-serif;
+  color: #000;
+  background: #f6f5f3;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100dvh;
+}
+
+.route-placeholder {
+  display: grid;
+  min-height: 100dvh;
+  place-content: center;
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.route-placeholder img {
+  width: min(18rem, 70vw);
+}
