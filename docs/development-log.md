@@ -50,3 +50,10 @@
 - Added environment, schema, model, service, resolver, route, context, and HTTP middleware layers.
 - Exposed only health and GraphQL service-status operations for this phase.
 - Verified the REST health route and GraphQL endpoint through isolated smoke tests.
+
+## Repository verification
+
+- Added repository-level contracts for the required structure, independent service entry points, assigned ports, and gateway-only frontend boundaries.
+- Added a credential-free continuous integration workflow for installation, tests, and the production frontend build.
+- Added root development commands and public setup, testing, and architecture guidance.
+- Removed the temporary design-resource workspace after incorporating the approved assets and visual direction.

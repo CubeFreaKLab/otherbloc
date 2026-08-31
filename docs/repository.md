@@ -28,3 +28,10 @@ npm install
 ```
 
 The root package provides aggregate build and test commands. Individual applications can also be addressed through npm workspace names.
+
+```bash
+npm test
+npm run build
+```
+
+Repository-level contracts live in `tests`, while each backend application owns its integration tests. `.github/workflows/foundation-ci.yml` runs both verification commands for pushes and pull requests.

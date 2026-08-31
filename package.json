@@ -8,8 +8,13 @@
   ],
   "scripts": {
     "dev:frontend": "npm run dev --workspace frontend",
+    "dev:gateway": "npm run dev --workspace @otherbloc/api-gateway",
+    "dev:users": "npm run dev --workspace @otherbloc/users-service",
+    "dev:content": "npm run dev --workspace @otherbloc/content-service",
+    "dev:interactions": "npm run dev --workspace @otherbloc/interactions-service",
     "build": "npm run build --workspace frontend",
-    "test": "npm run test --workspaces --if-present"
+    "test": "npm run test:foundation && npm run test --workspaces --if-present",
+    "test:foundation": "node --test tests/foundation.test.js"
   },
   "engines": {
     "node": ">=20.11.0"
