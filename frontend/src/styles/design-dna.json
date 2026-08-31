@@ -1,0 +1,241 @@
+{
+  "meta": {
+    "name": "otherbloc editorial foundation",
+    "description": "A measured monochrome editorial system for long-form digital publishing.",
+    "source_references": [
+      "official otherbloc brand board",
+      "official otherbloc desktop and mobile interface reference"
+    ],
+    "created_at": "2026-08-30"
+  },
+  "design_system": {
+    "color": {
+      "palette_type": "monochromatic",
+      "primary": { "hex": "#000000", "role": "primary text, marks, and primary actions" },
+      "secondary": { "hex": "#373735", "role": "supporting text and strong dividers" },
+      "accent": { "hex": "#373735", "role": "restrained interactive emphasis" },
+      "neutral": {
+        "scale": ["#FEFEFE", "#F6F5F3", "#EAE9E6", "#CFCFCE", "#7F7F7B", "#373735", "#000000"],
+        "usage": "Light paper surfaces carry dark-on-light content; graphite and grey establish secondary hierarchy."
+      },
+      "semantic": {
+        "success": "#2F6148",
+        "warning": "#735B18",
+        "error": "#8B2020",
+        "info": "#365B72"
+      },
+      "surface": {
+        "background": "#F6F5F3",
+        "card": "#FEFEFE",
+        "elevated": "#EAE9E6"
+      },
+      "contrast_strategy": "High-contrast black and graphite on paper surfaces, with hierarchy created by type scale and thin rules.",
+      "measurement": {
+        "k": 8,
+        "sampling": {
+          "method": "deterministic_stratified",
+          "max_pixels": 160000,
+          "sampled_pixels": 160000
+        }
+      },
+      "measured_palette": [
+        { "hex": "#F8F7F5", "coverage": 0.8038, "role": "background" },
+        { "hex": "#040404", "coverage": 0.07, "role": "text" },
+        { "hex": "#DCDBDA", "coverage": 0.0363, "role": "line" },
+        { "hex": "#B8B7B7", "coverage": 0.0254, "role": "muted line" },
+        { "hex": "#1A1919", "coverage": 0.0205, "role": "dark detail" },
+        { "hex": "#383837", "coverage": 0.0174, "role": "secondary text" },
+        { "hex": "#898989", "coverage": 0.0157, "role": "muted text" },
+        { "hex": "#60605F", "coverage": 0.0109, "role": "supporting detail" }
+      ]
+    },
+    "typography": {
+      "type_scale": {
+        "display": { "size": "clamp(3rem, 7vw, 7.25rem)", "weight": "700", "line_height": "0.98", "tracking": "-0.03em" },
+        "heading_1": { "size": "clamp(2.6rem, 5.1vw, 5rem)", "weight": "700", "line_height": "0.98", "tracking": "-0.03em" },
+        "heading_2": { "size": "clamp(1.8rem, 3vw, 2.8rem)", "weight": "700", "line_height": "1", "tracking": "-0.025em" },
+        "heading_3": { "size": "clamp(1.35rem, 2.2vw, 2rem)", "weight": "700", "line_height": "1.02", "tracking": "-0.025em" },
+        "body": { "size": "1rem", "weight": "400", "line_height": "1.6", "tracking": "0" },
+        "body_small": { "size": "0.8125rem", "weight": "400", "line_height": "1.45", "tracking": "0" },
+        "caption": { "size": "0.6875rem", "weight": "800", "line_height": "1.25", "tracking": "0.04em" },
+        "overline": { "size": "0.6875rem", "weight": "800", "line_height": "1", "tracking": "0.08em" }
+      },
+      "font_families": {
+        "heading": "Prumo Display",
+        "body": "Adelle Sans",
+        "mono": "ui-monospace, SFMono-Regular, Consolas, monospace"
+      },
+      "font_style_notes": "Prumo creates compressed editorial display hierarchy, Adelle Sans supports interface clarity, and locally hosted Georgia carries sustained reading."
+    },
+    "spacing": {
+      "base_unit": "4px",
+      "scale": ["4px", "8px", "12px", "16px", "24px", "32px", "40px", "48px", "64px", "96px", "128px"],
+      "content_density": "spacious",
+      "section_rhythm": "Large section pauses alternate with compact rule-led metadata groups."
+    },
+    "layout": {
+      "grid_system": "fluid editorial grid with asymmetric feature spans",
+      "max_content_width": "1536px",
+      "columns": "12 conceptual columns, implemented with page-specific CSS Grid tracks",
+      "gutter": "clamp(16px, 4vw, 64px)",
+      "breakpoints": ["640px", "768px", "1024px", "1280px", "1536px"],
+      "alignment_tendency": "asymmetric desktop composition with strict single-column mobile collapse"
+    },
+    "shape": {
+      "border_radius": { "small": "0", "medium": "0", "large": "0", "pill": "0" },
+      "border_usage": "subtle 1px rules define regions and controls",
+      "divider_style": "hairline graphite or neutral grey"
+    },
+    "elevation": {
+      "shadow_style": "none",
+      "levels": { "low": "none", "medium": "none", "high": "none" },
+      "depth_cues": "scale, cropping, borders, and tonal contrast"
+    },
+    "iconography": {
+      "style": "geometric outline",
+      "stroke_weight": "1.5px to 2px",
+      "size_scale": ["16px", "18px", "22px"],
+      "preferred_set": "Phosphor Icons"
+    },
+    "motion": {
+      "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "duration_scale": { "micro": "160ms", "normal": "320ms", "macro": "480ms" },
+      "entrance_pattern": "static by default",
+      "exit_pattern": "instant route replacement",
+      "philosophy": "minimal functional feedback limited to hover, focus, and press states"
+    },
+    "components": {
+      "button_style": "sharp rectangular controls with black primary fill and visible focus outline",
+      "input_style": "white fields with graphite 1px borders and labels above",
+      "card_style": "flat editorial modules separated by rules, without shadows",
+      "navigation_pattern": "two-tier masthead with compact utility row and category index",
+      "modal_style": "flat paper panel with strong border and no shadow",
+      "list_style": "asymmetric image-led grid with sparse metadata",
+      "component_notes": "Components favor whitespace and clear responsibility over decorative containers."
+    }
+  },
+  "design_style": {
+    "aesthetic": {
+      "mood": ["rigorous", "calm", "literate", "independent"],
+      "visual_metaphor": "a contemporary independent journal translated to the browser",
+      "era_influence": "modernist editorial systems with current responsive behavior",
+      "genre": "minimal digital editorial",
+      "personality_traits": ["confident", "thoughtful", "precise", "restrained"],
+      "adjectives": ["monochrome", "typographic", "structured", "spacious"]
+    },
+    "visual_language": {
+      "complexity": "minimal",
+      "ornamentation": "none",
+      "whitespace_usage": "generous and structural",
+      "visual_weight_distribution": "large typographic anchors balanced by quiet image fields",
+      "focal_strategy": "single lead story followed by progressively smaller modules",
+      "contrast_level": "high",
+      "texture_usage": "subtle photographic grain only"
+    },
+    "composition": {
+      "hierarchy_method": "typographic scale, spatial isolation, and image proportion",
+      "balance_type": "asymmetric",
+      "flow_direction": "top-to-bottom with horizontal editorial bands",
+      "grouping_strategy": "rules and negative space",
+      "negative_space_role": "creates pacing and protects long-form readability"
+    },
+    "imagery": {
+      "photo_treatment": "monochrome documentary images with strong architectural geometry",
+      "illustration_style": "not used in the foundation",
+      "graphic_elements": "official wordmark, monogram, and thin rules",
+      "pattern_usage": "none",
+      "image_shape": "sharp rectangular crops with varied editorial aspect ratios"
+    },
+    "interaction_feel": {
+      "feedback_style": "immediate and understated",
+      "hover_behavior": "small image scale change, underline movement, or border darkening",
+      "transition_personality": "quick and composed",
+      "loading_style": "layout-matched rectangular skeletons",
+      "microinteraction_density": "low"
+    },
+    "brand_voice_in_ui": {
+      "tone": "direct, clear, and considered",
+      "formality": "professional but conversational",
+      "cta_style": "plain imperative",
+      "empty_state_approach": "state what is missing and offer the next useful action",
+      "error_tone": "specific, neutral, and actionable"
+    }
+  },
+  "visual_effects": {
+    "overview": {
+      "effect_intensity": "subtle-accent",
+      "performance_tier": "lightweight",
+      "fallback_strategy": "remove transitions and retain the complete static composition",
+      "primary_technology": "CSS only"
+    },
+    "background_effects": {
+      "type": "none",
+      "description": "Paper surfaces remain flat and stable.",
+      "technology": "CSS",
+      "params": { "color_palette": ["#F6F5F3"], "speed": "0", "density": "0", "opacity": "1", "blend_mode": "normal" }
+    },
+    "particle_systems": {
+      "enabled": false,
+      "type": "none",
+      "description": "No particles are used.",
+      "technology": "none",
+      "params": { "count": 0, "shape": "none", "size_range": "none", "movement_pattern": "none", "color_behavior": "none", "interaction": "none", "spawn_area": "none" }
+    },
+    "3d_elements": {
+      "enabled": false,
+      "type": "none",
+      "description": "No 3D rendering is used.",
+      "technology": "none",
+      "params": { "renderer": "none", "lighting": "none", "camera": "none", "materials": [], "geometry": [], "post_processing": [], "interaction_model": "none" }
+    },
+    "shader_effects": {
+      "enabled": false,
+      "type": "none",
+      "description": "No shaders are used.",
+      "technology": "none",
+      "params": { "uniforms": {}, "vertex_manipulation": "none", "fragment_output": "none", "noise_type": "none", "distortion": "none" }
+    },
+    "scroll_effects": {
+      "parallax": { "enabled": false, "layers": 0, "depth_range": "none", "speed_curve": "none" },
+      "scroll_triggered_animations": { "enabled": false, "trigger_points": [], "animation_type": "none", "scrub_behavior": "none" },
+      "scroll_morphing": { "enabled": false, "description": "No scroll morphing is used." }
+    },
+    "text_effects": {
+      "type": "none",
+      "description": "Typography remains stable and readable.",
+      "technology": "CSS",
+      "params": { "split_strategy": "none", "animation_per_unit": "none", "stagger": "0", "effect_style": "none" }
+    },
+    "cursor_effects": {
+      "enabled": false,
+      "type": "none",
+      "description": "The native cursor is preserved.",
+      "params": { "shape": "native", "size": "native", "blend_mode": "normal", "trail": "none", "interaction_zone": "none" }
+    },
+    "image_effects": {
+      "type": "subtle-hover-scale",
+      "description": "Editorial images shift slightly on hover to confirm interaction.",
+      "technology": "CSS",
+      "params": { "filter_pipeline": "grayscale and contrast", "hover_transform": "scale(1.015)", "reveal_animation": "none", "distortion_type": "none" }
+    },
+    "glassmorphism_neumorphism": {
+      "enabled": false,
+      "style": "none",
+      "params": { "blur_radius": "0", "transparency": "0", "border_treatment": "none", "shadow_type": "none", "light_source_angle": "none" }
+    },
+    "canvas_drawings": {
+      "enabled": false,
+      "type": "none",
+      "description": "No canvas drawing is used.",
+      "technology": "none",
+      "params": { "draw_method": "none", "animation_loop": "none", "color_scheme": "monochrome", "responsiveness": "not applicable", "interaction": "none" }
+    },
+    "svg_animations": {
+      "enabled": false,
+      "type": "none",
+      "description": "Official SVG marks remain static.",
+      "params": { "animation_method": "none", "path_morphing": "none", "stroke_animation": "none", "filter_effects": "none" }
+    },
+    "composite_notes": "The foundation intentionally avoids advanced effects. Its character comes from type, composition, image treatment, and stable responsive behavior."
+  }
+}

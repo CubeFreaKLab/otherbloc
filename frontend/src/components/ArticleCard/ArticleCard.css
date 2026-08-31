@@ -1,0 +1,114 @@
+.article-card {
+  display: grid;
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.article-card__image-link {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper-grey);
+}
+
+.article-card__image-link img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.04);
+  transition: transform var(--duration-normal) var(--ease-standard), filter var(--duration-normal) var(--ease-standard);
+}
+
+.article-card:hover .article-card__image-link img {
+  filter: grayscale(0.7) contrast(1.03);
+  transform: scale(1.015);
+}
+
+.article-card__content {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  padding: var(--space-4);
+  flex-direction: column;
+}
+
+.article-card__topline,
+.article-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--graphite);
+  font-size: var(--text-caption);
+}
+
+.article-card h3 {
+  margin: var(--space-5) 0 var(--space-4);
+  font-family: var(--font-title);
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+
+.article-card h3 a {
+  color: inherit;
+}
+
+.article-card p {
+  max-width: 40rem;
+  margin: 0 0 var(--space-6);
+  color: var(--graphite);
+  font-family: var(--font-reading);
+  line-height: 1.55;
+}
+
+.article-card__meta {
+  margin-top: auto;
+  padding-top: var(--space-4);
+}
+
+.article-card__meta a {
+  color: inherit;
+}
+
+.article-card__read {
+  margin-top: var(--space-6);
+}
+
+.article-card--featured {
+  grid-template-columns: minmax(0, 1fr) minmax(24rem, 1fr);
+}
+
+.article-card--featured .article-card__image-link {
+  min-height: 24rem;
+  aspect-ratio: auto;
+  border-right: 1px solid var(--line);
+  border-bottom: 0;
+}
+
+.article-card--featured .article-card__content {
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.article-card--featured h3 {
+  font-size: clamp(2rem, 3vw, 3.5rem);
+}
+
+@media (max-width: 47.99rem) {
+  .article-card--featured {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .article-card--featured .article-card__image-link {
+    min-height: 0;
+    aspect-ratio: 16 / 10;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .article-card--featured .article-card__content {
+    padding: var(--space-5);
+  }
+}

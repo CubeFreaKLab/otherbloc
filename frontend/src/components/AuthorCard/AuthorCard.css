@@ -1,0 +1,56 @@
+.author-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-6);
+  padding: var(--space-6) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.author-card__monogram {
+  display: grid;
+  width: 5rem;
+  height: 5rem;
+  place-items: center;
+  background: var(--ink);
+  color: var(--white);
+  font-family: var(--font-title);
+  font-size: 1.35rem;
+}
+
+.author-card__role {
+  color: var(--graphite);
+  font-size: var(--text-caption);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.author-card h2 {
+  margin: var(--space-2) 0 var(--space-3);
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+}
+
+.author-card p {
+  max-width: 42rem;
+  margin: 0 0 var(--space-5);
+  color: var(--graphite);
+  line-height: 1.6;
+}
+
+.author-card--compact {
+  align-items: center;
+  border-bottom: 0;
+}
+
+.author-card--compact .author-card__monogram {
+  width: 3rem;
+  height: 3rem;
+  font-size: 0.9rem;
+}
+
+.author-card--compact h2 {
+  margin: 0.2rem 0 var(--space-2);
+  font-size: 1.25rem;
+}
