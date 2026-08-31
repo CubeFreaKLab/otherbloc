@@ -18,4 +18,4 @@ The frontend communicates only with the API Gateway. The gateway owns the public
 
 ## Current foundation
 
-The API Gateway exposes `GET /health` and `GET /api` for local foundation checks. Its environment configuration records the internal service locations. Request forwarding, authentication, persistence, rate limiting, and business endpoints belong to later implementation phases.
+The API Gateway exposes `GET /health` and `GET /api` for local foundation checks. Its environment configuration records the internal service locations. The Users service exposes its own health and REST boundary metadata without implementing authentication business logic. Request forwarding, authentication, persistence, rate limiting, and business endpoints belong to later implementation phases.

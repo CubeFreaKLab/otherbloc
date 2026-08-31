@@ -29,3 +29,10 @@
 
 - Updated repository ignore rules so safe `.env.example` templates are tracked while real environment files remain private.
 - Documented the npm workspace layout and repository privacy boundaries.
+
+## Users service foundation
+
+- Created an independent Express REST service on port 3001.
+- Added environment, model, service, controller, route, and HTTP middleware layers.
+- Exposed only health and service-boundary metadata for this phase.
+- Verified the service through isolated HTTP smoke tests.
