@@ -17,3 +17,10 @@
 - Added original monochrome editorial imagery and optimized it for browser delivery.
 - Verified desktop and 390-pixel mobile layouts, category and article routing, mobile navigation, accessible form labels, accurate date rendering, and clean browser logs.
 - Confirmed that the production bundle builds locally after visual verification.
+
+## API Gateway foundation
+
+- Created an independent Express service on port 3000.
+- Added environment-based service targets for users, content, and interactions.
+- Added health, gateway index, not-found, and error-handling foundations.
+- Verified the service through isolated HTTP smoke tests.
