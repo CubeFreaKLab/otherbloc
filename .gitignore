@@ -1,0 +1,44 @@
+# Private agent context
+.agent/
+
+# Private project documentation
+.project/
+
+# Temporary design resources
+resources/
+
+
+# Dependencies
+node_modules/
+
+
+# Environment variables
+.env
+.env.*
+
+
+# Build output
+dist/
+build/
+
+
+# Testing
+coverage/
+
+
+# Firebase
+.firebase/
+
+
+# Logs
+*.log
+
+
+# OS files
+.DS_Store
+Thumbs.db
+
+
+# Editor files
+.vscode/
+.idea/
