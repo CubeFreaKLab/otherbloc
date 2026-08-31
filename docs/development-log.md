@@ -36,3 +36,10 @@
 - Added environment, model, service, controller, route, and HTTP middleware layers.
 - Exposed only health and service-boundary metadata for this phase.
 - Verified the service through isolated HTTP smoke tests.
+
+## Content service foundation
+
+- Created an independent Express REST service on port 3002.
+- Added environment, model, service, controller, route, and HTTP middleware layers.
+- Exposed only health and publication-boundary metadata for this phase.
+- Verified the service through isolated HTTP smoke tests.
