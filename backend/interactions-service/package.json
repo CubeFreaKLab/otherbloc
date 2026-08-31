@@ -1,0 +1,23 @@
+{
+  "name": "@otherbloc/interactions-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@apollo/server": "^5.0.0",
+    "@as-integrations/express5": "^1.1.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "graphql": "^16.11.0"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  }
+}

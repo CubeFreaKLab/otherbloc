@@ -18,4 +18,4 @@ The frontend communicates only with the API Gateway. The gateway owns the public
 
 ## Current foundation
 
-The API Gateway exposes `GET /health` and `GET /api` for local foundation checks. Its environment configuration records the internal service locations. The Users and Content services expose their own health and REST boundary metadata without implementing business logic. Request forwarding, authentication, persistence, rate limiting, and full resource endpoints belong to later implementation phases.
+The API Gateway exposes `GET /health` and `GET /api` for local foundation checks. Its environment configuration records the internal service locations. The Users and Content services expose their own health and REST boundary metadata. The Interactions service hosts an Apollo GraphQL endpoint with an operational status query. Request forwarding, authentication, persistence, rate limiting, and domain operations belong to later implementation phases.

@@ -43,3 +43,10 @@
 - Added environment, model, service, controller, route, and HTTP middleware layers.
 - Exposed only health and publication-boundary metadata for this phase.
 - Verified the service through isolated HTTP smoke tests.
+
+## Interactions service foundation
+
+- Created an independent Express and Apollo Server application on port 3003.
+- Added environment, schema, model, service, resolver, route, context, and HTTP middleware layers.
+- Exposed only health and GraphQL service-status operations for this phase.
+- Verified the REST health route and GraphQL endpoint through isolated smoke tests.
