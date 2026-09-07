@@ -13,6 +13,12 @@ export const services = {
 }
 const root = fileURLToPath(new URL('..', import.meta.url))
 
+export function parseWatchOptions(args) {
+  if (!args.length) return { watch: true }
+  if (args.length === 1 && args[0] === '--no-watch') return { watch: false }
+  throw new Error('The only optional development flag is --no-watch')
+}
+
 export async function runService(name, { watch = true } = {}) {
   if (!Object.hasOwn(services, name)) throw new Error('Unknown application name')
   await setupLocal()
@@ -27,7 +33,7 @@ export async function runService(name, { watch = true } = {}) {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const child = await runService(process.argv[2])
+  const child = await runService(process.argv[2], parseWatchOptions(process.argv.slice(3)))
   child.on('exit', (code) => { process.exitCode = code ?? 1 })
   process.on('SIGTERM', () => child.kill('SIGTERM'))
 }

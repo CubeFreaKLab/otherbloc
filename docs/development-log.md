@@ -1,5 +1,11 @@
 # Development log
 
+## Stable verification entry point — 2026-09-07
+
+- Exposed `--no-watch` through aggregate and individual local-development commands, retaining normal watch defaults and Vite's frontend development behavior. Invalid flags fail explicitly. Added Interactions to the live E2E health preflight.
+- Verified 35 Node checks, lint/build and nine targeted real desktop journeys in 50.4 seconds after starting the public stable command. This replaces the private verification launcher without claiming a diagnosis of the earlier Windows watch-restart trigger.
+- Export/import, clean installation, load/performance and cloud CI/CD are still pending; no push or deployment.
+
 ## Administrative observations and private identity — 2026-09-07
 
 - Extended interrupted-session recovery to the administrator's personal reason, proposed action and original version, without copying the author's publication. Same-version recovery is explicit; a changed version keeps the reason read-only/downloadable until confirmed discard and a fresh review. A withdrawn private draft stays inaccessible.

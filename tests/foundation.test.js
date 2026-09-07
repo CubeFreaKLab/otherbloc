@@ -9,6 +9,13 @@ const resolveFromRoot = (...segments) => join(repositoryRoot, ...segments)
 const readJson = (...segments) =>
   JSON.parse(readFileSync(resolveFromRoot(...segments), 'utf8'))
 
+test('development watch configuration has an explicit stable mode and rejects misspelled options', async () => {
+  const { parseWatchOptions } = await import('../scripts/run-service.mjs')
+  assert.deepEqual(parseWatchOptions([]), { watch: true })
+  assert.deepEqual(parseWatchOptions(['--no-watch']), { watch: false })
+  for (const args of [['--nowatch'], ['--no-watch', '--watch'], ['--no-watch', '--no-watch']]) assert.throws(() => parseWatchOptions(args), /--no-watch/)
+})
+
 const services = [
   {
     directory: 'api-gateway',

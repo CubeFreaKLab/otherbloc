@@ -16,6 +16,8 @@ npm run dev
 
 The frontend is on port 5173, gateway 3000, Users 3001, Content 3002 and Interactions 3003. Open the frontend, not a service port. The emulator UI is on `http://127.0.0.1:4000`; Firestore uses 8080 and Storage 9199. These ports must be available. A production frontend build is `npm run build`.
 
+For integration verification or load testing, use `npm run dev -- --no-watch` (or `node scripts/dev.mjs --no-watch`). This starts the same four backend applications without development watch restarts; Vite still provides its normal frontend development server. Individual `dev:gateway`, `dev:users`, `dev:content` and `dev:interactions` commands accept the same flag. Without the flag, normal backend watching remains enabled. Do not edit frontend source during a browser test or run a load test alongside another resource-intensive suite. Stop the development terminal with Ctrl+C; this does not stop the separate emulator terminal.
+
 `setup:local` creates an ignored `.env.local` with randomly generated JWT, internal-service and configurable test-account secrets. It never overwrites an existing file or prints its values. Never reuse local secrets in production. Vite receives only public `VITE_*` settings, not backend credentials. During development `/api` is forwarded by Vite to gateway port 3000, including when browsing from a phone on the LAN.
 
 ## Demo accounts and browser tests

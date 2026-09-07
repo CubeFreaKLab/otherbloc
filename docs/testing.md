@@ -91,6 +91,12 @@ The tests revoke the current server session outside the SPA, attempt the real de
 
 Four genuine light/dark desktop/mobile recovery captures were visually inspected, with no overflow and no Axe WCAG A/AA violations. An initial desktop diagnostic passed four checks and failed one because the test expected the muted color on a section that correctly inherits the main text color; the expectation was corrected without changing CSS or disabling accessibility checks. The final twelve-check targeted run passes in 1.1 minutes before the full suite. Node checks remain 34; lint and production build pass. No backend, database schema, permission or cloud configuration changed in this milestone. This closes local M6, not clean-install/load testing or real cloud delivery.
 
+## Stable local verification runtime
+
+`node scripts/dev.mjs --no-watch` starts the same four backend applications without automatic restarts; Vite remains the frontend development server. The normal watch default is preserved, and misspelled flags fail explicitly. The browser preflight checks all four backend health endpoints, including Interactions, before launching Playwright.
+
+After switching to this public stable entry point, nine targeted desktop checks pass in 50.4 seconds: public Firestore/Storage reading and search, six moderation/identity cases, and the cross-account retry regression. All 35 Node checks, lint and build pass. The earlier full 78-check run belongs to M6D. This mode provides repeatable verification without claiming that the original Windows watch-restart trigger has been reproduced or fixed.
+
 ## Dependency review
 
 M2 audit on 2026-09-07: zero high/critical issues; nine moderate findings, five in the optional Storage SDK dependency chain and four in development tooling. The UUID advisory concerns buffer handling in UUID v3/v5/v6, while the Storage HTTP helper imports v4. Firebase CLI also includes older stream-json/OpenTelemetry branches. Do not apply `npm audit fix --force`: the suggested downgrade breaks the current Firebase runtime. Track upstream fixes and rerun audit/integration before production. These findings are disclosed, not counted as resolved by passing tests.
