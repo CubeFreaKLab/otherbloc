@@ -1,6 +1,9 @@
 import { createApp } from './app.js'
-import { env } from './config/env.js'
+import { env, validateRuntime } from './config/env.js'
+import { validateFirebaseEnvironment } from './config/firebase.js'
 
+validateRuntime()
+validateFirebaseEnvironment()
 const app = createApp()
 
 app.listen(env.port, () => {

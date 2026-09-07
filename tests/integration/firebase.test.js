@@ -14,10 +14,10 @@ let ruleEnvironment
 const id = 'test-' + randomUUID()
 
 before(async () => {
-  assert.equal(process.env.FIREBASE_PROJECT_ID, 'demo-otherbloc', 'Integration tests must never run against cloud data')
+  assert.equal(process.env.FIREBASE_PROJECT_ID, 'demo-otherbloc-test', 'Integration tests require their separate emulator project')
   firebase = getFirebase()
   ruleEnvironment = await initializeTestEnvironment({
-    projectId: 'demo-otherbloc',
+    projectId: 'demo-otherbloc-test',
     firestore: { rules: await readFile('firestore.rules', 'utf8'), host: '127.0.0.1', port: 8080 },
     storage: { rules: await readFile('storage.rules', 'utf8'), host: '127.0.0.1', port: 9199 },
   })
@@ -57,7 +57,7 @@ test('direct client reads and writes are denied, including fake Firebase-authent
   for (const context of [ruleEnvironment.unauthenticatedContext(), ruleEnvironment.authenticatedContext('forged-admin', { role: 'admin' })]) {
     await assertFails(getDoc(doc(context.firestore(), '_checks', id)))
     await assertFails(setDoc(doc(context.firestore(), '_checks', id), { count: 999 }))
-    await assertFails(uploadBytes(ref(context.storage('gs://demo-otherbloc.appspot.com'), '_checks/' + id), new Uint8Array([1, 2, 3])))
+    await assertFails(uploadBytes(ref(context.storage('gs://demo-otherbloc-test.appspot.com'), '_checks/' + id), new Uint8Array([1, 2, 3])))
   }
 })
 

@@ -85,11 +85,13 @@ test('routes browser traffic through the gateway boundary', () => {
     'utf8',
   )
 
-  assert.match(frontendEnvironment, /^VITE_API_URL=http:\/\/localhost:3000\/api$/m)
+  assert.match(frontendEnvironment, /^VITE_API_URL=\/api$/m)
   assert.match(
     frontendEnvironment,
-    /^VITE_GRAPHQL_URL=http:\/\/localhost:3000\/api\/interactions$/m,
+    /^VITE_GRAPHQL_URL=\/api\/interactions$/m,
   )
+  const viteConfig = readFileSync(resolveFromRoot('frontend', 'vite.config.js'), 'utf8')
+  assert.match(viteConfig, /'\/api':\s*\{\s*target:\s*'http:\/\/127\.0\.0\.1:3000'/)
   assert.match(gatewayEnvironment, /^USERS_SERVICE_URL=http:\/\/localhost:3001$/m)
   assert.match(gatewayEnvironment, /^CONTENT_SERVICE_URL=http:\/\/localhost:3002$/m)
   assert.match(

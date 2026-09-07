@@ -1,0 +1,44 @@
+.account-page { max-width: 76rem; padding-block: clamp(2.5rem, 6vw, 6rem); }
+.account-heading { border-bottom: 1px solid var(--ink); padding-bottom: 2rem; margin-bottom: 2.5rem; }
+.eyebrow { font-size: var(--text-caption); font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--graphite); }
+.account-heading h1 { font-size: clamp(3rem, 7vw, 5.5rem); margin: 1rem 0; }
+.account-profile, .account-section { max-width: 44rem; }
+.account-profile__heading { display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+.account-page h2 { font-size: clamp(1.8rem, 4vw, 2.5rem); margin: .6rem 0 1.25rem; }
+.account-page p { line-height: 1.65; }
+.account-section { border-top: 1px solid var(--line); margin-top: 2.5rem; padding-top: 2rem; }
+.account-section summary { font-weight: 800; cursor: pointer; min-height: 2.75rem; line-height: 2.75rem; }
+.account-form { display: grid; gap: 1.5rem; }
+.form-field textarea, .form-field select { width: 100%; border: 1px solid var(--graphite); background: var(--white); color: var(--ink); padding: .8rem 1rem; line-height: 1.6; border-radius: 0; }
+.form-field textarea { resize: vertical; min-height: 8rem; }
+.form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; }
+.secondary-button { display: inline-flex; align-items: center; justify-content: center; min-height: 3rem; padding: .65rem 1.25rem; border: 1px solid var(--graphite); background: transparent; color: var(--ink); font-weight: 800; }
+.secondary-button:hover { background: var(--paper-grey); }
+.text-button { border: 0; background: transparent; color: var(--ink); padding: .75rem 0; min-height: 2.75rem; text-decoration: underline; text-underline-offset: .2em; }
+.button-link { display: inline-flex; align-items: center; justify-content: center; }
+.account-avatar { display: flex; align-items: center; gap: 1.5rem; margin-block: 1.25rem 2rem; }
+.account-avatar img, .account-avatar__initial { width: 5.5rem; height: 5.5rem; flex-shrink: 0; object-fit: cover; }
+.account-avatar__initial { display: grid; place-items: center; border: 1px solid var(--line); background: var(--paper-grey); font-family: var(--font-title); font-size: 3rem; }
+.field-help, .account-email { color: var(--graphite); font-size: var(--text-small); }
+.account-email { margin: 0; }
+.account-email small { display: block; margin-top: .5rem; }
+.success-message { color: var(--ink); border-left: 2px solid var(--ink); padding-left: 1rem; }
+.editorial-dialog { max-width: min(32rem, calc(100% - 2rem)); border: 1px solid var(--ink); padding: 2rem; color: var(--ink); background: var(--paper); }
+.editorial-dialog::backdrop { background: #0008; }
+.editorial-dialog h2 { margin-top: 0; font-size: 2rem; }
+.editorial-dialog p { line-height: 1.6; margin-bottom: 1.5rem; }
+.editorial-dialog[open] { animation: dialog-enter 160ms ease-out; }
+.session-state { min-height: 16rem; padding-block: 2rem; }
+.session-state p { line-height: 1.65; }
+.admin-users-list { list-style: none; margin: 2rem 0; padding: 0; }
+.admin-users-list li { display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; border-top: 1px solid var(--line); padding-block: 1.5rem; }
+.admin-users-list h2 { font-size: 1.65rem; margin: 0 0 .5rem; }
+.admin-users-list li > div { min-width: 0; }
+.admin-users-list p { margin: 0 0 .5rem; overflow-wrap: anywhere; font-size: var(--text-small); }
+.admin-users-list .secondary-button { flex-shrink: 0; }
+.user-status { color: var(--graphite); font-size: var(--text-small); line-height: 1.6; }
+.text-skeleton { height: 1rem; background: var(--paper-grey); margin-block: 1rem; width: min(80%, 28rem); animation: skeleton-pulse 1.2s ease-in-out infinite alternate; }
+.text-skeleton:nth-child(2) { width: min(60%, 20rem); }
+@keyframes skeleton-pulse { to { opacity: .4; } }
+@keyframes dialog-enter { from { opacity: 0; transform: translateY(.4rem); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 35rem) { .account-avatar { gap: 1rem; align-items: flex-start; } .account-avatar img, .account-avatar__initial { width: 4rem; height: 4rem; } .account-avatar .secondary-button { padding-inline: .75rem; } .admin-users-list li { align-items: flex-start; flex-direction: column; gap: 1rem; } }

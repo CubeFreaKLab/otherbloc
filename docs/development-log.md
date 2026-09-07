@@ -1,5 +1,14 @@
 # Development log
 
+## Persistent Users and account integration — 2026-09-07
+
+- Implemented strict reader registration, normalized unique email reservations, scrypt passwords, short JWT access tokens and revocable/rotating HttpOnly-cookie sessions.
+- Added own-profile/avatar/password controls, reader author requests and admin-only user pagination/role/suspension; protected against self-promotion, self-permission changes and removal of the active-admin invariant.
+- Added server-owned Firestore collections, Storage avatar validation/re-encoding, safe serializers, current-session HTTP lookup for other services and idempotent local demo-user seeding.
+- Connected responsive login/registration, account, public profile and user administration. Added explicit loading/error/retry/denied states and unsaved-change dialogs.
+- Verified 19 Node checks, 11 emulator integration checks, 18 visual regression checks and six actual desktop/mobile browser journeys. Concurrency lock waits and a browser-test loading race were diagnosed and corrected before the passing reruns.
+- Kept access credentials out of localStorage, source, screenshots and browser traces. Backend domain persistence is local emulator evidence; publication/interaction implementation and cloud verification remain pending.
+
 ## Gateway and emulator foundation — 2026-09-07
 
 - Implemented exact REST/GraphQL forwarding with explicit upstream failures, header sanitization, JWT signature checks, CORS allowlists, request limits and security headers.

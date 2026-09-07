@@ -16,6 +16,8 @@ const router = createBrowserRouter([{
     { path: '/profile/:id?', lazy: async () => ({ Component: (await import('./pages/ProfilePage')).default }) },
     { path: '/login', lazy: async () => ({ Component: (await import('./pages/LoginPage')).default }) },
     { path: '/register', lazy: async () => ({ Component: (await import('./pages/RegisterPage')).default }) },
+    { path: '/account', lazy: async () => ({ Component: (await import('./pages/AccountPage')).default }) },
+    { path: '/admin/users', lazy: async () => ({ Component: (await import('./pages/AdminUsersPage')).default }) },
     { path: '*', element: <NotFoundPage /> },
   ],
 }])

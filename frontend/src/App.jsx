@@ -1,5 +1,6 @@
 import { Outlet, ScrollRestoration, useLocation, useNavigationType } from 'react-router-dom'
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
+import { refreshSession } from './services/gatewayClient'
 import Footer from './components/Footer/Footer'
 import Header from './components/Header/Header'
 import './styles/layout.css'
@@ -31,6 +32,7 @@ function NavigationFocus() {
 }
 
 export default function App() {
+  useEffect(() => { refreshSession().catch(() => {}) }, [])
   const { pathname } = useLocation()
   const authRoute = pathname === '/login' || pathname === '/register'
   return (

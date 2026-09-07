@@ -30,11 +30,10 @@ test('reports the users service health', async () => {
   })
 })
 
-test('exposes only foundation metadata at the users boundary', async () => {
+test('requires an internal service key at the users boundary', async () => {
   const response = await fetch(`${baseUrl}/api/users`)
   const body = await response.json()
 
-  assert.equal(response.status, 200)
-  assert.equal(body.status, 'foundation-ready')
-  assert.deepEqual(body.capabilities, ['registration', 'authentication', 'profiles', 'roles'])
+  assert.equal(response.status, 403)
+  assert.equal(body.error, 'service_access_required')
 })

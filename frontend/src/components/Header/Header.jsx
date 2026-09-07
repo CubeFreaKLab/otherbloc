@@ -5,8 +5,10 @@ import { categories, normalizeSearch } from '../../data/articles'
 import SearchBar from '../SearchBar/SearchBar'
 import ThemeControl from '../ThemeControl/ThemeControl'
 import './Header.css'
+import { useSession } from '../../hooks/useSession'
 
 export default function Header() {
+  const { user } = useSession()
   const [menuOpen, setMenuOpen] = useState(false)
   const buttonRef = useRef(null)
   const location = useLocation()
@@ -23,7 +25,7 @@ export default function Header() {
         <div className="site-header__actions">
           <div className="site-header__search"><SearchBar compact /></div>
           <ThemeControl />
-          <Link to="/login" onClick={closeMenu}>Entrar</Link>
+          <Link to={user ? '/account' : '/login'} onClick={closeMenu}>{user ? 'Mi cuenta' : 'Entrar'}</Link>
           <button ref={buttonRef} className="site-header__menu-button" type="button"
             aria-controls="site-navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>
             {menuOpen ? <X size={22} aria-hidden="true" /> : <List size={22} aria-hidden="true" />}

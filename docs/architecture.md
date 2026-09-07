@@ -18,6 +18,6 @@ The frontend communicates only with the API Gateway. The gateway owns the public
 
 ## Current implementation
 
-The gateway forwards the three agreed boundaries with origin, body-size, rate-limit and JWT signature checks. The Users and Content services still expose boundary metadata; Interactions hosts Apollo's operational status query. Domain authorization is not yet complete. Each service has its own Firebase Admin initialization with emulator/cloud safety checks; tests verify Firestore atomic writes, Storage round trips and rejection of direct client access.
+The gateway forwards the three agreed boundaries with origin, body-size, rate-limit and JWT signature checks. Users implements persistent accounts, revocable sessions, profiles, avatars and roles. Content still exposes boundary metadata; Interactions hosts Apollo's operational status query. Their business authorization remains pending. Each service has its own Firebase Admin initialization with emulator/cloud safety checks. Users is authoritative for session/role checks through its internal HTTP session endpoint.
 
 Firestore and Storage clients are server-only. Custom JWT sessions are separate from Firebase Authentication; deny-all Firebase client rules do not authorize Admin SDK operations, which use server credentials and IAM. Each service must enforce ownership and permissions in its application logic. No frontend Firebase SDK or service credential is used. See [gateway](gateway.md), [database](database.md), [development](development.md) and [testing](testing.md).

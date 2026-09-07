@@ -1,6 +1,18 @@
 const { test, expect } = require('@playwright/test')
 const AxeBuilder = require('@axe-core/playwright').default
 
+// Visual regression isolates Users responses. Real persistence journeys use test:e2e.
+test.beforeEach(async ({ page }) => {
+  const { authors } = await import('../../frontend/src/data/articles.js')
+  await page.route('**/api/users/**', async (route) => {
+    const id = new URL(route.request().url()).pathname.split('/').pop()
+    const author = authors.find((item) => item.id === id)
+    if (id === 'refresh') return route.fulfill({ status: 401, json: { error: 'invalid_session' } })
+    if (id === 'register') return route.fulfill({ status: 503, json: { error: 'users_unavailable', message: 'No se pudo completar la operación. Inténtalo de nuevo.' } })
+    return route.fulfill(author ? { status: 200, json: { user: { ...author, biography: author.bio, role: 'author' } } } : { status: 404, json: { error: 'user_not_found' } })
+  })
+})
+
 test('home has one editorial heading, actual navigation, and no removed newsletter', async ({ page }) => {
   await page.goto('/')
   await expect(page.locator('main h1')).toHaveText('Leer también es una forma de quedarse.')
@@ -63,9 +75,9 @@ test('access composition is labeled, keyboard usable and never fakes an account'
   await page.getByLabel('Correo electrónico').fill('prueba@example.test')
   await page.getByLabel('Contraseña', { exact: true }).fill('Una frase de prueba segura')
   await page.getByRole('button', { name: 'Crear cuenta', exact: true }).click()
-  await expect(page.getByRole('status')).toContainText('No se ha enviado ni guardado ningún dato')
+  await expect(page.getByRole('alert')).toContainText('No se pudo completar la operación')
   await page.getByRole('link', { name: 'Inicia sesión', exact: true }).click()
-  await expect(page).toHaveURL(/\/login$/)
+  await expect(page).toHaveURL(/\/login\?returnTo=/)
   await page.getByLabel('Correo electrónico').focus()
   await page.keyboard.press('Tab')
   await expect(page.getByLabel('Contraseña', { exact: true })).toBeFocused()

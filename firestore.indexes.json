@@ -1,1 +1,10 @@
-{ "indexes": [], "fieldOverrides": [] }
+{
+  "indexes": [],
+  "fieldOverrides": [
+    { "collectionGroup": "users", "fieldPath": "passwordHash", "indexes": [] },
+    { "collectionGroup": "users", "fieldPath": "biography", "indexes": [] },
+    { "collectionGroup": "userSessions", "fieldPath": "refreshHash", "indexes": [] },
+    { "collectionGroup": "userSessions", "fieldPath": "previousHash", "indexes": [] },
+    { "collectionGroup": "userSessions", "fieldPath": "expiresAt", "ttl": true, "indexes": [] }
+  ]
+}

@@ -1,5 +1,7 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useRef, useState } from 'react'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
+import { useSession } from '../../hooks/useSession'
+import { signIn } from '../../services/gatewayClient'
 import { ArrowLeft } from '@phosphor-icons/react'
 import ThemeControl from '../ThemeControl/ThemeControl'
 import './AuthForm.css'
@@ -7,10 +9,32 @@ import './AuthForm.css'
 export default function AuthForm({ mode }) {
   const register = mode === 'register'
   const [message, setMessage] = useState('')
-  function submit(event) {
+  const [busy, setBusy] = useState(false)
+  const [fields, setFields] = useState([])
+  const submitted = useRef(false)
+  const navigate = useNavigate()
+  const [params] = useSearchParams()
+  const { user } = useSession()
+  const requested = params.get('returnTo')
+  const destination = requested?.startsWith('/') && !requested.startsWith('//') && !requested.includes('\\') && !/^\/(login|register)(?:[/?#]|$)/.test(requested) ? requested : '/account'
+  if (user && !busy) return <Navigate to={destination} replace />
+  async function submit(event) {
     event.preventDefault()
-    setMessage('El acceso aún no está conectado en esta etapa de desarrollo. No se ha enviado ni guardado ningún dato.')
+    if (submitted.current) return
+    submitted.current = true
+    const data = Object.fromEntries(new FormData(event.currentTarget))
+    setBusy(true)
+    setMessage('')
+    setFields([])
+    try {
+      await signIn(register ? 'register' : 'login', data)
+      navigate(destination, { replace: true })
+    } catch (error) {
+      setMessage(error.message)
+      setFields(error.fields ?? [])
+    } finally { setBusy(false); submitted.current = false }
   }
+  const invalid = (name) => fields.some((field) => field.field === name) || undefined
   return (
     <>
       <header className="auth-header">
@@ -27,16 +51,17 @@ export default function AuthForm({ mode }) {
           <span className="access-form__eyebrow">Bienvenido a otherbloc</span>
           <h1 id="access-title">{register ? 'Haz espacio para tus ideas.' : 'Qué bueno volver a leerte.'}</h1>
           <p className="access-form__intro">{register ? 'Crea una cuenta para descubrir, guardar y compartir otras miradas.' : 'Entra a tu cuenta y continúa donde dejaste la lectura.'}</p>
-          <form onSubmit={submit}>
-            {register && <div className="form-field"><label htmlFor="access-name">Nombre</label><input id="access-name" name="name" autoComplete="name" required minLength={2} maxLength={80} /></div>}
-            <div className="form-field"><label htmlFor="access-email">Correo electrónico</label><input id="access-email" name="email" type="email" autoComplete="email" required maxLength={254} /></div>
-            <div className="form-field"><label htmlFor="access-password">Contraseña</label><input id="access-password" name="password" type="password" autoComplete={register ? 'new-password' : 'current-password'} required minLength={register ? 12 : 1} maxLength={128} aria-describedby={register ? 'password-help' : undefined} />
+          {!register && params.get('passwordChanged') === '1' && <p className="success-message" role="status">Contraseña actualizada. Inicia sesión con la nueva contraseña.</p>}
+          <form onSubmit={submit} aria-busy={busy}>
+            {register && <div className="form-field"><label htmlFor="access-name">Nombre</label><input id="access-name" name="name" autoComplete="name" required minLength={2} maxLength={80} aria-invalid={invalid('name')} /></div>}
+            <div className="form-field"><label htmlFor="access-email">Correo electrónico</label><input id="access-email" name="email" type="email" autoComplete="email" required maxLength={254} aria-invalid={invalid('email')} /></div>
+            <div className="form-field"><label htmlFor="access-password">Contraseña</label><input id="access-password" name="password" type="password" autoComplete={register ? 'new-password' : 'current-password'} required minLength={register ? 12 : 1} maxLength={128} aria-describedby={register ? 'password-help' : undefined} aria-invalid={invalid('password')} />
               {register && <small id="password-help">Usa al menos 12 caracteres. Puedes escribir una frase.</small>}
             </div>
-            <button className="primary-button" type="submit">{register ? 'Crear cuenta' : 'Iniciar sesión'}</button>
-            {message && <p className="form-feedback" role="status">{message}</p>}
+            <button className="primary-button" type="submit" disabled={busy}>{busy ? 'Comprobando…' : register ? 'Crear cuenta' : 'Iniciar sesión'}</button>
+            {message && <div className="form-feedback" role="alert"><p>{message}</p>{fields.length > 0 && <ul>{fields.map((field, index) => <li key={index}>{field.message}</li>)}</ul>}</div>}
           </form>
-          <p className="access-form__alternative">{register ? '¿Ya tienes una cuenta?' : '¿Todavía no tienes cuenta?'} <Link to={register ? '/login' : '/register'} onClick={() => setMessage('')}>{register ? 'Inicia sesión' : 'Crea una cuenta'}</Link></p>
+          <p className="access-form__alternative">{register ? '¿Ya tienes una cuenta?' : '¿Todavía no tienes cuenta?'} <Link to={(register ? '/login' : '/register') + '?returnTo=' + encodeURIComponent(destination)} onClick={() => { setMessage(''); setFields([]) }}>{register ? 'Inicia sesión' : 'Crea una cuenta'}</Link></p>
         </section>
       </main>
     </>

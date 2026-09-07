@@ -40,6 +40,11 @@ export function createApp({ config = env, fetchImpl = fetch } = {}) {
     windowMs: config.rateWindowMs, limit: config.rateLimit, standardHeaders: 'draft-8', legacyHeaders: false,
     message: { error: 'rate_limited', message: 'Demasiadas solicitudes. Inténtalo más tarde.' },
   }))
+  app.use(['/api/users/register', '/api/users/login'], rateLimit({
+    windowMs: 900000, limit: config.authRateLimit ?? 30, standardHeaders: 'draft-8', legacyHeaders: false,
+    skipSuccessfulRequests: true,
+    message: { error: 'authentication_rate_limited', message: 'Demasiados intentos de acceso. Espera unos minutos.' },
+  }))
   app.use('/api', verifyAccess(config))
   app.use('/api', express.raw({ type: () => true, limit: '6mb' }))
   app.use('/api/users', proxyTo(config.usersServiceUrl, '/api/users', config, fetchImpl))
