@@ -14,9 +14,18 @@
     "dev:interactions": "npm run dev --workspace @otherbloc/interactions-service",
     "build": "npm run build --workspace frontend",
     "test": "npm run test:foundation && npm run test --workspaces --if-present",
-    "test:foundation": "node --test tests/foundation.test.js"
+    "test:foundation": "node --test tests/foundation.test.js",
+    "test:ui": "playwright test"
   },
   "engines": {
     "node": ">=20.11.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "chrome-launcher": "^1.2.1",
+    "lighthouse": "^13.4.1",
+    "sharp": "^0.35.4",
+    "wawoff2": "^2.0.1"
   }
 }

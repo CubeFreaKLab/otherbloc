@@ -6,4 +6,13 @@ export default defineConfig({
   server: {
     port: 5173,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/@apollo/') || id.includes('node_modules/graphql/')) return 'graphql-client'
+        },
+      },
+    },
+  },
 })

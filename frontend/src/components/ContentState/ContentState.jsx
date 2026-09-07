@@ -7,18 +7,18 @@ export default function ContentState({ status = 'empty', message }) {
         <span />
         <span />
         <span />
-        <p>Loading publications</p>
+        <p>Cargando publicaciones</p>
       </div>
     )
   }
 
   const copy = status === 'error'
-    ? message ?? 'Publications could not be loaded. Check the connection and try again.'
-    : message ?? 'No publications match this view yet.'
+    ? message ?? 'No se pudieron cargar las publicaciones. Comprueba la conexión e inténtalo de nuevo.'
+    : message ?? 'Todavía no hay publicaciones en esta vista.'
 
   return (
     <div className={`content-state content-state--${status}`} role={status === 'error' ? 'alert' : 'status'}>
-      <h2>{status === 'error' ? 'Something interrupted the request' : 'Nothing to show yet'}</h2>
+      <h2>{status === 'error' ? 'No pudimos completar la petición' : 'No hay resultados'}</h2>
       <p>{copy}</p>
     </div>
   )

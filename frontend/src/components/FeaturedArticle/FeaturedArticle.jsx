@@ -7,7 +7,7 @@ export default function FeaturedArticle({ article }) {
   return (
     <article className="featured-article">
       <div className="featured-article__content">
-        <span className="featured-article__label">Featured</span>
+        <span className="featured-article__label">Lectura destacada · {article.type}</span>
         <h1>{article.title}</h1>
         <p>{article.summary}</p>
         <div className="featured-article__meta">
@@ -16,11 +16,11 @@ export default function FeaturedArticle({ article }) {
           <time dateTime={article.date}>{formatDate(article.date)}</time>
         </div>
         <Link className="text-link" to={`/article/${article.slug}`}>
-          Read article <ArrowRight aria-hidden="true" size={18} />
+          Leer publicación <ArrowRight aria-hidden="true" size={18} />
         </Link>
       </div>
       <Link className="featured-article__image" to={`/article/${article.slug}`} tabIndex={-1}>
-        <img src={article.image} alt={article.imageAlt} fetchPriority="high" />
+        <img src={article.image} srcSet={article.image.replace('.webp', '-640.webp') + ' 640w, ' + article.image.replace('.webp', '-960.webp') + ' 960w, ' + article.image + ' 1536w'} sizes="(max-width: 767px) 100vw, 60vw" width="1536" height="1024" alt={article.imageAlt} fetchPriority="high" />
       </Link>
     </article>
   )

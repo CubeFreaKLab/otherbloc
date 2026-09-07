@@ -8,11 +8,11 @@ export default function ArticleCard({ article, featured = false }) {
   return (
     <article className={`article-card${featured ? ' article-card--featured' : ''}`}>
       <Link className="article-card__image-link" to={`/article/${article.slug}`} tabIndex={-1}>
-        <img src={article.image} alt={article.imageAlt} loading="lazy" />
+        <img src={article.image} srcSet={article.image.replace('.webp', '-640.webp') + ' 640w, ' + article.image.replace('.webp', '-960.webp') + ' 960w, ' + article.image + ' 1536w'} sizes="(max-width: 767px) 100vw, 50vw" width="1536" height="1024" alt={article.imageAlt} loading="lazy" />
       </Link>
       <div className="article-card__content">
         <div className="article-card__topline">
-          <CategoryTag>{article.category}</CategoryTag>
+          <CategoryTag>{article.type} · {article.category}</CategoryTag>
           <span>{article.readTime}</span>
         </div>
         <h3>
@@ -24,7 +24,7 @@ export default function ArticleCard({ article, featured = false }) {
           <time dateTime={article.date}>{formatDate(article.date)}</time>
         </div>
         <Link className="text-link article-card__read" to={`/article/${article.slug}`}>
-          Read article <ArrowRight aria-hidden="true" size={17} />
+          Leer publicación <ArrowRight aria-hidden="true" size={17} />
         </Link>
       </div>
     </article>

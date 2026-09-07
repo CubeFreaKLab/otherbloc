@@ -1,28 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="otherbloc is an independent platform for thoughtful long-form publishing."
+      content="otherbloc: un espacio para publicar, descubrir y leer ideas con tiempo."
     />
     <link rel="icon" type="image/svg+xml" href="/brand/otherbloc-mark-black.svg" />
     <link
       rel="preload"
-      href="/fonts/adelle-sans-regular.ttf"
+      href="/fonts/adelle-sans-regular.woff2"
       as="font"
-      type="font/ttf"
+      type="font/woff2"
       crossorigin
     />
     <link
       rel="preload"
-      href="/fonts/prumo-display-bold.otf"
+      href="/fonts/prumo-display-bold.woff2"
       as="font"
-      type="font/otf"
+      type="font/woff2"
       crossorigin
     />
     <title>otherbloc</title>
+    <script>
+      (() => {
+        let preference = 'system';
+        try { preference = localStorage.getItem('otherbloc-theme') || 'system'; } catch {}
+        document.documentElement.dataset.theme = preference === 'dark' ||
+          (preference !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

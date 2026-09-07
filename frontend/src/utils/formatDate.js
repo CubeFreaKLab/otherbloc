@@ -1,4 +1,4 @@
-export function formatDate(value, locale = 'en') {
+export function formatDate(value, locale = 'es-BO') {
   return new Intl.DateTimeFormat(locale, {
     month: 'short',
     day: 'numeric',

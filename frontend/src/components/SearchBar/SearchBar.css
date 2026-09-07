@@ -36,7 +36,7 @@
 }
 
 .search-bar input::placeholder {
-  color: #5f5f5b;
+  color: var(--grey);
 }
 
 .search-bar input:focus-visible {

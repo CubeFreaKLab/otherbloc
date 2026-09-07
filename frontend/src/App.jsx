@@ -1,29 +1,45 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Outlet, ScrollRestoration, useLocation, useNavigationType } from 'react-router-dom'
+import { useLayoutEffect, useRef } from 'react'
 import Footer from './components/Footer/Footer'
 import Header from './components/Header/Header'
-import ArticlePage from './pages/ArticlePage'
-import ExplorePage from './pages/ExplorePage'
-import HomePage from './pages/HomePage'
-import LoginPage from './pages/LoginPage'
-import ProfilePage from './pages/ProfilePage'
-import RegisterPage from './pages/RegisterPage'
 import './styles/layout.css'
 import './styles/pages.css'
 
+function NavigationFocus() {
+  const location = useLocation()
+  const navigationType = useNavigationType()
+  const previous = useRef(location.pathname)
+  const focusTargets = useRef(new Map())
+  useLayoutEffect(() => {
+    if (previous.current !== location.pathname) {
+      const previousHref = navigationType === 'POP' ? focusTargets.current.get(location.key) : null
+      const target = previousHref
+        ? [...document.querySelectorAll('a[href]')].find((element) => element.getAttribute('href') === previousHref)
+        : document.querySelector('main')
+      target?.focus({ preventScroll: true })
+      previous.current = location.pathname
+    }
+    const heading = document.querySelector('h1')?.textContent
+    document.title = heading ? heading + ' — otherbloc' : 'otherbloc'
+    return () => {
+      const href = document.activeElement?.getAttribute('href')
+      if (href) focusTargets.current.set(location.key, href)
+    }
+  }, [location, navigationType])
+  return null
+}
+
 export default function App() {
+  const { pathname } = useLocation()
+  const authRoute = pathname === '/login' || pathname === '/register'
   return (
     <div className="site-shell">
-      <Header />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/explore" element={<ExplorePage />} />
-        <Route path="/article/:slug" element={<ArticlePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/profile/:id?" element={<ProfilePage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-      <Footer />
+      <a className="skip-link" href="#main-content">Saltar al contenido</a>
+      <NavigationFocus />
+      {!authRoute && <Header />}
+      <Outlet />
+      {!authRoute && <Footer />}
+      <ScrollRestoration />
     </div>
   )
 }

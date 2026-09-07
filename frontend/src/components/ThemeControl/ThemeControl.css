@@ -1,0 +1,7 @@
+.theme-control { display: inline-flex; align-items: center; gap: .35rem; color: var(--ink); }
+html[data-theme-transition]::view-transition { pointer-events: none; }
+.theme-control select { min-height: 2.75rem; max-width: 6.5rem; border: 0; background: var(--paper); color: var(--ink); font-size: var(--text-small); cursor: pointer; }
+html[data-theme-transition]::view-transition-old(root),
+html[data-theme-transition]::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+html[data-theme-transition]::view-transition-new(root) { z-index: 2; }
+html[data-theme-transition]::view-transition-old(root) { z-index: 1; }

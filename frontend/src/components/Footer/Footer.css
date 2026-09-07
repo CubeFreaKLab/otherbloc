@@ -48,7 +48,7 @@
   text-underline-offset: 0.2em;
 }
 
-@media (max-width: 47.99rem) {
+@media (max-width: 63.99rem) {
   .site-footer__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

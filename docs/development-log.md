@@ -1,5 +1,16 @@
 # Development log
 
+## Editorial refinement — 2026-09-07
+
+- Preserved the existing visual identity while removing the oversized duplicate home logo, the out-of-scope newsletter and placeholder footer links.
+- Added an explicitly labeled Spanish demo edition covering all seven publication types and four synthetic authors, with independent article bodies and correct profile filtering.
+- Implemented query/category/type filtering, empty results, missing-resource 404 pages and native sharing with a fallback.
+- Added persistent light/dark/system preferences, a compatible reduced-motion alternative, keyboard focus handling and responsive access compositions.
+- Retained supplied photographs in color, with CSS-only grayscale/zoom for lists and direct color on touch/small screens.
+- Added WOFF2 derivatives of the original fonts, responsive images, route splitting, a robots file and reproducible asset/performance scripts. Original font files remain intact.
+- Added Node tests and a desktop/mobile browser suite with automated accessibility checks. The optimized local production home audit reached 97 performance and 100 accessibility, best practices and SEO; this is a simulated mobile Lighthouse result, not cloud or load-test evidence.
+- Business persistence and authentication are not part of this visual milestone. The access form explicitly reports its pending connection instead of simulating success.
+
 ## Frontend application foundation
 
 - Initialized the React and Vite application.
