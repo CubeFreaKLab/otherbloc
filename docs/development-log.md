@@ -1,5 +1,11 @@
 # Development log
 
+## Guarded Render release controller — 2026-09-07
+
+- Prepared read-only Blueprint/service/deployment preflight and a sequential Users → Content → Interactions → Gateway controller using Render's official API contracts. It requires exact source identities, both independent auto-deployment paths disabled, explicit commit IDs, live deployment metadata and matching non-cached health before advancing.
+- Added a guarded CLI and blank release-environment example. Requests reject redirects, do not expose API response bodies/keys, have bounded waits and never automatically retry uncertain writes. Safe deploy IDs remain available when a later validation fails. Partial rollout stops without rollback, cancellation or database mutation.
+- Passed 63 Node checks, lint/build, including 13 new controlled-response contracts and an actual local CLI rejection before credentials/network. Corrected a custom-port origin validation defect found by the first test run. Runtime services and frontend are unchanged; real accounts, resource/cost approval, a protected release workflow and actual cloud verification remain separate pending work.
+
 ## Verifiable runtime and frontend revisions — 2026-09-07
 
 - Added validated full-SHA metadata and non-cached REST health responses to the gateway and three owner services. Missing local metadata remains null; malformed or conflicting values prevent startup. The GraphQL schema, business routes, data ownership and permissions are unchanged.

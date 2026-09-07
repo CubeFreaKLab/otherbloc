@@ -53,6 +53,10 @@ These fields are operational metadata supplied by a trusted build/runtime, not c
 
 The metadata change passes 50 Node checks, lint/build, 30 API checks (59.19 seconds), four targeted live desktop/mobile reading checks (27.5 seconds) and four real preview screenshot inspections. Each actual backend entry point also refuses an invalid revision before listening, while the existing applications remain healthy. A build with uncommitted changes correctly reports the previous HEAD and `dirty: true`; unspecified backend versions report null. This is local evidence, not deployment evidence.
 
+## Render controller preparation
+
+The [Render release controller](render-deployment.md) provides read-only preflight and sequential exact-commit deployment logic, tested without accessing a Render account. It verifies both Blueprint Auto Sync and service auto-deployment, targets exactly four named Node web services, waits for each live deploy and matching uncached health, and stops on uncertain or failed outcomes without automatic re-deployment or rollback. Its write entry point requires the intended release workflow context; the actual protected workflow, provisioning configuration and account approvals are still pending. Local contracts are not evidence of a Render API call or CD execution.
+
 ## Evidence and release boundary
 
 Do not upload `.project/`, `.agent/`, `.env*`, snapshots, authentication traces, user data or the private academic evidence register to GitHub artifacts. The workflow has no artifact-upload step. E2E authentication traces/video remain disabled. Job logs provide check names and outcomes for the disposable demo data, not production credentials. Preserve the real Actions run URL and its triggering commit only after it has actually executed; pull-request checks normally test GitHub's merge revision, whereas push checks test the pushed revision.

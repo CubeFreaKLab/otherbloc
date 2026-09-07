@@ -143,6 +143,12 @@ All 50 checks, lint/build and the 30 real API checks pass (59.19 seconds for API
 
 Actual startup of each backend with a malformed revision fails with exit 1 before listening, without disrupting the already running service. Restarting without revision metadata produces null at all four healthy endpoints. A production build from the uncommitted worktree correctly identifies the current HEAD and `dirty: true`. See [revision metadata and its limits](ci-cd.md#exact-revision-metadata); a local preview does not verify cloud cache headers, real Actions or Firebase persistence.
 
+## Render controller preparation — M7G2
+
+Thirteen new fixture-based contracts bring Node checks to 63. They validate four distinct targets, release-context guards, Blueprint/service identity and independent auto-deployment controls, no active deployment, safe requests, sequential exact-SHA rollout, live/health acceptance, timeouts, partial failure and no automatic retry of uncertain POSTs. A child-process test confirms that the public write command refuses local execution before credentials or network access. A noncanonical-origin port accepted by the initial version was caught, corrected and retained as a failed diagnostic.
+
+The complete Node suite, lint and build pass. Two real desktop reading journeys pass again in 12.7 seconds; their light/dark home screenshots were inspected and retained privately. Render requests in the controller tests are controlled fixtures, not real Render calls or cloud evidence. Existing application code, persistence, permissions and visual composition are unchanged. See [Render preparation, controls and limits](render-deployment.md); actual API permissions, protected Actions execution and cloud acceptance remain pending.
+
 ## Dependency review
 
 M2 audit on 2026-09-07: zero high/critical issues; nine moderate findings, five in the optional Storage SDK dependency chain and four in development tooling. The UUID advisory concerns buffer handling in UUID v3/v5/v6, while the Storage HTTP helper imports v4. Firebase CLI also includes older stream-json/OpenTelemetry branches. Do not apply `npm audit fix --force`: the suggested downgrade breaks the current Firebase runtime. Track upstream fixes and rerun audit/integration before production. These findings are disclosed, not counted as resolved by passing tests.
