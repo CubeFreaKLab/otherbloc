@@ -24,7 +24,7 @@ export default function Header() {
     }}>
       <div className="site-header__utility page-width">
         <Link className="site-header__brand" to="/" onClick={closeMenu}>
-          <img className="brand-logo" src="/brand/otherbloc-logo-black.svg" alt="otherbloc, inicio" />
+          <img className="brand-logo" src="/brand/otherbloc-logo-black.svg" width="1532" height="291" alt="otherbloc, inicio" />
         </Link>
         <div className="site-header__actions">
           <div className="site-header__search"><SearchBar compact /></div>

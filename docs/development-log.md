@@ -1,5 +1,12 @@
 # Development log
 
+## Smaller reading fonts and stable logo dimensions — 2026-09-07
+
+- Added four Latin Georgia WOFF2 subsets, preserving every retained glyph's outlines and metrics and all supplied source assets. The complete original faces remain available for other alphabets; Prumo, Adelle, photographs and the editorial grid are unchanged. Regular Georgia falls from 102,672 to 54,108 bytes. Optional regeneration/verification is separate from normal npm installation/build.
+- Reserved the header/footer logos' intrinsic SVG aspect ratio without changing their responsive dimensions. Added browser contracts for font selection, shaped Spanish text, complete-alphabet fallback and image dimensions before/after the actual SVG response.
+- Passed 37 Node checks, lint/build, 22 visual checks (51.2 seconds) and 40 targeted live desktop/mobile E2E journeys (4.7 minutes). Inspected four fresh light/dark desktop/mobile screenshots. Mobile integrated Lighthouse reports 85/100/96/100, CLS 0 and LCP 4.257 seconds; retained the baseline and disclosed single-run variability, client-side image discovery and the expected anonymous-refresh 401.
+- Kept private evidence outside Git. No backend permission, schema, index, push or deployment changed; actual Actions and cloud acceptance remain pending.
+
 ## Measured local reading load — 2026-09-07
 
 - Added a loopback/demo-only k6 runner with discovered seed IDs, fresh private evidence directories, script hashes, exact environment/options and preserved exit codes. The fixed 50-VU/60-second closed workload reads publications, four profiles, composed GraphQL and real Storage images, with one-second reader think time and independent per-route thresholds.

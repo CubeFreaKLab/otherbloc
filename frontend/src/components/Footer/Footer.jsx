@@ -17,7 +17,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="site-footer__grid page-width">
         <div className="site-footer__identity">
-          <Link to="/"><img className="brand-logo" src="/brand/otherbloc-logo-black.svg" alt="otherbloc, inicio" /></Link>
+          <Link to="/"><img className="brand-logo" src="/brand/otherbloc-logo-black.svg" width="1532" height="291" alt="otherbloc, inicio" /></Link>
           <p>Un espacio para leer con tiempo y compartir otras miradas.</p>
           <small>© 2026 otherbloc</small>
         </div>

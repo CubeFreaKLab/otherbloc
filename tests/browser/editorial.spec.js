@@ -48,6 +48,56 @@ test('home has one editorial heading, actual navigation, and no removed newslett
   await expect(page.locator('main')).toBeFocused()
 })
 
+test('Latin reading fonts keep original metrics and load the complete face for other alphabets', async ({ page }) => {
+  const fonts = []
+  page.on('response', (response) => { if (response.url().includes('/fonts/')) fonts.push(new URL(response.url()).pathname) })
+  await page.goto('/')
+  await expect(page.locator('main h1')).toHaveText('Leer también es una forma de quedarse.')
+  await page.evaluate(() => document.fonts.ready)
+  expect(fonts).toContain('/fonts/georgia-regular-latin.woff2')
+  expect(fonts).not.toContain('/fonts/georgia-regular.woff2')
+
+  const results = await page.evaluate(async () => {
+    const sample = 'Árbol, escritura y café: ñ, Ü, ¿por qué? «AV» — 19,50 €; a\u0301, e\u0301, o\u0308.'
+    const context = document.createElement('canvas').getContext('2d')
+    const variants = [['regular', 'normal', '400'], ['bold', 'normal', '700'], ['italic', 'italic', '400'], ['bold-italic', 'italic', '700']]
+    const results = []
+    for (const [file, style, weight] of variants) {
+      await document.fonts.load(`${style} ${weight} 24px "otherbloc Georgia"`, sample)
+      context.font = `${style} ${weight} 24px "otherbloc Georgia"`
+      const actual = context.measureText(sample).width
+      const family = 'Original verification ' + file
+      const face = new FontFace(family, `url(/fonts/georgia-${file}.woff2)`, { style, weight })
+      document.fonts.add(await face.load())
+      context.font = `${style} ${weight} 24px "${family}"`
+      results.push({ file, actual, original: context.measureText(sample).width })
+      document.fonts.delete(face)
+    }
+    // This range is deliberately outside Latin; the original CSS face must remain available.
+    const full = await document.fonts.load('400 24px "otherbloc Georgia"', 'Ελληνικά Привет')
+    return { results, full: full.map((face) => ({ family: face.family, status: face.status, range: face.unicodeRange })) }
+  })
+  for (const { actual, original } of results.results) expect(actual).toBeCloseTo(original, 5)
+  expect(results.full.some((face) => face.status === 'loaded' && face.range === 'U+0-10FFFF')).toBe(true)
+})
+
+test('brand images reserve their original aspect ratio before the SVG arrives', async ({ page }) => {
+  let release
+  const gate = new Promise((resolve) => { release = resolve })
+  await page.route('**/brand/otherbloc-logo-black.svg', async (route) => { await gate; await route.continue() })
+  try {
+    await page.goto('/', { waitUntil: 'domcontentloaded' })
+    await expect(page.locator('main h1')).toHaveText('Leer también es una forma de quedarse.')
+    const before = await page.locator('.brand-logo').evaluateAll((images) => images.map((image) => ({ width: image.getBoundingClientRect().width, height: image.getBoundingClientRect().height, complete: image.complete })))
+    expect(before).toHaveLength(2)
+    for (const image of before) { expect(image.complete).toBe(false); expect(image.width / image.height).toBeCloseTo(1532 / 291, 2) }
+    release()
+    await expect.poll(() => page.locator('.brand-logo').evaluateAll((images) => images.every((image) => image.complete && image.naturalWidth > 0))).toBe(true)
+    const after = await page.locator('.brand-logo').evaluateAll((images) => images.map((image) => ({ width: image.getBoundingClientRect().width, height: image.getBoundingClientRect().height })))
+    expect(after).toEqual(before.map(({ width, height }) => ({ width, height })))
+  } finally { release() }
+})
+
 test('search and combined filters survive reload; clear and empty states work', async ({ page }) => {
   await page.goto('/explore')
   await page.locator('#explore-search').fill('maria')

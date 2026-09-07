@@ -121,6 +121,14 @@ The local k6 run passes 50 constant virtual users for 60 seconds, with 11,476 re
 
 The new workload/configuration contract brings Node checks to 37; lint and build pass. Reading UI remains unchanged and is checked against the live services after the run. The previously verified clean checkout remains `7e24e12`; load tooling was added afterward.
 
+## Reading fonts and layout reservation — M7E
+
+Four new browser checks (two scenarios in both viewports) bring the visual suite to 22 passing checks (51.2 seconds). They require the initial Spanish page to request Latin Georgia without the complete regular file, compare shaped text widths against all four original styles, confirm complete-font availability for Greek/Cyrillic, and hold back the actual logo response to verify identical reserved dimensions before/after loading. The font generator independently verifies all 240 retained characters in each variant, including outlines, horizontal and vertical metrics, and unchanged source files. Normal Node checks remain 37; lint/build pass.
+
+The integrated mobile Lighthouse run reports 85 performance, 100 accessibility, 96 best practices and 100 SEO, with CLS 0 and LCP 4.257 seconds. The full report and prior 84-point run remain private. Font transfer and logo sizing improved; the initial image's client-side discovery and expected anonymous-refresh 401 remain disclosed. This is not a cloud score or a replacement for authorization/end-to-end coverage.
+
+After the final assets, 40 live desktop/mobile E2E checks pass in 4.7 minutes across public content, author/editor/moderation, navigation and motion. They use the actual gateway, owner services and emulators, including Storage, errors, unsaved changes, role-aware footer destinations, focus/history and reduced motion. Four fresh home screenshots (desktop/mobile × light/dark) were opened and visually inspected. This targeted run does not replace or claim a new full 78-check run.
+
 ## Dependency review
 
 M2 audit on 2026-09-07: zero high/critical issues; nine moderate findings, five in the optional Storage SDK dependency chain and four in development tooling. The UUID advisory concerns buffer handling in UUID v3/v5/v6, while the Storage HTTP helper imports v4. Firebase CLI also includes older stream-json/OpenTelemetry branches. Do not apply `npm audit fix --force`: the suggested downgrade breaks the current Firebase runtime. Track upstream fixes and rerun audit/integration before production. These findings are disclosed, not counted as resolved by passing tests.

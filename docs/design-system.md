@@ -36,6 +36,8 @@ These are the supplied light-brand values. The runtime strengthens muted text fr
 
 All font files are hosted locally with `font-display: swap`. Responsive display sizes use `clamp()` so hierarchy scales without fixed breakpoints.
 
+Georgia's four Latin WOFF2 subsets reduce first-reading transfer without changing glyph outlines, spacing or the selected typeface. The complete supplied faces remain available through composite-font matching for characters outside those subsets. Prumo and Adelle remain unchanged. Header/footer logos reserve their intrinsic SVG ratio while retaining the established CSS dimensions. See [font verification and measured performance](frontend.md#asset-and-performance-maintenance).
+
 ## Layout and shape
 
 The maximum content width is 1536 pixels with fluid page gutters. Desktop layouts use asymmetric CSS Grid tracks; layouts collapse to one column below 768 pixels. All surfaces and controls use sharp corners. Depth comes from composition, cropping, borders, and tonal contrast rather than shadows.
