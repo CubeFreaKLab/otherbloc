@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { List, X } from '@phosphor-icons/react'
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
+import Link from '../MotionLink'
 import { categories, normalizeSearch } from '../../data/navigation'
 import SearchBar from '../SearchBar/SearchBar'
 import ThemeControl from '../ThemeControl/ThemeControl'

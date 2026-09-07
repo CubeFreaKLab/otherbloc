@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
-import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
+import Link from '../MotionLink'
+import { useMotionNavigate as useNavigate } from '../../hooks/useMotionNavigate'
 import { useSession } from '../../hooks/useSession'
 import { signIn } from '../../services/gatewayClient'
 import { ArrowLeft } from '@phosphor-icons/react'

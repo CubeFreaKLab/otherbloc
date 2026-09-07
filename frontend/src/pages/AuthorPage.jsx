@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
+import Link from '../components/MotionLink'
+import { useMotionNavigate as useNavigate } from '../hooks/useMotionNavigate'
 import SessionBoundary from '../components/SessionBoundary'
 import ContentState from '../components/ContentState/ContentState'
 import { PublicationLoading, PublicationPagination } from '../components/PublicationFeed/PublicationFeed'

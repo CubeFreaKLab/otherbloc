@@ -1,10 +1,25 @@
-import { useEffect, useId } from 'react'
-import { useBlocker } from 'react-router-dom'
+import { useEffect, useId, useLayoutEffect, useRef } from 'react'
+import { useBlocker, useLocation, useNavigate, useNavigation } from 'react-router-dom'
 import EditorialDialog from './EditorialDialog'
 
 export default function UnsavedChanges({ dirty, pending = false }) {
   const blocker = useBlocker(({ currentLocation, nextLocation }) => (dirty || pending) && currentLocation.pathname !== nextLocation.pathname)
+  const location = useLocation(), navigation = useNavigation(), navigate = useNavigate()
+  const historyIndex = useRef(window.history.state?.idx), canceling = useRef(false)
+  useLayoutEffect(() => { historyIndex.current = window.history.state?.idx }, [location.key])
   const titleId = useId()
+  useLayoutEffect(() => {
+    if (navigation.state === 'idle') canceling.current = false
+    if (!canceling.current && (dirty || pending) && blocker.state === 'unblocked' && navigation.state !== 'idle' && navigation.location.pathname !== location.pathname) {
+      // Editing after a slow navigation started cancels that navigation, not the new work.
+      canceling.current = true
+      const currentIndex = window.history.state?.idx
+      // During POP the browser cursor has already moved, although the old page is still mounted.
+      // Restore the Router-owned index; replacing that entry would erase the page we came from.
+      if (Number.isInteger(historyIndex.current) && Number.isInteger(currentIndex) && historyIndex.current !== currentIndex) navigate(historyIndex.current - currentIndex)
+      else navigate(location.pathname + location.search + location.hash, { replace: true, preventScrollReset: true, viewTransition: false })
+    }
+  }, [dirty, pending, blocker.state, navigation, location, navigate])
   useEffect(() => {
     const warn = (event) => { if (dirty || pending) { event.preventDefault(); event.returnValue = '' } }
     window.addEventListener('beforeunload', warn)

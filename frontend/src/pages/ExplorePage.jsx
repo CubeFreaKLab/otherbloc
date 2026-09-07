@@ -1,14 +1,19 @@
-import { useSearchParams } from 'react-router-dom'
+import { useLoaderData, useSearchParams } from 'react-router-dom'
 import SearchBar from '../components/SearchBar/SearchBar'
 import PublicationFeed from '../components/PublicationFeed/PublicationFeed'
 import { useResource } from '../hooks/useResource'
 import { loadPublications, publicationQuery, publicRequest } from '../services/publications'
+import { routeResource } from '../services/routeResource'
+import { prepareFeedReading } from '../services/readingCover'
+
+export const loader = async ({ request }) => prepareFeedReading(await routeResource(publicationQuery(new URL(request.url).searchParams), loadPublications, request.signal), request.signal)
 
 export default function ExplorePage() {
   const [params, setParams] = useSearchParams()
+  const initial = useLoaderData()
   const category = params.get('category') ?? ''
   const type = params.get('type') ?? ''
-  const resource = useResource(publicationQuery(params), loadPublications)
+  const resource = useResource(publicationQuery(params), loadPublications, initial)
   const options = useResource('/publications/options', publicRequest)
   const categories = options.data?.categories ?? [], publicationTypes = options.data?.types ?? []
   const update = (key, value) => {

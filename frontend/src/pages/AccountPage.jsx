@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import Link from '../components/MotionLink'
+import { useMotionNavigate as useNavigate } from '../hooks/useMotionNavigate'
 import { useSession } from '../hooks/useSession'
 import { clearSession, gatewayMediaUrl, gatewayRequest, setSessionUser, signOut } from '../services/gatewayClient'
 import SessionBoundary from '../components/SessionBoundary'

@@ -1,5 +1,5 @@
 import { ArrowRight } from '@phosphor-icons/react'
-import { Link } from 'react-router-dom'
+import Link from '../MotionLink'
 import './AuthorCard.css'
 import { gatewayMediaUrl } from '../../services/gatewayClient'
 

@@ -1,5 +1,6 @@
 import { MagnifyingGlass } from '@phosphor-icons/react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
+import { useMotionNavigate as useNavigate } from '../../hooks/useMotionNavigate'
 import './SearchBar.css'
 
 export default function SearchBar({ compact = false }) {

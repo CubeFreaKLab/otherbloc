@@ -1,5 +1,6 @@
 import { ArrowRight } from '@phosphor-icons/react'
-import { Link } from 'react-router-dom'
+import { useLoaderData } from 'react-router-dom'
+import Link from '../components/MotionLink'
 import ArticleCard from '../components/ArticleCard/ArticleCard'
 import FeaturedArticle from '../components/FeaturedArticle/FeaturedArticle'
 import { useResource } from '../hooks/useResource'
@@ -7,9 +8,14 @@ import { usePageTitle } from '../hooks/usePageTitle'
 import { loadPublications } from '../services/publications'
 import ContentState from '../components/ContentState/ContentState'
 import { PublicationLoading } from '../components/PublicationFeed/PublicationFeed'
+import { routeResource } from '../services/routeResource'
+import { prepareFeedReading } from '../services/readingCover'
+
+export const loader = async ({ request }) => prepareFeedReading(await routeResource('/publications?limit=7', loadPublications, request.signal), request.signal, true)
 
 export default function HomePage() {
-  const { data, status, error, retry } = useResource('/publications?limit=7', loadPublications)
+  const initial = useLoaderData()
+  const { data, status, error, retry } = useResource('/publications?limit=7', loadPublications, initial)
   const articles = data?.items ?? []
   usePageTitle(articles[0]?.title ?? 'Últimas publicaciones')
   if (status !== 'success' || !articles.length) return <main id="main-content" tabIndex={-1} className="home-page page-width page-main">

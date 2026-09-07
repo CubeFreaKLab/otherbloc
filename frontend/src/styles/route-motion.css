@@ -1,0 +1,27 @@
+/* Theme transitions own the root snapshot; route names must not split it. */
+html[data-route-motion]:not([data-route-motion="none"]):not([data-theme-transition]) .site-shell--transitioning main { view-transition-name: route-content; }
+html[data-route-motion="reading"]:not([data-theme-transition]) .reading-cover-transition { view-transition-name: reading-cover; }
+html[data-route-motion]:not([data-theme-transition])::view-transition { pointer-events: none; }
+html[data-route-motion]:not([data-theme-transition])::view-transition-old(root),
+html[data-route-motion]:not([data-theme-transition])::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+html[data-route-motion]:not([data-theme-transition])::view-transition-group(route-content) { animation-duration: 250ms; animation-timing-function: var(--ease-standard); }
+html[data-route-motion]:not([data-theme-transition])::view-transition-old(route-content) { animation: route-out 90ms ease-out both; }
+html[data-route-motion]:not([data-theme-transition])::view-transition-new(route-content) { animation: route-in 160ms 90ms ease-out both; }
+html[data-route-motion="forward"]::view-transition-old(route-content) { animation-name: route-forward-out; }
+html[data-route-motion="forward"]::view-transition-new(route-content) { animation-name: route-forward-in; }
+html[data-route-motion="backward"]::view-transition-old(route-content) { animation-name: route-backward-out; }
+html[data-route-motion="backward"]::view-transition-new(route-content) { animation-name: route-backward-in; }
+html[data-route-motion="reading"]::view-transition-group(reading-cover) { animation-duration: 320ms; animation-timing-function: var(--ease-standard); overflow: clip; }
+html[data-route-motion="reading"]::view-transition-old(reading-cover),
+html[data-route-motion="reading"]::view-transition-new(reading-cover) { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: normal; animation-duration: 320ms; }
+@keyframes route-out { to { opacity: 0; } }
+@keyframes route-in { from { opacity: 0; } }
+@keyframes route-forward-out { to { opacity: 0; transform: translateX(-16px); } }
+@keyframes route-forward-in { from { opacity: 0; transform: translateX(16px); } }
+@keyframes route-backward-out { to { opacity: 0; transform: translateX(16px); } }
+@keyframes route-backward-in { from { opacity: 0; transform: translateX(-16px); } }
+@media (prefers-reduced-motion: reduce) {
+  html[data-route-motion]:not([data-theme-transition]) main,
+  html[data-route-motion]:not([data-theme-transition]) .reading-cover-transition { view-transition-name: none !important; }
+  html::view-transition-group(*), html::view-transition-old(*), html::view-transition-new(*) { animation: none !important; }
+}

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import Link from '../MotionLink'
 import { useSession } from '../../hooks/useSession'
 import './Footer.css'
 

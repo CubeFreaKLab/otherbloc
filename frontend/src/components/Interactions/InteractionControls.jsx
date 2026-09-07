@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
+import Link from '../MotionLink'
 import { BookmarkSimple, Heart, UserPlus } from '@phosphor-icons/react'
 import { useSession } from '../../hooks/useSession'
 import { useResource } from '../../hooks/useResource'

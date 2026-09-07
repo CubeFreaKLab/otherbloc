@@ -50,6 +50,9 @@ test('revoked session keeps private profile edits in memory until the same accou
   await page.emulateMedia({ reducedMotion: 'reduce' })
   for (const theme of ['light', 'dark']) {
     await page.getByRole('combobox', { name: 'Tema de color' }).selectOption(theme)
+    // Audit the resolved theme, not an accessibility scan spanning style invalidation.
+    await expect(page.locator('body')).toHaveCSS('background-color', theme === 'dark' ? 'rgb(23, 23, 22)' : 'rgb(246, 245, 243)')
+    await expect(page.locator('.account-email span')).toHaveCSS('color', theme === 'dark' ? 'rgb(208, 208, 203)' : 'rgb(55, 55, 53)')
     expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([])
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     await page.screenshot({ path: testInfo.outputPath('session-recovery-' + theme + '.png'), fullPage: true })

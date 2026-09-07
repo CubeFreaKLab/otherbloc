@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
+import Link from '../MotionLink'
 import { useSession } from '../../hooks/useSession'
 import { deleteOwnComment, loadComments, loadEngagement, writeComment } from '../../services/interactionQueries'
 import { formatDate } from '../../utils/formatDate'

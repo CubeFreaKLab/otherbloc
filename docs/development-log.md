@@ -1,5 +1,14 @@
 # Development log
 
+## Reading continuity and route loading — 2026-09-07
+
+- Prepared actual public-route and composed-reading data before navigation, preserving the current page during requests and retaining explicit errors, retry, cancellation and viewer isolation. Added native cover continuity, fade-through main destinations and restrained lateral motion only for explicit parent-child journeys; kept the separate theme transition and a reduced-motion/unsupported-browser alternative.
+- Decoded the matching responsive cover before snapshots, with a maximum image budget and fade fallback. Removed persistent route snapshot names after transitions and corrected reduced-motion specificity. Preserved the original typography, palette, photos and grid.
+- Protected text started after a slow departure, including restoring the original browser history cursor when a late Back cancellation would otherwise replace its destination entry. Verified retained comment focus and subsequent Back/Forward destinations.
+- Passed the complete 64-check E2E suite (7.9 minutes), then six affected checks after the final history fix (37.3 seconds), and ten motion checks again (46.7 seconds). The inventory now has 66 E2E checks; no full 66-check run is claimed. All 18 visual checks pass (49.7 seconds), with 34 Node checks, final lint/build and genuine desktop/mobile light/dark transition captures inspected.
+- Kept diagnostic failures explicit: stale Vite exports, watched-backend 503s, an undecoded incoming cover, status/route-commit test synchronization, a theme scan spanning style updates and the reproduced late-history overwrite. Accessibility assertions now wait for the selected theme's resolved colors without disabling WCAG checks. Successful business responses remain real gateway/emulator data, separate from visual fixtures.
+- Updated technical docs and private evidence. Administrative-note recovery, clean installation, performance/k6 and real cloud CI/CD remain pending. No push, billing activation or deployment.
+
 ## Navigation and transient surfaces — 2026-09-07
 
 - Restored reading-source focus and scroll after actual asynchronous feed loading, including direct reading fragments. Bounded observers stop when restoration finishes or the reader starts a new interaction, avoiding late focus theft.

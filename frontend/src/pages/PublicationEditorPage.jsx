@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import Link from '../components/MotionLink'
+import { useMotionNavigate as useNavigate } from '../hooks/useMotionNavigate'
 import SessionBoundary from '../components/SessionBoundary'
 import UnsavedChanges from '../components/UnsavedChanges'
 import ContentState from '../components/ContentState/ContentState'

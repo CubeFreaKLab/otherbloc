@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from 'react'
-import { useLocation, useNavigationType } from 'react-router-dom'
+import { useLocation, useNavigation, useNavigationType } from 'react-router-dom'
 
 function identify(element) {
   if (element?.id) return { id: element.id }
@@ -18,11 +18,22 @@ function locate(target) {
 export default function NavigationFocus() {
   const location = useLocation(), navigationType = useNavigationType()
   const positions = useRef(new Map()), previous = useRef(location)
+  const navigation = useNavigation(), pendingInteraction = useRef(null)
+
+  useLayoutEffect(() => {
+    if (navigation.state === 'idle') return
+    const marker = { key: navigation.location.key, interrupted: false }
+    pendingInteraction.current = marker
+    const interrupt = () => { marker.interrupted = true }
+    for (const name of ['pointerdown', 'wheel', 'touchstart', 'keydown']) document.addEventListener(name, interrupt, { passive: true })
+    return () => { for (const name of ['pointerdown', 'wheel', 'touchstart', 'keydown']) document.removeEventListener(name, interrupt) }
+  }, [navigation.state, navigation.location?.key])
 
   useLayoutEffect(() => {
     const history = positions.current, last = previous.current
     const changedPath = last.pathname !== location.pathname
     const saved = navigationType === 'POP' ? history.get(location.key) : null
+    const preserveInteraction = pendingInteraction.current?.key === location.key && pendingInteraction.current.interrupted
     previous.current = location
     let frame = 0, stopped = false, fontsReady = document.fonts.status === 'loaded', observer, resize
     const stop = () => { stopped = true; cancelAnimationFrame(frame); observer?.disconnect(); resize?.disconnect() }
@@ -51,8 +62,8 @@ export default function NavigationFocus() {
       stop()
     }
     const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(restore) }
-    if (changedPath) document.querySelector('main')?.focus({ preventScroll: true })
-    if (changedPath || saved || location.hash) {
+    if (changedPath && !preserveInteraction) document.querySelector('main')?.focus({ preventScroll: true })
+    if (!preserveInteraction && (changedPath || saved || location.hash)) {
       observer = new MutationObserver(schedule)
       observer.observe(document.getElementById('root'), { childList: true, subtree: true, attributes: true, attributeFilter: ['aria-busy'] })
       resize = new ResizeObserver(schedule)

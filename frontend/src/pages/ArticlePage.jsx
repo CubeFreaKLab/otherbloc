@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ShareNetwork } from '@phosphor-icons/react'
-import { Link, useParams } from 'react-router-dom'
+import { useLoaderData, useParams, useViewTransitionState } from 'react-router-dom'
+import Link from '../components/MotionLink'
 import AuthorCard from '../components/AuthorCard/AuthorCard'
 import CategoryTag from '../components/CategoryTag/CategoryTag'
 import { useResource } from '../hooks/useResource'
@@ -9,11 +10,28 @@ import { loadInteractionPublication } from '../services/interactionQueries'
 import { useSession } from '../hooks/useSession'
 import { SaveControl, ReactionControl, FollowControl } from '../components/Interactions/InteractionControls'
 import CommentSection from '../components/Interactions/CommentSection'
-import { gatewayMediaUrl } from '../services/gatewayClient'
+import { gatewayMediaUrl, getSession, refreshSession } from '../services/gatewayClient'
 import ContentState from '../components/ContentState/ContentState'
 import { PublicationLoading } from '../components/PublicationFeed/PublicationFeed'
 import { formatDate } from '../utils/formatDate'
 import NotFoundPage from './NotFoundPage'
+import { fadeReadingMotion, prepareReadingCover, readingCoverSizes } from '../services/readingCover'
+
+const readingPath = (slug, viewer) => '/publications/' + encodeURIComponent(slug) + '?viewer=' + viewer
+
+export async function loader({ params, request }) {
+  if (getSession().status === 'loading') await refreshSession().catch(() => {})
+  const viewer = getSession().user?.id ?? 'anonymous', path = readingPath(params.slug, viewer)
+  try {
+    const data = await loadInteractionPublication(path, { signal: request.signal })
+    await prepareReadingCover(data.publication, readingCoverSizes, request.signal)
+    return { viewer, resource: { path, status: 'success', data, error: null } }
+  } catch (error) {
+    if (request.signal.aborted) throw error
+    fadeReadingMotion()
+    return { viewer, resource: { path, status: 'error', data: null, error } }
+  }
+}
 
 export function ArticleBlocks({ blocks }) {
   return blocks.map((block, index) => {
@@ -25,8 +43,9 @@ export function ArticleBlocks({ blocks }) {
   })
 }
 
-function ReadingPage({ slug, viewer }) {
-  const { data, status, error, retry } = useResource('/publications/' + encodeURIComponent(slug) + '?viewer=' + viewer, loadInteractionPublication)
+function ReadingPage({ slug, viewer, initial }) {
+  const transitioning = useViewTransitionState('/article/' + slug)
+  const { data, status, error, retry } = useResource(readingPath(slug, viewer), loadInteractionPublication, initial)
   const article = data?.publication
   usePageTitle(article?.title ?? (error?.status === 404 ? 'Publicación no encontrada' : 'Publicación'))
   const [shareMessage, setShareMessage] = useState('')
@@ -66,7 +85,7 @@ function ReadingPage({ slug, viewer }) {
         </div>
       </header>
       {shareMessage && <p role="status">{shareMessage}</p>}
-      <img className="article-page__hero" src={article.image} alt={article.imageAlt} width="1536" height="1024" />
+      <img className={'article-page__hero' + (transitioning ? ' reading-cover-transition' : '')} data-reading-slug={slug} src={article.image} srcSet={article.imageSrcSet} sizes={readingCoverSizes} alt={article.imageAlt} width={article.coverWidth ?? 1536} height={article.coverHeight ?? 1024} fetchPriority="high" />
       <div className="article-page__body-grid">
         <article className="article-prose"><ArticleBlocks blocks={article.blocks} /></article>
         <aside className="article-page__contents">
@@ -84,7 +103,8 @@ function ReadingPage({ slug, viewer }) {
 
 export default function ArticlePage() {
   const { slug } = useParams(), { user, status } = useSession()
+  const loaded = useLoaderData()
   if (status === 'loading') return <main id="main-content" tabIndex={-1} className="page-width page-main"><h1 className="visually-hidden">Publicación</h1><PublicationLoading feature /></main>
   const viewer = user?.id ?? 'anonymous'
-  return <ReadingPage key={slug + ':' + viewer} slug={slug} viewer={viewer} />
+  return <ReadingPage key={slug + ':' + viewer} slug={slug} viewer={viewer} initial={loaded?.viewer === viewer ? loaded.resource : null} />
 }

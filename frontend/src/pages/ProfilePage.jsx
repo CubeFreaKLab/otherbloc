@@ -1,4 +1,4 @@
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useLoaderData, useParams, useSearchParams } from 'react-router-dom'
 import AuthorCard from '../components/AuthorCard/AuthorCard'
 import PublicationFeed from '../components/PublicationFeed/PublicationFeed'
 import { useResource } from '../hooks/useResource'
@@ -7,13 +7,25 @@ import { loadPublications, publicRequest } from '../services/publications'
 import '../styles/account.css'
 import NotFoundPage from './NotFoundPage'
 import { ProfileFollow } from '../components/Interactions/InteractionControls'
+import { routeResource } from '../services/routeResource'
+import { fadeReadingMotion, prepareFeedReading } from '../services/readingCover'
+
+const profilePaths = (id, cursor) => ({ user: '/users/' + encodeURIComponent(id ?? 'missing'), publications: '/publications?authorId=' + encodeURIComponent(id ?? 'missing') + (cursor ? '&cursor=' + encodeURIComponent(cursor) : '') })
+export async function loader({ params, request }) {
+  const paths = profilePaths(params.id, new URL(request.url).searchParams.get('cursor'))
+  const [user, publications] = await Promise.all([routeResource(paths.user, publicRequest, request.signal), routeResource(paths.publications, loadPublications, request.signal)])
+  if (user.status !== 'success') fadeReadingMotion()
+  return { user, publications: await prepareFeedReading(publications, request.signal) }
+}
 
 export default function ProfilePage() {
   const { id } = useParams()
   const [params] = useSearchParams()
-  const { data, status, error, retry } = useResource('/users/' + encodeURIComponent(id ?? 'missing'), publicRequest)
+  const initial = useLoaderData()
   const cursor = params.get('cursor')
-  const publications = useResource('/publications?authorId=' + encodeURIComponent(id ?? 'missing') + (cursor ? '&cursor=' + encodeURIComponent(cursor) : ''), loadPublications)
+  const paths = profilePaths(id, cursor)
+  const { data, status, error, retry } = useResource(paths.user, publicRequest, initial?.user)
+  const publications = useResource(paths.publications, loadPublications, initial?.publications)
   usePageTitle(data?.user.name ? 'Publicaciones de ' + data.user.name : 'Perfil')
   if (error?.status === 404) return <NotFoundPage resource="cuenta" />
   if (status === 'loading') return <main id="main-content" tabIndex={-1} className="page-width page-main profile-page"><h1>Perfil</h1><div className="session-state" aria-busy="true" role="status"><div className="text-skeleton" /><p>Cargando perfil…</p></div></main>

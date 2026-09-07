@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import Link from '../components/MotionLink'
 import SessionBoundary from '../components/SessionBoundary'
 import EditorialDialog from '../components/EditorialDialog'
 import UnsavedChanges from '../components/UnsavedChanges'

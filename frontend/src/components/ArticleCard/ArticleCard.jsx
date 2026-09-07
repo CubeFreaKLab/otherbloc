@@ -1,14 +1,17 @@
 import { ArrowRight } from '@phosphor-icons/react'
-import { Link } from 'react-router-dom'
+import { useViewTransitionState } from 'react-router-dom'
+import Link from '../MotionLink'
 import { formatDate } from '../../utils/formatDate'
 import CategoryTag from '../CategoryTag/CategoryTag'
 import './ArticleCard.css'
+import { cardCoverSizes } from '../../services/readingCover'
 
 export default function ArticleCard({ article, featured = false }) {
+  const transitioning = useViewTransitionState('/article/' + article.slug)
   return (
     <article className={`article-card${featured ? ' article-card--featured' : ''}`}>
       <Link className="article-card__image-link" to={`/article/${article.slug}`} tabIndex={-1}>
-        <img src={article.image} srcSet={article.imageSrcSet} sizes="(max-width: 767px) 100vw, 50vw" width={article.coverWidth ?? 1536} height={article.coverHeight ?? 1024} alt={article.imageAlt} loading="lazy" />
+        <img className={transitioning ? 'reading-cover-transition' : undefined} data-reading-slug={article.slug} src={article.image} srcSet={article.imageSrcSet} sizes={cardCoverSizes} width={article.coverWidth ?? 1536} height={article.coverHeight ?? 1024} alt={article.imageAlt} loading="lazy" />
       </Link>
       <div className="article-card__content">
         <div className="article-card__topline">

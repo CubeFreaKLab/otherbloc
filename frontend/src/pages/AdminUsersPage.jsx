@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import Link from '../components/MotionLink'
 import SessionBoundary from '../components/SessionBoundary'
 import EditorialDialog from '../components/EditorialDialog'
 import { useSession } from '../hooks/useSession'
