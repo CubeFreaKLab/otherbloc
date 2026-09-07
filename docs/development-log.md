@@ -1,5 +1,12 @@
 # Development log
 
+## Complete isolated CI verification — 2026-09-07
+
+- Expanded the existing workflow into reusable Platform CI with pinned setup actions, read-only repository permission, Node 24/Java 21, Chromium/system dependencies and sequential visual/API/live browser stages. No cloud credentials, persisted Git credentials, artifact upload, push or deployment is included.
+- Added a disposable-checkout runner that rejects existing private settings/snapshots and occupied ports, removes inherited cloud targets/credentials and rate overrides, generates fresh demo settings and isolates emulator temporary storage. It requires actual readiness, preserves failed command results and closes only its owned application children; Firebase manages its emulator shutdown.
+- Verified a fresh clone/installation with 43 Node checks, lint/build, 22 CI-mode visual checks (1.2 minutes), 30 API checks (62.04 seconds), six accounts/seven published Storage-backed readings and all 78 E2E checks (9.3 minutes). The complete runner exits 0 and leaves no required port occupied. Six new contract checks and two deliberately rejected unsafe invocations pass; Actionlint accepts the final workflow.
+- Inspected four genuine clean-run screenshots and kept logs/source hashes private. Backed up and restored the separate original development environment. Existing runtime/browser/emulator caches and nine moderate dependency advisories are disclosed. This is local CI-equivalent verification, not an executed Actions run or cloud delivery.
+
 ## Smaller reading fonts and stable logo dimensions — 2026-09-07
 
 - Added four Latin Georgia WOFF2 subsets, preserving every retained glyph's outlines and metrics and all supplied source assets. The complete original faces remain available for other alphabets; Prumo, Adelle, photographs and the editorial grid are unchanged. Regular Georgia falls from 102,672 to 54,108 bytes. Optional regeneration/verification is separate from normal npm installation/build.

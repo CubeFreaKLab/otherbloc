@@ -129,6 +129,12 @@ The integrated mobile Lighthouse run reports 85 performance, 100 accessibility, 
 
 After the final assets, 40 live desktop/mobile E2E checks pass in 4.7 minutes across public content, author/editor/moderation, navigation and motion. They use the actual gateway, owner services and emulators, including Storage, errors, unsaved changes, role-aware footer destinations, focus/history and reduced motion. Four fresh home screenshots (desktop/mobile × light/dark) were opened and visually inspected. This targeted run does not replace or claim a new full 78-check run.
 
+## Complete disposable CI sequence — M7F
+
+Platform CI now prepares installation, Node contracts, lint/build, visual/accessibility checks, fresh emulators, API integration, demo seeds and complete live desktop/mobile E2E. The local equivalent passes 43 Node checks, 22 visual checks with `CI=true` (1.2 minutes), all 30 API checks (62.04 seconds) and all 78 E2E checks (9.3 minutes) in a new disposable checkout. The wrapper exits 0 after its application children and emulators stop; the required ports are confirmed free. Actionlint 1.7.12 accepts the workflow. No GitHub-hosted run is claimed.
+
+Six new contracts verify CI isolation, environment/port guards, readiness and process failures, and workflow ordering. Negative runs over an existing private configuration and directly through the inner entry point fail before startup. Fresh credentials and temporary storage are distinct from development; no original snapshot is imported or overwritten. Four actual clean-run home screenshots are retained privately and inspected across both viewports/themes. Authentication traces/video remain off and the workflow uploads no private artifacts. See [CI setup, commands, verification and limitations](ci-cd.md); actual Actions/CD remain dependent on the owner's push and authorized cloud setup.
+
 ## Dependency review
 
 M2 audit on 2026-09-07: zero high/critical issues; nine moderate findings, five in the optional Storage SDK dependency chain and four in development tooling. The UUID advisory concerns buffer handling in UUID v3/v5/v6, while the Storage HTTP helper imports v4. Firebase CLI also includes older stream-json/OpenTelemetry branches. Do not apply `npm audit fix --force`: the suggested downgrade breaks the current Firebase runtime. Track upstream fixes and rerun audit/integration before production. These findings are disclosed, not counted as resolved by passing tests.

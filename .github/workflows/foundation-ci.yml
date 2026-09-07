@@ -1,8 +1,9 @@
-name: Foundation CI
+name: Platform CI
 
 on:
   push:
   pull_request:
+  workflow_call:
 
 permissions:
   contents: read
@@ -10,17 +11,25 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 24
           cache: npm
+
+      - name: Set up Java for Firebase emulators
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6
+        with:
+          distribution: temurin
+          java-version: '21'
 
       - name: Install dependencies
         run: npm ci
@@ -33,3 +42,14 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+
+      - name: Install Chromium and system dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Visual and accessibility regression
+        run: npm run test:ui
+
+      - name: Fresh Firebase, API integration and complete live journeys
+        run: npm run test:ci
+        env:
+          JAVA_TOOL_OPTIONS: -Xmx1g

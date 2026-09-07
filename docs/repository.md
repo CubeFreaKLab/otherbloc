@@ -34,4 +34,4 @@ npm test
 npm run build
 ```
 
-Repository-level contracts live in `tests`, while each backend application owns its HTTP tests. Firebase integration tests live in `tests/integration`. `.github/workflows/foundation-ci.yml` runs lint, Node tests and build for pushes and pull requests. See [local development](development.md) for startup and emulator persistence commands.
+Repository-level contracts live in `tests`, while each backend application owns its HTTP tests. Firebase integration tests live in `tests/integration`. `.github/workflows/foundation-ci.yml` now prepares the complete Platform CI sequence: install, Node contracts, lint, build, visual regression, fresh emulators, API integration, demo seeds and live desktop/mobile journeys. It uses no cloud secrets or artifact uploads and supports same-commit reuse for a future gated release. An actual Actions run still requires the owner's push. See [CI boundaries and reproduction](ci-cd.md) and [local development](development.md).
