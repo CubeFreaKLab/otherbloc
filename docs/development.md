@@ -36,6 +36,18 @@ The start scripts load the root local configuration and refuse cloud project IDs
 
 Firestore and Storage run as actual Firebase emulators, not JavaScript in-memory substitutes. Stop the emulator terminal with Ctrl+C and allow it to finish exporting to ignored `.local-data/current`. The next start imports that snapshot automatically. `npm run emulators:export` exports a separate timestamped snapshot while the suite is running; it does not overwrite the current snapshot. These local exports are not cloud backups.
 
+To restore a chosen snapshot, first export and stop the current suite, then run:
+
+```bash
+npm run emulators -- start --import=.local-data/export-YOUR-TIMESTAMP
+```
+
+Replace the directory with an actual snapshot. A missing manifest is an error, never permission to start with an empty database. An explicit import replaces the next in-memory starting state; the source snapshot is left unchanged, and clean shutdown exports the new state to `current`. Do not terminate the process tree or close the terminal while it is exporting. Forced termination cannot guarantee an exit snapshot; use a timestamped export first when in doubt.
+
+Start/standalone-test scripts give Firebase separate temporary directories under `.local-data/emulator-runtime/{development,test}`. The export command uses the same development temporary directory to discover its hub. This matters because the Storage emulator stores live blobs below a fixed `os.tmpdir()` path: two suites sharing that path can delete each other's files on shutdown even with different ports/project IDs. Any manually launched parallel suite must also use distinct `TMP`, `TEMP` and `TMPDIR` directories, ports and a demo project. These changes affect only the local process, not system settings. Do not manually delete live runtime directories.
+
+Timestamped export uses Firebase Tools' supported Node module API and verifies that its manifest includes both Firestore and Storage. This avoids the CLI's forced-exit path that produced a Windows `UV_HANDLE_CLOSING` abort after writing a complete export. Export errors still fail the command; an export message alone is not restoration evidence. See [Firebase's module API](https://github.com/firebase/firebase-tools#using-as-a-module) and [emulator import/export](https://firebase.google.com/docs/emulator-suite/install_and_configure#export_and_import_emulator_data).
+
 Stop the development emulator suite before `npm run test:integration`, which creates its own emulator lifecycle. If the suite is already running, `npm run test:integration:running` reuses its loopback servers without stopping development. Both commands use the separate `demo-otherbloc-test` project/bucket, not development accounts in `demo-otherbloc`; tests fail closed on any other project ID. The emulator may warn about this intentional second demo project. Test cleanup removes only its own records and never resets development data.
 
 ## Java on Windows

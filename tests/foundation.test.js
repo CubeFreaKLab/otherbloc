@@ -16,6 +16,14 @@ test('development watch configuration has an explicit stable mode and rejects mi
   for (const args of [['--nowatch'], ['--no-watch', '--watch'], ['--no-watch', '--no-watch']]) assert.throws(() => parseWatchOptions(args), /--no-watch/)
 })
 
+test('emulator commands reject unknown actions and accept explicit imports only at startup', async () => {
+  const { parseEmulatorArgs } = await import('../scripts/emulator-options.mjs')
+  assert.deepEqual(parseEmulatorArgs([]), { mode: 'start', importPath: null })
+  assert.deepEqual(parseEmulatorArgs(['start', '--import=.local-data/a snapshot']), { mode: 'start', importPath: '.local-data/a snapshot' })
+  for (const mode of ['export', 'test', 'test-running']) assert.deepEqual(parseEmulatorArgs([mode]), { mode, importPath: null })
+  for (const args of [['typo'], ['start', '--import='], ['export', '--force'], ['test', '--import=x'], ['start', '--import=x', '--force']]) assert.throws(() => parseEmulatorArgs(args))
+})
+
 const services = [
   {
     directory: 'api-gateway',

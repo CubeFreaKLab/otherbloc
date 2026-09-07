@@ -97,6 +97,16 @@ Four genuine light/dark desktop/mobile recovery captures were visually inspected
 
 After switching to this public stable entry point, nine targeted desktop checks pass in 50.4 seconds: public Firestore/Storage reading and search, six moderation/identity cases, and the cross-account retry regression. All 35 Node checks, lint and build pass. The earlier full 78-check run belongs to M6D. This mode provides repeatable verification without claiming that the original Windows watch-restart trigger has been reproduced or fixed.
 
+## Export/import verification and emulator isolation
+
+Snapshot verification compares canonical hashes of every document, including publication history subcollections, and every Storage object's bytes/content type. The initial round trip matched 2,276 documents and 248 files (2,178,026 bytes). After preserving later session updates, the final recovery and default `.local-data/current` import match 2,278 documents and the same 248 files. These are dated development-data counts, not required seed sizes or production measurements. No credentials or document contents appear in the fingerprint reports.
+
+Parallel restoration exposed a real Firebase Storage emulator collision: different ports/project IDs still shared its fixed temporary blob directory, which one instance removed on shutdown. The surviving Firestore state was exported before restarting; verified Storage copies were retained and restored. Local commands now isolate development/standalone-test temporary directories, and the independent restore verifier uses a third one. After closing that verifier, the still-running development instance matched its complete fingerprint, proving that its blobs remained usable. Earlier failed/interrupted integration/browser runs are kept as diagnostics, not passes.
+
+The supported Firebase Tools module export completes with exit code 0 and a manifest containing both stores. The old CLI export wrote complete files but then hit a Windows forced-exit assertion. A real interactive terminal also verified SIGINT export/cleanup and the next default import; terminating the non-interactive process tree did not export, so it is not documented as safe shutdown. Missing explicit snapshots and invalid commands fail rather than silently starting empty.
+
+After the final restore, all 30 API integration checks pass (58.25 seconds), all ten targeted desktop user/content/editor journeys pass (1.7 minutes), and 36 Node checks, lint and build pass. This is local emulator evidence; clean installation, k6, cloud persistence and CI/CD still require separate verification.
+
 ## Dependency review
 
 M2 audit on 2026-09-07: zero high/critical issues; nine moderate findings, five in the optional Storage SDK dependency chain and four in development tooling. The UUID advisory concerns buffer handling in UUID v3/v5/v6, while the Storage HTTP helper imports v4. Firebase CLI also includes older stream-json/OpenTelemetry branches. Do not apply `npm audit fix --force`: the suggested downgrade breaks the current Firebase runtime. Track upstream fixes and rerun audit/integration before production. These findings are disclosed, not counted as resolved by passing tests.

@@ -1,5 +1,12 @@
 # Development log
 
+## Verified snapshots and isolated emulator storage — 2026-09-07
+
+- Added explicit snapshot imports with fail-closed argument/manifest validation. Timestamped exports now use the supported Firebase Tools module API, preserve existing snapshots and require both Firestore and Storage in the output manifest.
+- Reproduced and fixed temporary-blob collisions between parallel Storage emulator instances. Development, standalone integration and independent restoration now use separate temporary directories. Preserved surviving Firestore records and restored verified Storage data before continuing.
+- Verified complete document/history and media-byte fingerprints through isolated restoration, confirmed the live source remains intact afterward, and tested interactive shutdown export followed by default import: 2,278 development documents and 248 files / 2,178,026 bytes matched. These are local snapshot counts, not cloud claims.
+- Passed 30 API integration checks in 58.25 seconds, ten targeted desktop journeys in 1.7 minutes, 36 Node checks, lint and build. Kept the earlier forced-exit, shared-temporary-directory and non-interactive termination failures distinct from successful verification. Clean installation, load/performance and cloud CI/CD remain pending; no push or deployment.
+
 ## Stable verification entry point — 2026-09-07
 
 - Exposed `--no-watch` through aggregate and individual local-development commands, retaining normal watch defaults and Vite's frontend development behavior. Invalid flags fail explicitly. Added Interactions to the live E2E health preflight.
