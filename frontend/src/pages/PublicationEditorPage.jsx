@@ -12,6 +12,8 @@ import { useResource } from '../hooks/useResource'
 import { useSession } from '../hooks/useSession'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { usePublicationEditor } from '../hooks/usePublicationEditor'
+import { useDraftRecovery } from '../hooks/useDraftRecovery'
+import { RecoveryChoice } from '../components/DraftRecovery'
 import { gatewayRequest } from '../services/gatewayClient'
 import { blockLabels, changePublicationStatus, newBlock, statusLabels } from '../services/publicationEditor'
 import { publicRequest } from '../services/publications'
@@ -20,14 +22,16 @@ import '../styles/editor.css'
 function Editor({ initial }) {
   const navigate = useNavigate()
   const [uploads, setUploads] = useState(0), [acting, setActing] = useState(false), [deleted, setDeleted] = useState(false)
-  const editor = usePublicationEditor(initial, uploads > 0 || acting || deleted)
+  const recovery = useDraftRecovery({ ownerId: initial.authorId, key: 'publication:' + initial.id, path: '/author/publications/' + initial.id, label: 'Tu publicación', read: () => !recovery && !deleted && (dirty || operating) ? { document, baseVersion: publication.version, tags } : null })
+  const editor = usePublicationEditor(initial, uploads > 0 || acting || deleted || Boolean(recovery))
   const { document, publication, dirty, busy, error, update, save, accept } = editor
   const [preview, setPreview] = useState(publication.status !== 'draft')
   const [tags, setTags] = useState(initial.tags.join(', '))
   const [action, setAction] = useState(null), [actionError, setActionError] = useState(''), [message, setMessage] = useState('')
   const options = useResource('/publications/options', publicRequest)
-  const locked = publication.status !== 'draft' || acting || deleted
-  const operating = busy || acting || uploads > 0
+  const locked = publication.status !== 'draft' || acting || deleted || Boolean(recovery)
+  const inFlight = busy || acting || uploads > 0
+  const operating = inFlight || Boolean(recovery)
   usePageTitle((document.title || 'Borrador sin título') + ' · Editor')
   useEffect(() => { if (deleted) navigate('/author', { replace: true }) }, [deleted, navigate])
   const patch = (field, value) => update((current) => ({ ...current, [field]: value }))
@@ -88,8 +92,9 @@ function Editor({ initial }) {
   }
 
   return <>
-    <UnsavedChanges dirty={dirty && !deleted} pending={operating && !deleted} />
+    <UnsavedChanges dirty={dirty && !deleted} pending={inFlight && !deleted} />
     <header className="editor-heading"><Link className="text-link" to="/author">Mis publicaciones</Link><h1>Tu publicación</h1><span className="publication-status">{statusLabels[publication.status]}</span></header>
+    <RecoveryChoice entry={recovery} versioned onRestore={(value) => { editor.restore(value); setTags(value.tags); setPreview(false) }} />
     <div className="editor-toolbar">
       <p role="status">{uploads ? 'Subiendo imagen…' : busy ? 'Guardando…' : error ? 'No se guardaron los últimos cambios' : dirty ? 'Cambios sin guardar' : publication.status === 'draft' ? 'Borrador guardado' : 'Contenido guardado'}</p>
       {publication.status === 'draft' && <button type="button" className="primary-button" disabled={operating || !dirty} onClick={() => save().catch(() => {})}>Guardar ahora</button>}

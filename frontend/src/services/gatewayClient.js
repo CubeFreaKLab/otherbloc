@@ -1,3 +1,5 @@
+import { captureRecovery, hasRecovery, reconcileRecovery } from './draftRecovery'
+
 export const apiUrl = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
 let token = null
 let refreshFlight = null
@@ -19,6 +21,7 @@ export const getSession = () => snapshot
 export const getAccessToken = () => token
 export function setSessionUser(user) {
   snapshot = { user, status: user ? 'authenticated' : 'anonymous', error: null }
+  if (user) reconcileRecovery(user.id)
   for (const listener of listeners) listener()
 }
 
@@ -61,9 +64,12 @@ export function refreshSession() {
     return value
   }).catch((error) => {
     if (epoch === currentEpoch) {
-      token = null
-      snapshot = { user: null, status: error.status === 401 ? 'anonymous' : 'error', error: error.status === 401 ? null : error.message }
-      for (const listener of listeners) listener()
+      try { captureRecovery(snapshot.user?.id) } finally {
+        // Recovery must never prevent clearing an invalid session.
+        token = null
+        snapshot = { user: null, status: error.status === 401 ? 'anonymous' : 'error', error: error.status === 401 ? null : error.message }
+        for (const listener of listeners) listener()
+      }
     }
     throw error
   }).finally(() => { refreshFlight = null })
@@ -71,10 +77,22 @@ export function refreshSession() {
 }
 
 export async function gatewayRequest(path, options = {}) {
-  try { return await send(path, options, !options.anonymous) } catch (error) {
+  const identity = snapshot.user?.id ?? null
+  const sameIdentity = () => {
+    if (!options.anonymous && identity !== (snapshot.user?.id ?? null)) throw new ApiError('La sesión cambió durante la solicitud. Revisa la cuenta y vuelve a cargar antes de continuar.', 409, 'session_changed')
+  }
+  try {
+    const result = await send(path, options, !options.anonymous)
+    sameIdentity()
+    return result
+  } catch (error) {
     if (error.status !== 401 || options.retryAuth === false || options.anonymous) throw error
     await refreshSession()
-    return send(path, options, true)
+    // A cookie changed by another tab must not replay the old account's write as a new user.
+    sameIdentity()
+    const result = await send(path, options, true)
+    sameIdentity()
+    return result
   }
 }
 
@@ -96,15 +114,18 @@ export async function signIn(mode, input) {
 
 export async function signOut() {
   await refreshFlight?.catch(() => {})
+  if (hasRecovery()) throw new ApiError('Recupera o descarta las copias temporales antes de cerrar sesión.', 409, 'recovery_pending')
   await send('/users/logout', { method: 'POST', body: {} })
   epoch += 1
   token = null
+  reconcileRecovery(null, true)
   setSessionUser(null)
 }
 
 export function clearSession() {
   epoch += 1
   token = null
+  reconcileRecovery(null, true)
   setSessionUser(null)
 }
 

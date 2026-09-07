@@ -1,5 +1,13 @@
 # Development log
 
+## Interrupted sessions and identity-bound retries — 2026-09-07
+
+- Preserved pending profile text, comment attempts and publication documents in an owner-scoped, memory-only recovery store before an interrupted session unmounts their forms. Anonymous views reveal no contents; returning to the same account requires explicit restoration or confirmed discard. Another account purges the previous copies.
+- Kept the editor's original base version during recovery. Newer server work still produces a conflict, with JSON backup and explicit server reload; recovery does not silently overwrite it. Logout/password changes cannot discard pending recovery copies.
+- Reproduced and fixed an actual cross-account retry defect: a changed browser cookie could renew authentication as another user and replay the previous profile write. Fetch now checks the initiating identity before retries and before accepting responses; Apollo shares that boundary.
+- Verified 40 real desktop/mobile E2E journeys in 5.6 minutes, 32 Node checks, lint and production build. Recovery screenshots include both themes, keyboard focus and automated accessibility checks. Diagnostic failure logs remain distinct from passing results.
+- Kept all recovery payloads out of browser storage, databases and credentials. This is local M6A; navigation/motion, performance, clean installation and actual cloud CI/CD remain separate work. No push or billing activation.
+
 ## Composed GraphQL and personal interactions — 2026-09-07
 
 - Implemented current-session GraphQL context, public Content/Users HTTP composition, bounded selections/pages/work, private error-safe transport and actual Apollo Client integration through the existing gateway.

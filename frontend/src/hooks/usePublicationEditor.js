@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { editorDocument, savePublication } from '../services/publicationEditor'
+import { ApiError } from '../services/gatewayClient'
 
 export function usePublicationEditor(initial, paused = false) {
   const [document, setDocument] = useState(() => editorDocument(initial))
@@ -44,11 +45,21 @@ export function usePublicationEditor(initial, paused = false) {
     }
   }, [])
 
+  const restore = useCallback(({ document: draft, baseVersion }) => {
+    const base = currentPublication.current
+    currentDocument.current = draft; setDocument(draft)
+    if (base.version !== baseVersion) {
+      // Keep the actual edit base; recovery must never silently adopt a newer server version.
+      currentPublication.current = { ...base, version: baseVersion }; setPublication(currentPublication.current)
+      setError(new ApiError('El servidor cambió mientras tu sesión estaba interrumpida. Tus cambios se recuperaron sin sobrescribirlo. Descarga tu copia o recupera la versión del servidor.', 409, 'version_conflict'))
+    } else setError(null)
+  }, [])
+
   useEffect(() => {
     if (!dirty || busy || error || paused || publication.status !== 'draft') return
     const timer = setTimeout(() => save().catch(() => {}), 1200)
     return () => clearTimeout(timer)
   }, [document, dirty, busy, error, paused, publication.status, save])
 
-  return { document, publication, dirty, busy, error, update, save, accept }
+  return { document, publication, dirty, busy, error, update, save, accept, restore }
 }

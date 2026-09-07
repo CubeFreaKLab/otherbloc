@@ -6,6 +6,8 @@ import { formatDate } from '../../utils/formatDate'
 import { createId } from '../../utils/createId'
 import UnsavedChanges from '../UnsavedChanges'
 import EditorConfirmation from '../PublicationEditor/EditorConfirmation'
+import { RecoveryChoice } from '../DraftRecovery'
+import { useDraftRecovery } from '../../hooks/useDraftRecovery'
 import './Interactions.css'
 
 function mergeComments(previous, incoming) {
@@ -19,13 +21,14 @@ export default function CommentSection({ publicationId, initial, initialCount })
   const [text, setText] = useState(''), [busy, setBusy] = useState(false), [loading, setLoading] = useState(false), [error, setError] = useState(''), [readError, setReadError] = useState(''), [notice, setNotice] = useState('')
   const [selected, setSelected] = useState(null), [attempt, setAttempt] = useState(null)
   const pending = useRef(false), reading = useRef(false)
+  const recovery = useDraftRecovery({ ownerId: user?.id, key: 'comment:' + publicationId, path: location.pathname, label: 'Tu comentario', read: () => !recovery && (text || busy) ? { text, attempt } : null })
   async function refreshCount() {
     try { setTotal((await loadEngagement(publicationId)).commentCount); setReadError('') }
     catch (error) { setTotal(null); setReadError(error.message) }
   }
   async function submit(event) {
     event.preventDefault()
-    if (pending.current || !text.trim()) return
+    if (pending.current || recovery || !text.trim()) return
     pending.current = true; setBusy(true); setError(''); setNotice('')
     const currentAttempt = attempt ?? { id: createId(), text: text.trim() }
     setAttempt(currentAttempt)
@@ -59,8 +62,9 @@ export default function CommentSection({ publicationId, initial, initialCount })
     <UnsavedChanges dirty={Boolean(text)} pending={busy} />
     <h2 id="comments-heading">Conversación{total !== null ? ' · ' + total : ''}</h2>
     <p>Comparte tu lectura con respeto. Los comentarios son públicos; evita incluir información privada.</p>
+    <RecoveryChoice entry={recovery} onRestore={(value) => { setText(value.text); setAttempt(value.attempt); setError(value.attempt ? 'Se recuperó un envío sin confirmación. Reintenta el mismo comentario para comprobarlo sin duplicarlo.' : '') }} />
     {user ? <form className="account-form comment-form" onSubmit={submit} aria-busy={busy}>
-      <div className="form-field"><label htmlFor="comment-text">Tu comentario</label><textarea id="comment-text" rows={4} maxLength={2000} required disabled={busy || Boolean(attempt)} value={text} onChange={(event) => { setText(event.target.value); setError('') }} /><small>{text.length}/2000 caracteres.</small></div>
+      <div className="form-field"><label htmlFor="comment-text">Tu comentario</label><textarea id="comment-text" rows={4} maxLength={2000} required disabled={busy || Boolean(attempt) || Boolean(recovery)} value={text} onChange={(event) => { setText(event.target.value); setError('') }} /><small>{text.length}/2000 caracteres.</small></div>
       {attempt && error && <p>El reintento enviará el mismo comentario para no duplicarlo. Si quieres cambiarlo, comprueba primero si aparece en la conversación al recargar.</p>}
       <button className="primary-button" disabled={busy || !text.trim()}>{busy ? 'Guardando…' : attempt && error ? 'Reintentar comentario' : 'Publicar comentario'}</button>
     </form> : <Link className="text-link" to={'/login?returnTo=' + encodeURIComponent(location.pathname)}>Inicia sesión para comentar</Link>}
