@@ -16,6 +16,8 @@ Firebase data and storage infrastructure
 
 The frontend communicates only with the API Gateway. The gateway owns the public backend entry point and maintains the service registry. Backend services remain independent packages and do not import each other's source code.
 
-## Current foundation
+## Current implementation
 
-The API Gateway exposes `GET /health` and `GET /api` for local foundation checks. Its environment configuration records the internal service locations. The Users and Content services expose their own health and REST boundary metadata. The Interactions service hosts an Apollo GraphQL endpoint with an operational status query. Request forwarding, authentication, persistence, rate limiting, and domain operations belong to later implementation phases.
+The gateway forwards the three agreed boundaries with origin, body-size, rate-limit and JWT signature checks. The Users and Content services still expose boundary metadata; Interactions hosts Apollo's operational status query. Domain authorization is not yet complete. Each service has its own Firebase Admin initialization with emulator/cloud safety checks; tests verify Firestore atomic writes, Storage round trips and rejection of direct client access.
+
+Firestore and Storage clients are server-only. Custom JWT sessions are separate from Firebase Authentication; deny-all Firebase client rules do not authorize Admin SDK operations, which use server credentials and IAM. Each service must enforce ownership and permissions in its application logic. No frontend Firebase SDK or service credential is used. See [gateway](gateway.md), [database](database.md), [development](development.md) and [testing](testing.md).

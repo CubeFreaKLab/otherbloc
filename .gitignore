@@ -31,6 +31,7 @@ test-results/
 
 # Firebase
 .firebase/
+.local-data/
 
 
 # Logs

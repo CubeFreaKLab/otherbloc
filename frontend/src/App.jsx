@@ -11,8 +11,9 @@ function NavigationFocus() {
   const previous = useRef(location.pathname)
   const focusTargets = useRef(new Map())
   useLayoutEffect(() => {
+    const targets = focusTargets.current
     if (previous.current !== location.pathname) {
-      const previousHref = navigationType === 'POP' ? focusTargets.current.get(location.key) : null
+      const previousHref = navigationType === 'POP' ? targets.get(location.key) : null
       const target = previousHref
         ? [...document.querySelectorAll('a[href]')].find((element) => element.getAttribute('href') === previousHref)
         : document.querySelector('main')
@@ -23,7 +24,7 @@ function NavigationFocus() {
     document.title = heading ? heading + ' — otherbloc' : 'otherbloc'
     return () => {
       const href = document.activeElement?.getAttribute('href')
-      if (href) focusTargets.current.set(location.key, href)
+      if (href) targets.set(location.key, href)
     }
   }, [location, navigationType])
   return null

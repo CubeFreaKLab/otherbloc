@@ -24,7 +24,7 @@ Each application owns its package manifest, environment template, source tree, r
 Install dependencies once from the repository root:
 
 ```bash
-npm install
+npm ci
 ```
 
 The root package provides aggregate build and test commands. Individual applications can also be addressed through npm workspace names.
@@ -34,4 +34,4 @@ npm test
 npm run build
 ```
 
-Repository-level contracts live in `tests`, while each backend application owns its integration tests. `.github/workflows/foundation-ci.yml` runs both verification commands for pushes and pull requests.
+Repository-level contracts live in `tests`, while each backend application owns its HTTP tests. Firebase integration tests live in `tests/integration`. `.github/workflows/foundation-ci.yml` runs lint, Node tests and build for pushes and pull requests. See [local development](development.md) for startup and emulator persistence commands.

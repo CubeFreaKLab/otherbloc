@@ -1,0 +1,8 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Application JWTs are enforced by the owning services, not Firebase Auth.
+    // Admin SDK access is governed by IAM and bypasses these client rules.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

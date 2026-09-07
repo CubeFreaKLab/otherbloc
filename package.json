@@ -7,25 +7,41 @@
     "backend/*"
   ],
   "scripts": {
-    "dev:frontend": "npm run dev --workspace frontend",
-    "dev:gateway": "npm run dev --workspace @otherbloc/api-gateway",
-    "dev:users": "npm run dev --workspace @otherbloc/users-service",
-    "dev:content": "npm run dev --workspace @otherbloc/content-service",
-    "dev:interactions": "npm run dev --workspace @otherbloc/interactions-service",
+    "dev": "node scripts/dev.mjs",
+    "dev:frontend": "node scripts/run-service.mjs frontend",
+    "dev:gateway": "node scripts/run-service.mjs api-gateway",
+    "dev:users": "node scripts/run-service.mjs users-service",
+    "dev:content": "node scripts/run-service.mjs content-service",
+    "dev:interactions": "node scripts/run-service.mjs interactions-service",
     "build": "npm run build --workspace frontend",
     "test": "npm run test:foundation && npm run test --workspaces --if-present",
     "test:foundation": "node --test tests/foundation.test.js",
-    "test:ui": "playwright test"
+    "test:ui": "playwright test",
+    "lint": "eslint . --max-warnings 0",
+    "setup:local": "node scripts/setup-local.mjs",
+    "emulators": "node scripts/emulators.mjs",
+    "emulators:export": "node scripts/emulators.mjs export",
+    "test:integration": "node scripts/emulators.mjs test"
   },
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=22.12.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
+    "@eslint/js": "^10.0.1",
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@playwright/test": "^1.63.0",
     "chrome-launcher": "^1.2.1",
+    "eslint": "^10.10.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "firebase-tools": "^15.29.0",
+    "globals": "^17.12.0",
     "lighthouse": "^13.4.1",
     "sharp": "^0.35.4",
     "wawoff2": "^2.0.1"
+  },
+  "overrides": {
+    "uuid": "^11.1.1",
+    "qs": "^6.16.0"
   }
 }

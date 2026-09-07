@@ -1,5 +1,14 @@
 # Development log
 
+## Gateway and emulator foundation — 2026-09-07
+
+- Implemented exact REST/GraphQL forwarding with explicit upstream failures, header sanitization, JWT signature checks, CORS allowlists, request limits and security headers.
+- Added server-only Firebase Admin configuration to each independent service and deny-all direct-client rules.
+- Added safe local setup, five-application startup, emulator import/export and test lifecycle commands; raised the documented runtime to Node 24 and Java 21 for current tooling.
+- Verified 19 Node tests, four Firestore/Storage emulator tests, lint, build and a live gateway-to-Content metadata request. The browser's raw-API navigation was blocked by its client environment; HTTP verification was performed separately and is not presented as a browser business journey.
+- Prepared Hosting configuration without deploying. Business collections, account sessions, domain authorization, real cloud persistence and CD remain pending.
+- Disclosed moderate dependency advisories; no high or critical findings at this milestone.
+
 ## Editorial refinement — 2026-09-07
 
 - Preserved the existing visual identity while removing the oversized duplicate home logo, the out-of-scope newsletter and placeholder footer links.

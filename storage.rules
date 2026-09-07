@@ -1,0 +1,7 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // No public download tokens or direct client writes. Media uses the gateway.
+    match /{allPaths=**} { allow read, write: if false; }
+  }
+}
