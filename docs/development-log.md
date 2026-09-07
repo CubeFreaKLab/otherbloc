@@ -1,5 +1,12 @@
 # Development log
 
+## Administrative observations and private identity — 2026-09-07
+
+- Extended interrupted-session recovery to the administrator's personal reason, proposed action and original version, without copying the author's publication. Same-version recovery is explicit; a changed version keeps the reason read-only/downloadable until confirmed discard and a fresh review. A withdrawn private draft stays inaccessible.
+- Keyed private child trees to the authenticated identity, so two permitted accounts cannot retain one another's cached workspace, form or dialog state after a cookie-driven refresh. Existing request identity checks still prevent cross-account retries.
+- Passed all 78 live E2E checks in 9.1 minutes, including twelve new desktop/mobile recovery and identity checks, plus 34 Node checks, lint and production build. Inspected four genuine light/dark desktop/mobile captures with passing WCAG and overflow checks. The initial diagnostic color-expectation failure is documented separately.
+- Updated technical documentation and private evidence. Local M6 is complete; reproducible installation, export/import verification, k6/performance and actual cloud CI/CD remain separate milestones. No push, billing activation or deployment.
+
 ## Reading continuity and route loading — 2026-09-07
 
 - Prepared actual public-route and composed-reading data before navigation, preserving the current page during requests and retaining explicit errors, retry, cancellation and viewer isolation. Added native cover continuity, fade-through main destinations and restrained lateral motion only for explicit parent-child journeys; kept the separate theme transition and a reduced-motion/unsupported-browser alternative.

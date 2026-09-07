@@ -83,6 +83,14 @@ All ten motion checks pass again after the final history guard (46.7 seconds), a
 
 Node checks total 34 and final lint/build pass. The main bundle is 342.31 kB with Apollo's separate 168.75 kB lazy chunk; these are not Lighthouse or load-test scores. Initial Vite stale-module exports, watched-backend 503s, test selector/timing defects and an actual undecoded incoming cover are retained as separate diagnostic failures. Stable verification runs the same four backend apps without file watching, against the same emulators. Cloud, k6 and the remaining administrative recovery audit are still separate work.
 
+## Administrative recovery and private identity — M6D
+
+The complete live E2E suite passes all 78 checks in 9.1 minutes. Twelve new checks cover return/archive reason recovery, a concurrently published newer version, a publication withdrawn into a private draft, entering another account, and an authenticated cookie swap between accounts that can both use the author workspace. All run in desktop/mobile viewports against the gateway and real emulators. Only test-owned UUID publications are withdrawn and logically deleted in cleanup.
+
+The tests revoke the current server session outside the SPA, attempt the real decision, reauthenticate through the UI and require explicit recovery. Downloaded JSON must contain exactly the personal reason, action and original version. Anonymous views expose neither reason nor download; a changed version cannot receive the old decision, and an inaccessible draft remains inaccessible. The identity-swap test requires a new private-list request and verifies that the old list disappears without replaying the old account's creation request.
+
+Four genuine light/dark desktop/mobile recovery captures were visually inspected, with no overflow and no Axe WCAG A/AA violations. An initial desktop diagnostic passed four checks and failed one because the test expected the muted color on a section that correctly inherits the main text color; the expectation was corrected without changing CSS or disabling accessibility checks. The final twelve-check targeted run passes in 1.1 minutes before the full suite. Node checks remain 34; lint and production build pass. No backend, database schema, permission or cloud configuration changed in this milestone. This closes local M6, not clean-install/load testing or real cloud delivery.
+
 ## Dependency review
 
 M2 audit on 2026-09-07: zero high/critical issues; nine moderate findings, five in the optional Storage SDK dependency chain and four in development tooling. The UUID advisory concerns buffer handling in UUID v3/v5/v6, while the Storage HTTP helper imports v4. Firebase CLI also includes older stream-json/OpenTelemetry branches. Do not apply `npm audit fix --force`: the suggested downgrade breaks the current Firebase runtime. Track upstream fixes and rerun audit/integration before production. These findings are disclosed, not counted as resolved by passing tests.

@@ -9,6 +9,9 @@ import { PublicationLoading } from '../components/PublicationFeed/PublicationFee
 import PublicationPreview from '../components/PublicationEditor/PublicationPreview'
 import { useResource } from '../hooks/useResource'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { useSession } from '../hooks/useSession'
+import { useDraftRecovery } from '../hooks/useDraftRecovery'
+import { RecoveryChoice } from '../components/DraftRecovery'
 import { changePublicationStatus, statusLabels } from '../services/publicationEditor'
 import '../styles/editor.css'
 
@@ -19,14 +22,18 @@ const actions = {
 }
 
 function Review({ initial, reload }) {
+  const { user } = useSession()
   const [publication, setPublication] = useState(initial), [action, setAction] = useState(null), [reason, setReason] = useState('')
   const [busy, setBusy] = useState(false), [error, setError] = useState(null), [notice, setNotice] = useState('')
   const pending = useRef(false)
+  const recovery = useDraftRecovery({ ownerId: user.id, key: 'review:' + publication.id, path: '/admin/publications/' + publication.id, label: 'Tu observación editorial', read: () => !recovery && reason.trim() ? { reason, action, version: publication.version } : null })
+  const staleRecovery = recovery && (recovery.payload.version !== publication.version || !((recovery.payload.action === 'draft' && publication.status === 'review') || (recovery.payload.action === 'archived' && publication.status === 'published')))
+  const blocked = busy || Boolean(recovery)
   usePageTitle(publication.title + ' · Revisión')
   const choose = (status) => { setReason(''); setError(null); setAction(status) }
   async function confirm(event) {
     event.preventDefault()
-    if (pending.current) return
+    if (pending.current || recovery) return
     pending.current = true; setBusy(true); setError(null)
     try {
       const changed = await changePublicationStatus(publication, action, reason)
@@ -37,6 +44,7 @@ function Review({ initial, reload }) {
   }
   return <>
     <UnsavedChanges dirty={Boolean(reason.trim())} pending={busy} />
+    {staleRecovery ? <section className="recovery-choice" aria-label="Observación de una versión anterior"><h2>La publicación cambió durante la interrupción</h2><p>Tu observación corresponde a la versión {recovery.payload.version}; la actual es {publication.version}. No se aplicará a esta versión. Copia el texto o descárgalo desde el aviso superior, revisa de nuevo la publicación y descarta la copia temporal antes de tomar otra decisión.</p><div className="form-field"><label htmlFor="recovered-review-reason">Tu observación anterior</label><textarea id="recovered-review-reason" readOnly rows={4} value={recovery.payload.reason} /></div></section> : <RecoveryChoice entry={recovery} versioned onRestore={(value) => { setReason(value.reason); setAction(value.action); setError(null) }} />}
     <p className="publication-status">{statusLabels[publication.status]} · Versión {publication.version}</p>
     {notice && <p className="success-message" role="status">{notice}</p>}
     {publication.status === 'draft' ? <p>El contenido vuelve a estar bajo el control de su autor. Ya no está disponible en esta cola.</p> : <>
@@ -44,8 +52,8 @@ function Review({ initial, reload }) {
       <PublicationPreview publicationId={publication.id} document={publication} />
       {publication.moderationNote && <p className="moderation-note">Observación: {publication.moderationNote.reason}</p>}
       <section className="account-section"><h2>Decisión de revisión</h2><div className="form-actions">
-        {publication.status === 'review' && <><button type="button" className="primary-button" disabled={busy} onClick={() => choose('published')}>Aprobar publicación</button><button type="button" className="secondary-button" disabled={busy} onClick={() => choose('draft')}>Devolver al autor</button></>}
-        {publication.status === 'published' && <button type="button" className="secondary-button" disabled={busy} onClick={() => choose('archived')}>Archivar publicación</button>}
+        {publication.status === 'review' && <><button type="button" className="primary-button" disabled={blocked} onClick={() => choose('published')}>Aprobar publicación</button><button type="button" className="secondary-button" disabled={blocked} onClick={() => choose('draft')}>Devolver al autor</button></>}
+        {publication.status === 'published' && <button type="button" className="secondary-button" disabled={blocked} onClick={() => choose('archived')}>Archivar publicación</button>}
         {publication.status === 'archived' && <p>Solo su autor puede recuperar esta publicación como borrador.</p>}
       </div></section>
     </>}
