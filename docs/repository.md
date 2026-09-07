@@ -17,6 +17,8 @@ Each application owns its package manifest, environment template, source tree, r
 
 Release-controller source lives in `scripts/release/`, guarded commands in `scripts/release-render.mjs` and `scripts/release-check.mjs`, and blank controller settings in `deploy/.env.example`. Contract fixtures exercise external API behavior without calling cloud accounts. The manual `release.yml` workflow depends on same-commit CI and configured production approval; see [release preparation](ci-cd.md#manual-production-workflow). These files do not create resources or demonstrate an executed release.
 
+`deploy/render.blueprint.example.json` is an intentionally unconfigured infrastructure example. `scripts/render-blueprint.mjs` can prepare the final root `render.yaml` after explicit owner-approved region/plan choices, without overwriting one that already exists. No active Blueprint is silently created from defaults.
+
 ## Private development context
 
 `.agent`, `.project`, and `resources` are local development inputs and are excluded from Git. Real environment files, dependencies, build output, logs, coverage, and editor state are also ignored. `.env.example` files are intentionally tracked because they document runtime configuration without containing credentials.

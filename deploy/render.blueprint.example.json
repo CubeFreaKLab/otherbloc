@@ -1,0 +1,88 @@
+{
+  "services": [
+    {
+      "type": "web", "runtime": "node", "name": "otherbloc-users",
+      "repo": "https://github.com/CubeFreaKLab/otherbloc", "branch": "main",
+      "region": "OWNER_MUST_SELECT_REGION", "plan": "OWNER_MUST_SELECT_PLAN",
+      "autoDeployTrigger": "off", "healthCheckPath": "/health", "numInstances": 1,
+      "buildCommand": "npm ci --omit=dev --workspace @otherbloc/users-service",
+      "startCommand": "npm start --workspace @otherbloc/users-service",
+      "envVars": [
+        { "key": "NODE_VERSION", "value": "24.14.1" },
+        { "key": "NODE_ENV", "value": "production" },
+        { "key": "PORT", "value": "3001" },
+        { "key": "JWT_SECRET", "generateValue": true },
+        { "key": "SERVICE_AUTH_SECRET", "generateValue": true },
+        { "key": "ALLOWED_ORIGINS", "sync": false },
+        { "key": "FIREBASE_PROJECT_ID", "sync": false },
+        { "key": "FIREBASE_STORAGE_BUCKET", "sync": false },
+        { "key": "FIREBASE_CLIENT_EMAIL", "sync": false },
+        { "key": "FIREBASE_PRIVATE_KEY", "sync": false }
+      ]
+    },
+    {
+      "type": "web", "runtime": "node", "name": "otherbloc-content",
+      "repo": "https://github.com/CubeFreaKLab/otherbloc", "branch": "main",
+      "region": "OWNER_MUST_SELECT_REGION", "plan": "OWNER_MUST_SELECT_PLAN",
+      "autoDeployTrigger": "off", "healthCheckPath": "/health", "numInstances": 1,
+      "buildCommand": "npm ci --omit=dev --workspace @otherbloc/content-service",
+      "startCommand": "npm start --workspace @otherbloc/content-service",
+      "envVars": [
+        { "key": "NODE_VERSION", "value": "24.14.1" },
+        { "key": "NODE_ENV", "value": "production" },
+        { "key": "PORT", "value": "3002" },
+        { "key": "JWT_SECRET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "JWT_SECRET" } },
+        { "key": "SERVICE_AUTH_SECRET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "SERVICE_AUTH_SECRET" } },
+        { "key": "FIREBASE_PROJECT_ID", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "FIREBASE_PROJECT_ID" } },
+        { "key": "FIREBASE_STORAGE_BUCKET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "FIREBASE_STORAGE_BUCKET" } },
+        { "key": "FIREBASE_CLIENT_EMAIL", "sync": false },
+        { "key": "FIREBASE_PRIVATE_KEY", "sync": false },
+        { "key": "USERS_SERVICE_URL", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "RENDER_EXTERNAL_URL" } }
+      ]
+    },
+    {
+      "type": "web", "runtime": "node", "name": "otherbloc-interactions",
+      "repo": "https://github.com/CubeFreaKLab/otherbloc", "branch": "main",
+      "region": "OWNER_MUST_SELECT_REGION", "plan": "OWNER_MUST_SELECT_PLAN",
+      "autoDeployTrigger": "off", "healthCheckPath": "/health", "numInstances": 1,
+      "buildCommand": "npm ci --omit=dev --workspace @otherbloc/interactions-service",
+      "startCommand": "npm start --workspace @otherbloc/interactions-service",
+      "envVars": [
+        { "key": "NODE_VERSION", "value": "24.14.1" },
+        { "key": "NODE_ENV", "value": "production" },
+        { "key": "PORT", "value": "3003" },
+        { "key": "JWT_SECRET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "JWT_SECRET" } },
+        { "key": "SERVICE_AUTH_SECRET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "SERVICE_AUTH_SECRET" } },
+        { "key": "FIREBASE_PROJECT_ID", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "FIREBASE_PROJECT_ID" } },
+        { "key": "FIREBASE_STORAGE_BUCKET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "FIREBASE_STORAGE_BUCKET" } },
+        { "key": "FIREBASE_CLIENT_EMAIL", "sync": false },
+        { "key": "FIREBASE_PRIVATE_KEY", "sync": false },
+        { "key": "USERS_SERVICE_URL", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "RENDER_EXTERNAL_URL" } },
+        { "key": "CONTENT_SERVICE_URL", "fromService": { "type": "web", "name": "otherbloc-content", "envVarKey": "RENDER_EXTERNAL_URL" } }
+      ]
+    },
+    {
+      "type": "web", "runtime": "node", "name": "otherbloc-gateway",
+      "repo": "https://github.com/CubeFreaKLab/otherbloc", "branch": "main",
+      "region": "OWNER_MUST_SELECT_REGION", "plan": "OWNER_MUST_SELECT_PLAN",
+      "autoDeployTrigger": "off", "healthCheckPath": "/health", "numInstances": 1,
+      "buildCommand": "npm ci --omit=dev --workspace @otherbloc/api-gateway",
+      "startCommand": "INTERACTIONS_SERVICE_URL=\"${INTERACTIONS_SERVICE_ORIGIN}/graphql\" npm start --workspace @otherbloc/api-gateway",
+      "envVars": [
+        { "key": "NODE_VERSION", "value": "24.14.1" },
+        { "key": "NODE_ENV", "value": "production" },
+        { "key": "PORT", "value": "3000" },
+        { "key": "TRUST_PROXY", "value": "1" },
+        { "key": "UPSTREAM_TIMEOUT_MS", "value": "15000" },
+        { "key": "RATE_LIMIT_MAX", "value": "18000" },
+        { "key": "RATE_LIMIT_WINDOW_MS", "value": "900000" },
+        { "key": "JWT_SECRET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "JWT_SECRET" } },
+        { "key": "SERVICE_AUTH_SECRET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "SERVICE_AUTH_SECRET" } },
+        { "key": "ALLOWED_ORIGINS", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "ALLOWED_ORIGINS" } },
+        { "key": "USERS_SERVICE_URL", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "RENDER_EXTERNAL_URL" } },
+        { "key": "CONTENT_SERVICE_URL", "fromService": { "type": "web", "name": "otherbloc-content", "envVarKey": "RENDER_EXTERNAL_URL" } },
+        { "key": "INTERACTIONS_SERVICE_ORIGIN", "fromService": { "type": "web", "name": "otherbloc-interactions", "envVarKey": "RENDER_EXTERNAL_URL" } }
+      ]
+    }
+  ]
+}

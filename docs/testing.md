@@ -155,6 +155,14 @@ Eight new controlled-response contracts bring Node checks to 71. They test proje
 
 No production API is called by these fixtures or by the deliberately rejected local CLI. Actual GitHub protection, Google WIF/IAM, Render resources, Hosting headers and three-role Firebase-cloud persistence still require authorized execution. No new full API/browser suite is attributed to this operational-only change. See [manual release sequencing and limits](ci-cd.md#manual-production-workflow).
 
+## Render infrastructure and production-only installs — M7G4
+
+Four new contracts bring Node checks to 75. They require explicit region/plan choices, exactly four independent services, assigned ports, per-workspace production installation, shared generated signing keys, distinct owner Firebase credentials, no gateway Firebase credential and external HTTPS service references preserving `/graphql`. Preparation changes only the region/plan fields and does not write or provision during tests.
+
+A private validator checks the official Render 2020-12 schema: placeholders deliberately fail and an in-memory location/free-plan fixture passes without selecting or activating either value. The initial Ajv 6 validator could not read that schema version; Ajv 8.20.0 and formats 3.0.1 were installed only in the private tooling directory, without changing application dependencies. Schema validation does not establish Render API semantics or account readiness.
+
+Four independent temporary checkouts of `5458e45` install each exact `npm ci --omit=dev --workspace ...` command. Every direct runtime dependency resolves inside its checkout, without ancestor dependency reuse; no Firebase CLI, ESLint, Vite or React is installed. All 27 owned Node checks pass across the four installations. The root Node suite, lint and build also pass. An actual CLI run in a private temporary copy rejects missing choices, creates a fixture-only Blueprint and refuses a second write with an unchanged file hash; no root `render.yaml` is created. Public reading passes again in one real desktop journey (5.9 seconds), and its profile screenshot is inspected. The existing five moderate Firebase-chain advisories remain, while the gateway's selected install reports none. This verifies dependency completeness on Windows, not actual Render startup or cloud business operations.
+
 ## Dependency review
 
 M2 audit on 2026-09-07: zero high/critical issues; nine moderate findings, five in the optional Storage SDK dependency chain and four in development tooling. The UUID advisory concerns buffer handling in UUID v3/v5/v6, while the Storage HTTP helper imports v4. Firebase CLI also includes older stream-json/OpenTelemetry branches. Do not apply `npm audit fix --force`: the suggested downgrade breaks the current Firebase runtime. Track upstream fixes and rerun audit/integration before production. These findings are disclosed, not counted as resolved by passing tests.

@@ -1,5 +1,11 @@
 # Development log
 
+## Explicit Render infrastructure preparation — 2026-09-07
+
+- Added a four-service Blueprint example with unchosen region/plan placeholders and a local preparation command requiring both explicit values without overwriting an existing configuration. It does not provision anything or pick a paid default.
+- Preserved ports, standalone owner entry points and production-only workspace installation. Shared generated signing keys and assigned public HTTPS URLs are referenced from their owner; Firebase runtime credentials remain distinct and never reach the gateway. Kept normal limits and documented first-provisioning, auto-sync, IAM and proxy verification boundaries.
+- Passed 75 root Node checks, lint/build, four Blueprint contracts and official-schema validation using in-memory fixture choices. Independently installed each production workspace outside the original dependency tree and passed its own tests: 89/280/280/320 packages, 27 owned checks total. Retained five moderate Firebase-chain advisories and did not claim Linux startup, Render semantics or cloud deployment.
+
 ## Manual same-commit Hosting and Render workflow — 2026-09-07
 
 - Prepared manual main-branch release dispatch with an explicit full SHA, existing production reviewer/main-only preflight, same-commit reusable CI, protected production approval and non-canceling release concurrency. The workflow does not inherit production secrets into CI and grants OIDC only to the release job.
