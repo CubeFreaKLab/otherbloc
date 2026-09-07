@@ -3,7 +3,7 @@
   "storage": { "rules": "storage.rules" },
   "hosting": {
     "public": "frontend/dist",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "**/gha-creds-*.json"],
     "rewrites": [{ "source": "**", "destination": "/index.html" }],
     "headers": [
       { "source": "**", "headers": [

@@ -24,7 +24,7 @@ export async function assertPortsAvailable(ports = ciPorts) {
 }
 
 export function ciEnvironment(source, temporary, runId) {
-  const environment = Object.fromEntries(Object.entries(source).filter(([key]) => !/^(FIREBASE_|FIRESTORE_|GCLOUD_|GOOGLE_|JWT_|SERVICE_AUTH_|SEED_|VITE_|DOTENV_|OTHERBLOC_CI_|RATE_LIMIT_|APP_REVISION$|RENDER_GIT_COMMIT$|TRUST_PROXY$|UPSTREAM_TIMEOUT_MS$|ALLOWED_ORIGINS$|USERS_SERVICE_URL$|CONTENT_SERVICE_URL$|INTERACTIONS_SERVICE_URL$|PORT$|NODE_ENV$|PATH$|TMP$|TEMP$|TMPDIR$|CI$)/i.test(key)))
+  const environment = Object.fromEntries(Object.entries(source).filter(([key]) => !/^(FIREBASE_|FIRESTORE_|GCLOUD_|GOOGLE_|RENDER_|RELEASE_|JWT_|SERVICE_AUTH_|SEED_|VITE_|DOTENV_|OTHERBLOC_CI_|RATE_LIMIT_|APP_REVISION$|TRUST_PROXY$|UPSTREAM_TIMEOUT_MS$|ALLOWED_ORIGINS$|USERS_SERVICE_URL$|CONTENT_SERVICE_URL$|INTERACTIONS_SERVICE_URL$|PORT$|NODE_ENV$|PATH$|TMP$|TEMP$|TMPDIR$|CI$)/i.test(key)))
   const runtimePath = Object.entries(source).find(([key]) => key.toUpperCase() === 'PATH')?.[1] ?? ''
   return { ...environment, PATH: runtimePath, CI: 'true', NODE_ENV: 'development', OTHERBLOC_CI_RUN_ID: runId,
     FIREBASE_PROJECT_ID: 'demo-otherbloc', GCLOUD_PROJECT: 'demo-otherbloc',

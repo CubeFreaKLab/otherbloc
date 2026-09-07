@@ -15,7 +15,7 @@ tests/                     Cross-application foundation checks
 
 Each application owns its package manifest, environment template, source tree, runtime entry point, and tests. Backend applications do not share source modules or import internal code from another service.
 
-Release-controller source lives in `scripts/release/`, its guarded command in `scripts/release-render.mjs`, and blank controller settings in `deploy/.env.example`. Contract fixtures exercise external API behavior without calling Render; see [deployment preparation](render-deployment.md). This does not create resources or a completed release workflow.
+Release-controller source lives in `scripts/release/`, guarded commands in `scripts/release-render.mjs` and `scripts/release-check.mjs`, and blank controller settings in `deploy/.env.example`. Contract fixtures exercise external API behavior without calling cloud accounts. The manual `release.yml` workflow depends on same-commit CI and configured production approval; see [release preparation](ci-cd.md#manual-production-workflow). These files do not create resources or demonstrate an executed release.
 
 ## Private development context
 

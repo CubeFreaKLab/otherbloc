@@ -1,5 +1,11 @@
 # Development log
 
+## Manual same-commit Hosting and Render workflow — 2026-09-07
+
+- Prepared manual main-branch release dispatch with an explicit full SHA, existing production reviewer/main-only preflight, same-commit reusable CI, protected production approval and non-canceling release concurrency. The workflow does not inherit production secrets into CI and grants OIDC only to the release job.
+- Added clean-checkout/manifest and destination guards, late pinned WIF authentication, explicit Hosting-only publication and final public version checks across all five targets. Temporary Google credentials are ignored/cleaned; local commands fail before external access. Emulator CI also strips inherited Render credentials/release approval labels.
+- Passed 71 Node checks, affected-contract reruns, lint/build and Actionlint on both workflows. Corrected test-regex spacing found by lint. All external behavior here uses controlled fixtures; actual resources, protected settings, IAM, push, Actions execution and cloud acceptance are not claimed.
+
 ## Guarded Render release controller — 2026-09-07
 
 - Prepared read-only Blueprint/service/deployment preflight and a sequential Users → Content → Interactions → Gateway controller using Render's official API contracts. It requires exact source identities, both independent auto-deployment paths disabled, explicit commit IDs, live deployment metadata and matching non-cached health before advancing.

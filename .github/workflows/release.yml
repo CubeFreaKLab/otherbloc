@@ -1,0 +1,113 @@
+name: Production release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_sha:
+        description: Full 40-character commit SHA at the selected main branch
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: otherbloc-production-release
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Check out the triggering revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+      - name: Require manual main dispatch and exact approved SHA
+        run: node scripts/release-check.mjs --context
+        env:
+          RELEASE_APPROVED_SHA: ${{ inputs.release_sha }}
+      - name: Verify existing production reviewer and main-only restriction
+        run: node scripts/release-check.mjs --protection
+        env:
+          RELEASE_APPROVED_SHA: ${{ inputs.release_sha }}
+          GITHUB_TOKEN: ${{ github.token }}
+
+  ci:
+    needs: gate
+    uses: ./.github/workflows/foundation-ci.yml
+
+  release:
+    needs: [gate, ci]
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    environment:
+      name: production
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    env:
+      RELEASE_APPROVED_SHA: ${{ inputs.release_sha }}
+      RENDER_BLUEPRINT_ID: ${{ vars.RENDER_BLUEPRINT_ID }}
+      RENDER_USERS_SERVICE_ID: ${{ vars.RENDER_USERS_SERVICE_ID }}
+      RENDER_USERS_ORIGIN: ${{ vars.RENDER_USERS_ORIGIN }}
+      RENDER_CONTENT_SERVICE_ID: ${{ vars.RENDER_CONTENT_SERVICE_ID }}
+      RENDER_CONTENT_ORIGIN: ${{ vars.RENDER_CONTENT_ORIGIN }}
+      RENDER_INTERACTIONS_SERVICE_ID: ${{ vars.RENDER_INTERACTIONS_SERVICE_ID }}
+      RENDER_INTERACTIONS_ORIGIN: ${{ vars.RENDER_INTERACTIONS_ORIGIN }}
+      RENDER_GATEWAY_SERVICE_ID: ${{ vars.RENDER_GATEWAY_SERVICE_ID }}
+      RENDER_GATEWAY_ORIGIN: ${{ vars.RENDER_GATEWAY_ORIGIN }}
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+      FIREBASE_HOSTING_ORIGIN: ${{ vars.FIREBASE_HOSTING_ORIGIN }}
+      GOOGLE_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GOOGLE_WORKLOAD_IDENTITY_PROVIDER }}
+      GOOGLE_DEPLOY_SERVICE_ACCOUNT: ${{ vars.GOOGLE_DEPLOY_SERVICE_ACCOUNT }}
+      VITE_API_URL: ${{ vars.RENDER_GATEWAY_ORIGIN }}/api
+      VITE_GRAPHQL_URL: ${{ vars.RENDER_GATEWAY_ORIGIN }}/api/interactions
+    steps:
+      - name: Check out the same revision that passed CI
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install the lockfile
+        run: npm ci
+      - name: Recheck production protection after approval
+        run: node scripts/release-check.mjs --protection
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Validate destinations and exact clean checkout
+        run: node scripts/release-check.mjs --config
+      - name: Build for the approved HTTPS gateway
+        run: npm run build
+      - name: Require the clean exact-revision manifest
+        run: node scripts/release-check.mjs --build
+      - name: Deploy and verify Render owners then gateway
+        run: node scripts/release-render.mjs --deploy
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      - name: Authenticate for Hosting after Render verification
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          project_id: ${{ vars.FIREBASE_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GOOGLE_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GOOGLE_DEPLOY_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          export_environment_variables: true
+          cleanup_credentials: true
+      - name: Deploy only Hosting to the approved project
+        run: node node_modules/firebase-tools/lib/bin/firebase.js deploy --only hosting --project "$FIREBASE_PROJECT_ID" --non-interactive
+      - name: Verify the public frontend and all four runtime revisions
+        run: node scripts/release-check.mjs --live

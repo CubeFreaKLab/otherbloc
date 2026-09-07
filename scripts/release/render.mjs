@@ -35,7 +35,8 @@ export function readRenderConfig(environment = process.env) {
 }
 
 export function assertReleaseContext(environment, revision) {
-  requireValue(environment.GITHUB_ACTIONS === 'true' && environment.GITHUB_EVENT_NAME === 'workflow_dispatch'
+  requireValue(typeof revision === 'string' && /^[a-f0-9]{40}$/.test(revision)
+    && environment.GITHUB_ACTIONS === 'true' && environment.GITHUB_EVENT_NAME === 'workflow_dispatch'
     && environment.GITHUB_REPOSITORY === repository && environment.GITHUB_REF === 'refs/heads/main'
     && environment.GITHUB_WORKFLOW_REF === repository + '/.github/workflows/release.yml@refs/heads/main'
     && environment.GITHUB_SHA === revision && environment.RELEASE_APPROVED_SHA === revision,

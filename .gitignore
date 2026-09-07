@@ -32,6 +32,7 @@ test-results/
 # Firebase
 .firebase/
 .local-data/
+gha-creds-*.json
 
 
 # Logs

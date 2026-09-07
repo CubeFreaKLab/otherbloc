@@ -1,6 +1,6 @@
 # Render release controller
 
-This is offline deployment preparation, not an executed Render release. No resources, paid plan, region, Blueprint or account settings have been created or changed. The owner must approve those choices and control the first push. The gated release workflow and final `render.yaml` are separate pending steps; the controller cannot presently establish a completed CD pipeline.
+This is offline deployment preparation, not an executed Render release. No resources, paid plan, region, Blueprint or account settings have been created or changed. The owner must approve those choices and control the first push. The [gated release workflow](ci-cd.md#manual-production-workflow) is prepared; final `render.yaml` and actual protection/account configuration remain pending. The controller cannot presently establish a completed CD pipeline.
 
 ## Approved topology and configuration
 
@@ -31,7 +31,7 @@ Service auto-deployment and Blueprint synchronization are separate controls: Ren
 
 ## Sequential exact-commit deployment
 
-`--deploy` additionally refuses execution outside the expected manually dispatched main-branch `release.yml` Actions context with a matching `RELEASE_APPROVED_SHA`. These environment checks are defense in depth, not proof of approval by themselves. The future workflow must depend on successful same-commit Platform CI and use a configured, reviewer-protected production environment; merely naming an environment in YAML does not establish that protection.
+`--deploy` additionally refuses execution outside the expected manually dispatched main-branch `release.yml` Actions context with a matching `RELEASE_APPROVED_SHA`. These environment checks are defense in depth, not proof of approval by themselves. The prepared workflow depends on successful same-commit Platform CI and checks the existing reviewer/main-only production configuration before and after its approval boundary; merely naming an environment in YAML does not establish protection. The owner still has to configure and authorize it in GitHub.
 
 After every read-only preflight passes, the controller deploys Users → Content → Interactions → Gateway. Every [Render deploy request](https://api-docs.render.com/reference/create-deploy) sends exactly `{ "commitId": "<full SHA>" }`, never an implicit latest branch or a deploy hook. It does not send a conflicting `deployMode`. It reads the returned deploy object directly and polls that ID; only `live` with the expected `commit.id` succeeds. An early queued response may omit its commit, but a mismatched commit is rejected immediately and a live response without it fails.
 

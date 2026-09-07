@@ -149,6 +149,12 @@ Thirteen new fixture-based contracts bring Node checks to 63. They validate four
 
 The complete Node suite, lint and build pass. Two real desktop reading journeys pass again in 12.7 seconds; their light/dark home screenshots were inspected and retained privately. Render requests in the controller tests are controlled fixtures, not real Render calls or cloud evidence. Existing application code, persistence, permissions and visual composition are unchanged. See [Render preparation, controls and limits](render-deployment.md); actual API permissions, protected Actions execution and cloud acceptance remain pending.
 
+## Manual Hosting/Render workflow — M7G3
+
+Eight new controlled-response contracts bring Node checks to 71. They test project/site/service-account and gateway bindings, clean workflow manifests, identified production reviewers and main-only policy, failed settings reads, stale/cacheable Hosting responses, local context rejection, same-commit workflow ordering/permissions and credential-file exclusions. Both YAML files pass Actionlint 1.7.12. The initial lint run caught repeated spaces in test regular expressions; they were changed to explicit repetition counts, then affected contracts, lint and build passed.
+
+No production API is called by these fixtures or by the deliberately rejected local CLI. Actual GitHub protection, Google WIF/IAM, Render resources, Hosting headers and three-role Firebase-cloud persistence still require authorized execution. No new full API/browser suite is attributed to this operational-only change. See [manual release sequencing and limits](ci-cd.md#manual-production-workflow).
+
 ## Dependency review
 
 M2 audit on 2026-09-07: zero high/critical issues; nine moderate findings, five in the optional Storage SDK dependency chain and four in development tooling. The UUID advisory concerns buffer handling in UUID v3/v5/v6, while the Storage HTTP helper imports v4. Firebase CLI also includes older stream-json/OpenTelemetry branches. Do not apply `npm audit fix --force`: the suggested downgrade breaks the current Firebase runtime. Track upstream fixes and rerun audit/integration before production. These findings are disclosed, not counted as resolved by passing tests.

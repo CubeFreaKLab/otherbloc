@@ -24,7 +24,7 @@ test('CI strips inherited cloud targets, credentials and rate overrides and fixe
   const { ciEnvironment, assertCiEnvironment } = await import('../scripts/ci-config.mjs')
   const environment = ciEnvironment({ PATH: 'runtime-bin', NODE_ENV: 'production', FIREBASE_PROJECT_ID: 'real-project',
     FIREBASE_PRIVATE_KEY: 'not-a-real-key', GOOGLE_APPLICATION_CREDENTIALS: '/private/service.json', JWT_SECRET: 'not-a-real-secret',
-    VITE_API_URL: 'https://remote.example.test', RATE_LIMIT_MAX: '1', TRUST_PROXY: '1', SEED_PASSWORD: 'not-a-real-password', APP_REVISION: 'old-invalid-revision', RENDER_GIT_COMMIT: 'other-invalid-revision',
+    VITE_API_URL: 'https://remote.example.test', RATE_LIMIT_MAX: '1', TRUST_PROXY: '1', SEED_PASSWORD: 'not-a-real-password', APP_REVISION: 'old-invalid-revision', RENDER_GIT_COMMIT: 'other-invalid-revision', RENDER_API_KEY: 'fixture-not-a-key', RELEASE_APPROVED_SHA: 'not-approved',
   }, '/isolated/runtime', '00000000-0000-4000-8000-000000000000')
   assertCiEnvironment(environment)
   assert.equal(environment.PATH, 'runtime-bin')
@@ -33,7 +33,7 @@ test('CI strips inherited cloud targets, credentials and rate overrides and fixe
   assert.equal(windows.Path, undefined)
   assert.equal(windows.Temp, undefined)
   assert.equal(windows.TEMP, '/isolated/windows')
-  for (const key of ['FIREBASE_PRIVATE_KEY', 'GOOGLE_APPLICATION_CREDENTIALS', 'JWT_SECRET', 'SEED_PASSWORD', 'VITE_API_URL', 'RATE_LIMIT_MAX', 'TRUST_PROXY', 'APP_REVISION', 'RENDER_GIT_COMMIT']) assert.equal(environment[key], undefined)
+  for (const key of ['FIREBASE_PRIVATE_KEY', 'GOOGLE_APPLICATION_CREDENTIALS', 'JWT_SECRET', 'SEED_PASSWORD', 'VITE_API_URL', 'RATE_LIMIT_MAX', 'TRUST_PROXY', 'APP_REVISION', 'RENDER_GIT_COMMIT', 'RENDER_API_KEY', 'RELEASE_APPROVED_SHA']) assert.equal(environment[key], undefined)
   assert.equal(environment.TMPDIR, '/isolated/runtime')
   for (const [key, value] of [['CI', 'false'], ['OTHERBLOC_CI_RUN_ID', ''], ['NODE_ENV', 'production'], ['FIREBASE_PROJECT_ID', 'real-project'], ['FIREBASE_STORAGE_BUCKET', 'remote.appspot.com'], ['FIRESTORE_EMULATOR_HOST', 'remote.test:8080'], ['FIREBASE_STORAGE_EMULATOR_HOST', '']]) {
     assert.throws(() => assertCiEnvironment({ ...environment, [key]: value }), /both isolated local emulators/)
