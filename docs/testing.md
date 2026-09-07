@@ -135,6 +135,14 @@ Platform CI now prepares installation, Node contracts, lint/build, visual/access
 
 Six new contracts verify CI isolation, environment/port guards, readiness and process failures, and workflow ordering. Negative runs over an existing private configuration and directly through the inner entry point fail before startup. Fresh credentials and temporary storage are distinct from development; no original snapshot is imported or overwritten. Four actual clean-run home screenshots are retained privately and inspected across both viewports/themes. Authentication traces/video remain off and the workflow uploads no private artifacts. See [CI setup, commands, verification and limitations](ci-cd.md); actual Actions/CD remain dependent on the owner's push and authorized cloud setup.
 
+## Exact deployment-version contracts — M7G1
+
+Seven new Node checks bring the total to 50: each owned backend validates full, matching runtime SHAs; frontend checks distinguish clean/dirty/unavailable Git state, reject inconsistent declarations and emit only the public manifest fields. HTTP health tests also require the revision field and `Cache-Control: no-store`. CI environment tests reject inherited backend deployment labels.
+
+All 50 checks, lint/build and the 30 real API checks pass (59.19 seconds for API). Four targeted public-reading E2E checks pass in desktop/mobile (27.5 seconds), including persisted publication/profile/media data, search/filter routing and error recovery. Four genuine production-preview screenshots were inspected in both themes and sizes. The latest complete 78-case run remains M7F; these four do not replace it.
+
+Actual startup of each backend with a malformed revision fails with exit 1 before listening, without disrupting the already running service. Restarting without revision metadata produces null at all four healthy endpoints. A production build from the uncommitted worktree correctly identifies the current HEAD and `dirty: true`. See [revision metadata and its limits](ci-cd.md#exact-revision-metadata); a local preview does not verify cloud cache headers, real Actions or Firebase persistence.
+
 ## Dependency review
 
 M2 audit on 2026-09-07: zero high/critical issues; nine moderate findings, five in the optional Storage SDK dependency chain and four in development tooling. The UUID advisory concerns buffer handling in UUID v3/v5/v6, while the Storage HTTP helper imports v4. Firebase CLI also includes older stream-json/OpenTelemetry branches. Do not apply `npm audit fix --force`: the suggested downgrade breaks the current Firebase runtime. Track upstream fixes and rerun audit/integration before production. These findings are disclosed, not counted as resolved by passing tests.

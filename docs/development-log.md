@@ -1,5 +1,11 @@
 # Development log
 
+## Verifiable runtime and frontend revisions — 2026-09-07
+
+- Added validated full-SHA metadata and non-cached REST health responses to the gateway and three owner services. Missing local metadata remains null; malformed or conflicting values prevent startup. The GraphQL schema, business routes, data ownership and permissions are unchanged.
+- Added a production-only frontend version manifest that distinguishes a clean commit, uncommitted files and unavailable Git metadata, validates declared build revisions and exposes no arbitrary environment values. Prepared its Firebase Hosting cache header and removed inherited backend revision labels from disposable CI.
+- Passed 50 Node checks, lint/build, 30 API checks (59.19 seconds) and four targeted live reading checks (27.5 seconds). Verified invalid startup in all four actual entry points, null local health versions and an honestly dirty build manifest; inspected four genuine preview screenshots across viewports/themes. This is metadata preparation for a later gated release, not cloud delivery or a new full 78-case browser run.
+
 ## Complete isolated CI verification — 2026-09-07
 
 - Expanded the existing workflow into reusable Platform CI with pinned setup actions, read-only repository permission, Node 24/Java 21, Chromium/system dependencies and sequential visual/API/live browser stages. No cloud credentials, persisted Git credentials, artifact upload, push or deployment is included.

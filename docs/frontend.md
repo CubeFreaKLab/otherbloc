@@ -8,6 +8,10 @@ The editorial presentation reads actual Content records through the gateway. Sev
 
 Authentication uses the actual Users service through the gateway: register/login, HttpOnly-cookie refresh, explicit errors and server-revoked logout. Access tokens remain in memory. Account/profile/avatar forms, user administration, the author editor and publication moderation are connected to Firestore/Storage through their services. Apollo Client connects reading composition, comments, reactions, saves and follows to Interactions through the gateway. Share uses native sharing/clipboard with an explicit fallback.
 
+## Build identity
+
+`tooling/revision.mjs` emits `version.json` only during production builds. It records the full checkout revision, whether tracked or untracked non-ignored files differ, and whether the revision came from Git or validated `APP_REVISION`/`GITHUB_SHA` metadata. Missing Git state is explicitly unknown, not clean. The manifest contains no credentials and does not change the rendered interface. Its Firebase Hosting header disables caching; read [release verification and limitations](ci-cd.md#exact-revision-metadata) before treating it as deployment evidence.
+
 ## Routes and reading
 
 - `/`: seven latest public records, first featured; real loading, empty, failure and retry states, without a duplicated masthead or newsletter.
