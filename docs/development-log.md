@@ -1,5 +1,11 @@
 # Development log
 
+## Clean-start and three-role README — 2026-09-07
+
+- Completed the technical README with prerequisites, ordered startup/seeds, private configurable credentials, three-role journeys, snapshot preservation, test modes and a documentation index. Removed the obsolete note that the README should remain empty.
+- Checked 32 local links/anchors and 14 npm command names against actual files/package scripts, including seed order. Reused the already recorded independent installation evidence rather than claiming another fresh install for a documentation-only change.
+- Rechecked one real desktop reading journey (5.8 seconds) and inspected its light-theme home capture. Clearly separated emulator/fixture results from pending Firebase, Render and Actions evidence; the owner's push and account/cost decisions remain required.
+
 ## Explicit Render infrastructure preparation — 2026-09-07
 
 - Added a four-service Blueprint example with unchosen region/plan placeholders and a local preparation command requiring both explicit values without overwriting an existing configuration. It does not provision anything or pick a paid default.
