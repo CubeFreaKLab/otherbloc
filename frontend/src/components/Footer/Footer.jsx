@@ -1,12 +1,18 @@
 import { Link } from 'react-router-dom'
+import { useSession } from '../../hooks/useSession'
 import './Footer.css'
 
 const groups = [
   { title: 'Descubrir', links: [['Todas las publicaciones', '/explore'], ['Cultura', '/explore?category=cultura'], ['Ciudad', '/explore?category=ciudad']] },
   { title: 'Leer', links: [['Tecnología', '/explore?category=tecnologia'], ['Escritura', '/explore?category=escritura'], ['Guías', '/explore?type=Gu%C3%ADa']] },
-  { title: 'Participar', links: [['Iniciar sesión', '/login'], ['Crear una cuenta', '/register']] },
 ]
 export default function Footer() {
+  const { user } = useSession()
+  const personal = user ? { title: 'Tu espacio', links: [
+    ['Mi cuenta', '/account'], ['Publicaciones guardadas', '/account/saved'], ['Autores que sigues', '/account/following'],
+    ...(['author', 'admin'].includes(user.role) ? [['Mis publicaciones', '/author']] : []),
+    ...(user.role === 'admin' ? [['Revisar publicaciones', '/admin/publications'], ['Administrar usuarios', '/admin/users']] : []),
+  ] } : { title: 'Participar', links: [['Iniciar sesión', '/login'], ['Crear una cuenta', '/register']] }
   return (
     <footer className="site-footer">
       <div className="site-footer__grid page-width">
@@ -15,7 +21,7 @@ export default function Footer() {
           <p>Un espacio para leer con tiempo y compartir otras miradas.</p>
           <small>© 2026 otherbloc</small>
         </div>
-        {groups.map((group) => <nav className="site-footer__group" aria-label={group.title} key={group.title}>
+        {[...groups, personal].map((group) => <nav className="site-footer__group" aria-label={group.title} key={group.title}>
           <h2>{group.title}</h2>
           {group.links.map(([label, href]) => <Link key={label} to={href}>{label}</Link>)}
         </nav>)}

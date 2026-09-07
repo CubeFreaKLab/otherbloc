@@ -64,6 +64,14 @@ A supported browser animates theme changes with a 380 ms circular View Transitio
 
 Color-preserving WebP derivatives of the supplied original photographs are in `public/images/{lectura,ciudad,escritura}.webp`. Source masters were not altered. Lists use CSS `grayscale(1)`; hover or focus restores `grayscale(0)` with `scale(1.03)` inside a clipped fixed-size container. Touch devices see color directly. Reading and access photographs remain in color. No new photography was substituted for the supplied assets.
 
+## Navigation, menus and dialogs
+
+The footer now follows the actual session: visitor access links become account/library links, authors also receive their publication area and administrators receive existing user/review routes. Server authorization still decides access; hiding a link is not a permission boundary.
+
+`NavigationFocus` augments React Router's scroll restoration with a bounded, in-memory history of positions and focus targets. It records navigation links without form values, waits for actual loading boundaries and font readiness, then restores the matching link and position on Back. Direct reading fragments wait for their real section and give it keyboard focus. Mutation/resize observers disconnect after restoration or a new pointer, wheel, touch or keyboard action, so a delayed response cannot pull a reader away. No request is delayed for animation. Same-route filter controls keep their existing interaction.
+
+The mobile menu is an anchored overlay, so opening it does not push down the reading. Route changes close it; Escape returns to its trigger; hidden or exiting links are inert only at the mobile breakpoint. CSS animates opacity/transform and discrete display for 160 ms. `EditorialDialog` is the common native-modal boundary for unsaved work, editorial decisions, recovery and user permissions. Native close releases focus immediately, and inert outgoing content is retained only until actual CSS animations finish. Unmounting private areas removes their nodes immediately, including the outgoing content. Backdrop and surface transitions are disabled for reduced motion. Reading/container continuity and hierarchical route transitions remain the next motion milestone.
+
 ## Development and verification
 
 ```sh

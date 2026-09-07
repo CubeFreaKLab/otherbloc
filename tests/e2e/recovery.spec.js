@@ -123,7 +123,7 @@ test('comment attempt survives reauthentication and can be retried without chang
 for (const concurrent of [false, true]) test('author recovery ' + (concurrent ? 'keeps its original version and cannot overwrite newer server work' : 'restores and saves unchanged-version work'), async ({ page, request }, testInfo) => {
   await page.goto('/login')
   await submitLogin(page, process.env.SEED_AUTHOR_EMAIL, process.env.SEED_PASSWORD)
-  await page.getByRole('link', { name: 'Mis publicaciones', exact: true }).click()
+  await page.locator('main').getByRole('link', { name: 'Mis publicaciones', exact: true }).click()
   await page.getByRole('button', { name: 'Nueva publicación', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Tu publicación' })).toBeVisible()
   const id = new URL(page.url()).pathname.split('/').pop()

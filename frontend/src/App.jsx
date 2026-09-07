@@ -1,37 +1,13 @@
-import { Outlet, ScrollRestoration, useLocation, useNavigationType } from 'react-router-dom'
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import { refreshSession } from './services/gatewayClient'
 import Footer from './components/Footer/Footer'
 import Header from './components/Header/Header'
 import DraftRecoveryNotice from './components/DraftRecovery'
+import NavigationFocus from './components/NavigationFocus'
 import './styles/layout.css'
 import './styles/pages.css'
 import './styles/account.css'
-
-function NavigationFocus() {
-  const location = useLocation()
-  const navigationType = useNavigationType()
-  const previous = useRef(location.pathname)
-  const focusTargets = useRef(new Map())
-  useLayoutEffect(() => {
-    const targets = focusTargets.current
-    if (previous.current !== location.pathname) {
-      const previousHref = navigationType === 'POP' ? targets.get(location.key) : null
-      const target = previousHref
-        ? [...document.querySelectorAll('a[href]')].find((element) => element.getAttribute('href') === previousHref)
-        : document.querySelector('main')
-      target?.focus({ preventScroll: true })
-      previous.current = location.pathname
-    }
-    const heading = document.querySelector('h1')?.textContent
-    document.title = heading ? heading + ' — otherbloc' : 'otherbloc'
-    return () => {
-      const href = document.activeElement?.getAttribute('href')
-      if (href) targets.set(location.key, href)
-    }
-  }, [location, navigationType])
-  return null
-}
 
 export default function App() {
   useEffect(() => { refreshSession().catch(() => {}) }, [])

@@ -1,5 +1,14 @@
 # Development log
 
+## Navigation and transient surfaces — 2026-09-07
+
+- Restored reading-source focus and scroll after actual asynchronous feed loading, including direct reading fragments. Bounded observers stop when restoration finishes or the reader starts a new interaction, avoiding late focus theft.
+- Changed the mobile menu to an anchored overlay without content displacement, with route-aware closing, keyboard return and inert exiting links. Unified native dialogs across editing, recovery, moderation and user permissions with short CSS entry/exit transitions, immediate native focus release and reduced-motion handling for both surfaces and backdrops.
+- Completed the footer's account, library, author and administrator destinations from the real session. Preserved server-side permission boundaries, brand typography, original photos and existing editorial geometry.
+- Verified all 52 live E2E journeys in 6.4 minutes, 32 Node checks, lint and production build. New tests inspect actual outgoing animations and cover both themes, keyboard and mobile/desktop; diagnostic selector/observer timing failures remain distinguished from application defects.
+- Updated the public design-system document to reflect the implemented three-way themes and readable muted-text tokens rather than the old Foundation light-only description. Integrated-browser manual loading remained inconclusive and is not presented as a passing reading journey.
+- Reading/container continuity, hierarchical route transitions, final recovery audit, performance, clean installation and cloud CI/CD remain separate work. No push, paid-resource activation or deployment.
+
 ## Interrupted sessions and identity-bound retries — 2026-09-07
 
 - Preserved pending profile text, comment attempts and publication documents in an owner-scoped, memory-only recovery store before an interrupted session unmounts their forms. Anonymous views reveal no contents; returning to the same account requires explicit restoration or confirmed discard. Another account purges the previous copies.

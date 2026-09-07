@@ -9,10 +9,10 @@ The interface is typography-first and reading-focused. Scale, spacing, image pro
 The design is configured at:
 
 - design variance: 6
-- motion intensity: 3
+- motion intensity: 4 (short, task-driven transitions)
 - visual density: 3
 
-This produces asymmetric desktop compositions, restrained hover feedback, generous whitespace, and direct single-column mobile layouts.
+This preserves asymmetric desktop compositions, restrained state changes, generous whitespace, and direct single-column mobile layouts. It is an editorial aesthetic implemented with the existing CSS, not a replacement Material component theme.
 
 ## Color
 
@@ -26,7 +26,7 @@ This produces asymmetric desktop compositions, restrained hover feedback, genero
 | Paper | `#F6F5F3` | Page background |
 | White | `#FEFEFE` | Fields and raised reading surfaces |
 
-The interface uses a locked light, print-emulating theme. Text and interactive controls maintain high contrast against paper surfaces.
+These are the supplied light-brand values. The runtime strengthens muted text from `#7F7F7B` to `#646460` for readable contrast. Light, dark and system preferences apply to the entire page and persist as a theme preference only. Dark surfaces use paper `#171716`, white `#20201E`, paper grey `#292927`, ink `#F6F5F3`, graphite `#D0D0CB`, muted text `#A9A9A3` and line `#575752`. Existing original photographs remain in color; CSS desaturates list images until hover/focus, while touch layouts show color directly.
 
 ## Typography
 
@@ -42,6 +42,10 @@ The maximum content width is 1536 pixels with fluid page gutters. Desktop layout
 
 ## Motion and states
 
-Motion is limited to short hover, focus, and press feedback. Reduced-motion preferences disable nonessential transitions. Loading, empty, and error foundations are available through `ContentState`, and forms use explicit labels, visible focus styles, and readable helper text.
+Hover, focus and press feedback stay short. Theme changes use the existing 380 ms circular transition. Mobile navigation overlays the reading without shifting its layout; menu and modal surfaces enter and exit in 160 ms using opacity and a small transform. Native dialog close releases focus immediately, while the outgoing visual finishes and becomes non-interactive. Backdrops also honor reduced motion. Unsupported transition features fall back to immediate native behavior.
 
-The complete measured profile is stored in `frontend/src/styles/design-dna.json`.
+This applies the appearance/disappearance purpose of [Material's fade pattern](https://github.com/material-components/material-components-android/blob/master/docs/theming/Motion.md) to existing editorial surfaces, without importing Android components or changing the site's design system. CSS `@starting-style` and discrete display/overlay transitions follow [the native dialog animation model](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog#animating_dialogs). Reading continuity and hierarchical route transitions are a separate follow-up.
+
+Loading skeletons represent actual requests, not fixed animation delays. Empty/error/retry views remain explicit. Forms retain native labels, visible focus and readable helper text. History restoration waits for real content and fonts and stops if the user starts another interaction, so a late response does not steal focus.
+
+The original measured reference profile is stored in `frontend/src/styles/design-dna.json`; this document records subsequent implemented behavior and accessible theme adjustments.

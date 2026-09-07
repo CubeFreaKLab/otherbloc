@@ -108,7 +108,6 @@
 
   .site-header__actions { gap: .65rem; }
   .site-header__utility { gap: .5rem; }
-  .site-header__nav--open { animation: menu-appear 160ms var(--ease-standard); transform-origin: top; }
 
   .site-header__menu-button {
     display: inline-flex;
@@ -116,6 +115,14 @@
 
   .site-header__nav {
     display: none;
+    position: absolute;
+    inset: 100% 0 auto;
+    width: 100%;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    opacity: 0;
+    transform: translateY(-.4rem);
+    transition: opacity 160ms var(--ease-standard), transform 160ms var(--ease-standard), display 160ms allow-discrete;
     min-height: 0;
     align-items: stretch;
     padding-top: var(--space-3);
@@ -127,7 +134,11 @@
 
   .site-header__nav--open {
     display: flex;
+    opacity: 1;
+    transform: none;
   }
+
+  @starting-style { .site-header__nav--open { opacity: 0; transform: translateY(-.4rem); } }
 
   .site-header__nav a {
     padding: var(--space-3) 0;
@@ -142,8 +153,6 @@
     margin-left: 0;
   }
 }
-
-@keyframes menu-appear { from { opacity: 0; transform: translateY(-.5rem); } to { opacity: 1; transform: none; } }
 
 @media (max-width: 23rem) {
   .site-header__brand img { width: 6.2rem; }

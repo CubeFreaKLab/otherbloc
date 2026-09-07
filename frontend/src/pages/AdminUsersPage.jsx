@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SessionBoundary from '../components/SessionBoundary'
+import EditorialDialog from '../components/EditorialDialog'
 import { useSession } from '../hooks/useSession'
 import { gatewayRequest } from '../services/gatewayClient'
 import '../styles/account.css'
@@ -18,7 +19,6 @@ function UserManagement() {
   const [saving, setSaving] = useState(false)
   const [role, setRole] = useState('reader')
   const [status, setStatus] = useState('active')
-  const dialog = useRef(null)
   const pending = useRef(false)
   const load = useCallback(async (after = null) => {
     setLoading(true); setError('')
@@ -30,7 +30,6 @@ function UserManagement() {
     finally { setLoading(false) }
   }, [])
   useEffect(() => { load() }, [load])
-  useEffect(() => { if (selected) dialog.current?.showModal(); else dialog.current?.close() }, [selected])
   function choose(item) { setRole(item.role); setStatus(item.status); setError(''); setSelected(item) }
   async function save(event) {
     event.preventDefault()
@@ -55,7 +54,7 @@ function UserManagement() {
       <button className="secondary-button" disabled={item.id === user.id || loading} onClick={() => choose(item)} aria-label={'Gestionar a ' + item.name}>{item.id === user.id ? 'Tu cuenta' : 'Gestionar'}</button>
     </li>)}</ul>
     {cursor && <button className="secondary-button" disabled={loading} onClick={() => load(cursor)}>{loading ? 'Cargando…' : 'Cargar más usuarios'}</button>}
-    <dialog ref={dialog} className="editorial-dialog" aria-labelledby="permissions-title" onCancel={(event) => { event.preventDefault(); if (!saving) setSelected(null) }}>
+    <EditorialDialog open={Boolean(selected)} aria-labelledby="permissions-title" onCancel={(event) => { event.preventDefault(); if (!saving) setSelected(null) }}>
       <h2 id="permissions-title">Permisos de {selected?.name}</h2><p>La cuenta debe volver a iniciar sesión si cambias su rol o estado.</p>
       <form className="account-form" onSubmit={save} aria-busy={saving}>
         <div className="form-field"><label htmlFor="user-role">Rol de la cuenta</label><select id="user-role" value={role} onChange={(event) => setRole(event.target.value)}>{Object.entries(labels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
@@ -64,7 +63,7 @@ function UserManagement() {
         {error && <p className="form-feedback" role="alert">{error}</p>}
         <div className="form-actions"><button className="primary-button" disabled={saving}>{saving ? 'Guardando…' : 'Confirmar permisos'}</button><button className="secondary-button" type="button" disabled={saving} onClick={() => setSelected(null)}>Cancelar</button></div>
       </form>
-    </dialog>
+    </EditorialDialog>
   </>
 }
 

@@ -99,7 +99,7 @@ test('reader is denied administration; admin approves an author and the new role
   await expect(page.getByRole('heading', { name: 'Acceso no permitido' })).toBeVisible()
   await logout(page)
   await login(page, process.env.SEED_ADMIN_EMAIL, process.env.SEED_PASSWORD)
-  await page.getByRole('link', { name: 'Administrar usuarios' }).click()
+  await page.locator('main').getByRole('link', { name: 'Administrar usuarios' }).click()
   await expect(page.locator('.admin-users-list li').first()).toBeVisible()
   let row = page.locator('[data-user-id="' + reader.id + '"]')
   while (!await row.count()) {

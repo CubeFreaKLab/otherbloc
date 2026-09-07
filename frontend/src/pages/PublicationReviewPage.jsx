@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import SessionBoundary from '../components/SessionBoundary'
+import EditorialDialog from '../components/EditorialDialog'
 import UnsavedChanges from '../components/UnsavedChanges'
 import ContentState from '../components/ContentState/ContentState'
 import { PublicationLoading } from '../components/PublicationFeed/PublicationFeed'
@@ -19,9 +20,8 @@ const actions = {
 function Review({ initial, reload }) {
   const [publication, setPublication] = useState(initial), [action, setAction] = useState(null), [reason, setReason] = useState('')
   const [busy, setBusy] = useState(false), [error, setError] = useState(null), [notice, setNotice] = useState('')
-  const pending = useRef(false), dialog = useRef(null)
+  const pending = useRef(false)
   usePageTitle(publication.title + ' · Revisión')
-  useEffect(() => { if (action) dialog.current?.showModal(); else dialog.current?.close() }, [action])
   const choose = (status) => { setReason(''); setError(null); setAction(status) }
   async function confirm(event) {
     event.preventDefault()
@@ -48,14 +48,14 @@ function Review({ initial, reload }) {
         {publication.status === 'archived' && <p>Solo su autor puede recuperar esta publicación como borrador.</p>}
       </div></section>
     </>}
-    <dialog ref={dialog} className="editorial-dialog" aria-labelledby="review-confirm-title" onCancel={(event) => { event.preventDefault(); if (!busy) { setAction(null); setReason('') } }}>
+    <EditorialDialog open={Boolean(action)} aria-labelledby="review-confirm-title" onCancel={(event) => { event.preventDefault(); if (!busy) { setAction(null); setReason('') } }}>
       <h2 id="review-confirm-title">{actions[action]?.title}</h2><p>{actions[action]?.description}</p>
       <form className="account-form" onSubmit={confirm} aria-busy={busy}>
         {action !== 'published' && <div className="form-field"><label htmlFor="moderation-reason">Motivo para el autor</label><textarea id="moderation-reason" rows={4} required maxLength={1000} value={reason} disabled={busy} onChange={(event) => setReason(event.target.value)} /><small>Obligatorio. Hasta 1000 caracteres.</small></div>}
         {error && <div className="form-feedback" role="alert"><p>{error.message}</p>{error.status === 409 && <p>La publicación cambió desde que la abriste. Cancela y carga la versión actual antes de decidir.</p>}</div>}
         <div className="form-actions"><button className="secondary-button" type="button" disabled={busy} onClick={() => { setAction(null); setReason('') }}>Cancelar</button><button className="primary-button" disabled={busy || error?.status === 409 || (action !== 'published' && !reason.trim())}>{busy ? 'Procesando…' : actions[action]?.label}</button></div>
       </form>
-    </dialog>
+    </EditorialDialog>
     {!action && error?.status === 409 && <div className="form-feedback" role="alert"><p>{error.message}</p><button type="button" className="secondary-button" onClick={reload}>Cargar versión actual</button></div>}
   </>
 }

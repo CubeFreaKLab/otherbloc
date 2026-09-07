@@ -11,7 +11,7 @@ async function login(page, role = 'author') {
 }
 
 async function create(page) {
-  await page.getByRole('link', { name: 'Mis publicaciones', exact: true }).click()
+  await page.locator('main').getByRole('link', { name: 'Mis publicaciones', exact: true }).click()
   await page.getByRole('button', { name: 'Nueva publicación', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Tu publicación' })).toBeVisible()
   return new URL(page.url()).pathname.split('/').pop()
@@ -125,7 +125,7 @@ test('author writes all blocks; admin returns, approves and archives; public vis
     await page.getByRole('button', { name: 'Volver al editor' }).click()
     await expect(page.getByLabel('Título', { exact: true })).toBeDisabled()
     await login(admin, 'admin')
-    await admin.getByRole('link', { name: 'Revisar publicaciones' }).click()
+    await admin.locator('main').getByRole('link', { name: 'Revisar publicaciones' }).click()
     await admin.getByRole('link', { name: title, exact: true }).click()
     await expect(admin.locator('.editor-preview')).toContainText('El orden de las ideas')
     await admin.getByRole('button', { name: 'Devolver al autor' }).click()
@@ -192,7 +192,7 @@ test('autosave preserves typing during a slow save and blocks navigation until t
     await page.getByLabel('Título', { exact: true }).fill('Primera versión en camino')
     await started
     await page.getByLabel('Título', { exact: true }).fill('Segunda versión escrita durante el guardado')
-    await page.getByRole('link', { name: 'Mis publicaciones', exact: true }).click()
+    await page.locator('main').getByRole('link', { name: 'Mis publicaciones', exact: true }).click()
     const dialog = page.getByRole('dialog', { name: 'Hay una operación en curso' })
     await expect(dialog).toBeVisible()
     await expect(dialog.getByRole('button', { name: 'Salir sin guardar' })).toBeDisabled()
@@ -226,7 +226,7 @@ test('two editor tabs detect version conflicts without overwriting; recovery req
     await second.getByRole('button', { name: 'Descargar mis cambios' }).click()
     const download = await downloadEvent
     expect(download.suggestedFilename()).toBe('otherbloc-borrador-' + id + '.json')
-    await second.getByRole('link', { name: 'Mis publicaciones', exact: true }).click()
+    await second.locator('main').getByRole('link', { name: 'Mis publicaciones', exact: true }).click()
     await expect(second.getByRole('dialog', { name: 'Tienes cambios sin guardar' })).toBeVisible()
     await second.keyboard.press('Escape')
     await second.getByRole('button', { name: 'Recargar contenido del servidor' }).click()

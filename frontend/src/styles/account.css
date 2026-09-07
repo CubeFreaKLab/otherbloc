@@ -33,7 +33,15 @@
 .editorial-dialog::backdrop { background: #0008; }
 .editorial-dialog h2 { margin-top: 0; font-size: 2rem; }
 .editorial-dialog p { line-height: 1.6; margin-bottom: 1.5rem; }
-.editorial-dialog[open] { animation: dialog-enter 160ms ease-out; }
+.editorial-dialog { opacity: 0; transform: translateY(.4rem) scale(.98); transition: opacity 160ms ease-out, transform 160ms var(--ease-standard), display 160ms allow-discrete, overlay 160ms allow-discrete; }
+.editorial-dialog[open] { opacity: 1; transform: none; }
+.editorial-dialog::backdrop { opacity: 0; transition: opacity 160ms ease-out, display 160ms allow-discrete, overlay 160ms allow-discrete; }
+.editorial-dialog[open]::backdrop { opacity: 1; }
+@starting-style {
+  .editorial-dialog[open] { opacity: 0; transform: translateY(.4rem) scale(.98); }
+  .editorial-dialog[open]::backdrop { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .editorial-dialog, .editorial-dialog::backdrop { transition: none !important; } }
 .session-state { min-height: 16rem; padding-block: 2rem; }
 .session-state p { line-height: 1.65; }
 .admin-users-list { list-style: none; margin: 2rem 0; padding: 0; }
@@ -46,5 +54,4 @@
 .text-skeleton { height: 1rem; background: var(--paper-grey); margin-block: 1rem; width: min(80%, 28rem); animation: skeleton-pulse 1.2s ease-in-out infinite alternate; }
 .text-skeleton:nth-child(2) { width: min(60%, 20rem); }
 @keyframes skeleton-pulse { to { opacity: .4; } }
-@keyframes dialog-enter { from { opacity: 0; transform: translateY(.4rem); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 35rem) { .account-avatar { gap: 1rem; align-items: flex-start; } .account-avatar img, .account-avatar__initial { width: 4rem; height: 4rem; } .account-avatar .secondary-button { padding-inline: .75rem; } .admin-users-list li { align-items: flex-start; flex-direction: column; gap: 1rem; } }
