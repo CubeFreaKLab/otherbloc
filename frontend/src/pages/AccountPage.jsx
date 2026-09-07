@@ -95,5 +95,5 @@ function PasswordSection({ disabled }) {
 
 export default function AccountPage() {
   const { user } = useSession()
-  return <main id="main-content" className="account-page page-width" tabIndex={-1}><header className="account-heading"><span className="eyebrow">Tu espacio en otherbloc</span><h1>Mi cuenta</h1>{user?.role === 'admin' && <Link className="text-link" to="/admin/users">Administrar usuarios</Link>}</header><SessionBoundary>{user && <ProfileEditor key={user.id} user={user} />}</SessionBoundary></main>
+  return <main id="main-content" className="account-page page-width" tabIndex={-1}><header className="account-heading"><span className="eyebrow">Tu espacio en otherbloc</span><h1>Mi cuenta</h1><div className="form-actions">{['author', 'admin'].includes(user?.role) && <Link className="text-link" to="/author">Mis publicaciones</Link>}{user?.role === 'admin' && <><Link className="text-link" to="/admin/users">Administrar usuarios</Link><Link className="text-link" to="/admin/publications">Revisar publicaciones</Link></>}</div></header><SessionBoundary>{user && <ProfileEditor key={user.id} user={user} />}</SessionBoundary></main>
 }

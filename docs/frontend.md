@@ -6,7 +6,7 @@ The React/Vite frontend preserves the editorial identity: Prumo titles, Adelle S
 
 The editorial presentation reads actual Content records through the gateway. Seven Spanish publications and synthetic authors are reproducibly seeded into Firestore/Storage emulators and visibly marked as demonstration content. `src/data/articles.js` supplies seed and visual-test input only; production views do not import it or fall back to it. Fictional news and review identify themselves inside their content. Navigation taxonomy is separate from article fixtures.
 
-Authentication now uses the actual Users service through the gateway: register/login, HttpOnly-cookie refresh, explicit errors and server-revoked logout. Access tokens remain in memory. Account/profile/avatar forms and administrator user management are connected and tested with Firestore/Storage emulators. Authoring, publication moderation and interactions remain later integration milestones. The Save link still leads to sign-in until Interactions is connected; Share uses native sharing/clipboard with an explicit fallback.
+Authentication uses the actual Users service through the gateway: register/login, HttpOnly-cookie refresh, explicit errors and server-revoked logout. Access tokens remain in memory. Account/profile/avatar forms, user administration, the author editor and publication moderation are connected to Firestore/Storage through their services. Interactions remain the next milestone. The Save link still leads to sign-in until Interactions is connected; Share uses native sharing/clipboard with an explicit fallback.
 
 ## Routes and reading
 
@@ -17,15 +17,29 @@ Authentication now uses the actual Users service through the gateway: register/l
 - `/login`, `/register`: the approved split photographic composition on desktop; form-only composition on mobile.
 - `/account`: own profile/avatar, author request, password change and server-revoked logout. Unsaved profile changes block navigation and refresh.
 - `/admin/users`: paginated user management, access-denied state for non-admins and a keyboard-trapped confirmation dialog. All role enforcement also occurs server-side.
+- `/author`: own publications, status filter and cursor pagination; idempotent draft creation.
+- `/author/publications/:id`: owner-only block editor, versioned manual/autosave, private preview, image uploads and lifecycle controls.
+- `/admin/publications`: administrator review/published/archived queues with pagination.
+- `/admin/publications/:id`: read-only review, approval, return-to-author and archival with explicit confirmation. Returning or archiving requires a reason in this interface.
 - Unknown paths render an explicit 404 view, without redirecting silently to home.
 
-The footer links only to existing destinations. The primary navigation checks category query parameters, avoiding multiple active categories. Reading data is public and does not attach a stale access token; private author requests will use the authenticated client. Bounded profile lookup (`/users/profiles`, maximum 40 IDs) hydrates current public names without exposing private emails. Missing/suspended profiles are labeled unavailable, not replaced with an invented person. Async article/profile titles update after the data arrives. All five block types, heading levels, ordered lists, quote attribution and image captions render without HTML injection.
+The footer links only to existing destinations. The primary navigation checks category query parameters, avoiding multiple active categories. Reading data is public and does not attach a stale access token; private author requests use the authenticated client. Bounded profile lookup (`/users/profiles`, maximum 40 IDs) hydrates current public names without exposing private emails. Missing/suspended profiles are labeled unavailable, not replaced with an invented person. Async article/profile titles update after the data arrives. All five block types, heading levels, ordered lists, quote attribution and image captions render without HTML injection.
+
+## Author editor and moderation
+
+The editor serializes only allowed document fields. Five block controls support paragraph, heading, ordered/unordered list, quote with attribution, and image with alt text/caption. Stable UUIDs preserve block identity while moving them. Block removal, state transitions, deletion and conflict recovery use native modal confirmations. All data writes enter through the gateway; private image bytes are fetched with authentication and displayed as temporary Blob URLs, revoked on cleanup.
+
+Autosave waits 1.2 seconds after editing stops. It serializes in-flight saves and records the snapshot actually sent, preserving any text typed while that request was pending. Later edits trigger another save with the returned version. The status distinguishes unsaved, saving, saved and failed work. A 409 stops autosave without discarding inputs; users can download their local JSON or explicitly replace it with the server version. The download is a backup, not an import feature. Network errors retain inputs and support manual retry. Nothing stores publication data in localStorage.
+
+Navigation and browser unload warn about unsaved work. In-app departure is blocked until a pending save/upload/state operation ends, because an already-sent request cannot honestly be described as discarded. Uploads pause autosave and block dependent block manipulation. Status changes wait for the latest save and lock editing. Confirmed deletion uses the server version directly, so invalid unsaved fields do not prevent the owner from deleting a draft. It does not silently overwrite a newer server version.
+
+Published/review/archived documents are read-only in the editor. Authors can submit, withdraw, archive, recover and logically delete only as allowed by the Content API. Administrators review without editing someone else's text. Notes appear in the author's workspace after return or administrative archival; stale moderation decisions require loading current state. All these checks are enforced independently by the server. A reload restores the last successful save, not keystrokes that never reached the server.
 
 ## Theme, images and accessibility
 
 Light, dark and system themes are selected with a labeled native control. Only the preference is stored in localStorage; no credentials or business records are stored there. The inline head initialization avoids a wrong-theme flash. System changes and storage events update the selected theme; unavailable storage does not prevent use.
 
-A supported browser animates theme changes with a 380 ms circular View Transition from the control. Unsupported browsers and reduced-motion users get an immediate change. The transition overlay does not intercept input. Native controls, visible focus, a skip link and route focus handling support keyboard reading. React Router's data router preserves scroll history; changing exploration filters preserves the current position.
+A supported browser animates theme changes with a 380 ms circular View Transition from the control. Unsupported browsers and reduced-motion users get an immediate change. The transition overlay does not intercept input. Primary-button foreground/background colors switch as a contrasting pair; separately interpolating them caused a transient 3.99:1 contrast failure during testing. Button motion remains, and the circular theme transition is preserved. Native controls, visible focus, a skip link and route focus handling support keyboard reading. React Router's data router preserves scroll history; changing exploration filters preserves the current position.
 
 Color-preserving WebP derivatives of the supplied original photographs are in `public/images/{lectura,ciudad,escritura}.webp`. Source masters were not altered. Lists use CSS `grayscale(1)`; hover or focus restores `grayscale(0)` with `scale(1.03)` inside a clipped fixed-size container. Touch devices see color directly. Reading and access photographs remain in color. No new photography was substituted for the supplied assets.
 
@@ -42,7 +56,7 @@ npm run build
 
 Vite uses port 5173. Browser tests cover desktop and mobile layouts, filtering/reload, 404, content/author mapping, theme persistence, system theme changes, reduced motion, keyboard fields, contrast and layout overflow. Automated accessibility checks complement visual review; they do not by themselves certify accessibility.
 
-`npm run test:e2e` drives account journeys and actual public reading/search/filter/profile/reload/image journeys against services and emulators. Ten scenarios pass across desktop/mobile, including an explicitly injected failure followed by a retry against the real gateway. Visual regression fixtures are separate and are not persistence evidence. See [development](development.md). Author editor and moderation screens are still M4B; GraphQL interactions and deployment remain pending.
+`npm run test:e2e` drives account, public reading and author/editor/moderation journeys against services and emulators. It also exercises slow saves, two-tab conflicts, rejected uploads, private/public visibility, failed-save recovery and denied roles in desktop/mobile viewports. Explicit fault injection is limited to failure/delay scenarios; successful data is not mocked. Visual regression fixtures are separate and are not persistence evidence. See [testing](testing.md) and [development](development.md). GraphQL interactions and deployment remain pending.
 
 ## Asset and performance maintenance
 

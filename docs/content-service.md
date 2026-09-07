@@ -44,7 +44,7 @@ Drafts may be incomplete so work can be recovered. Review and publication requir
 | Published → archived | Owner, or admin with a reason | Remove from public lists/detail/media without destroying content |
 | Archived → draft | Owner with author/admin role | Recover for editing and a new review cycle |
 
-Administrators may author their own content, but cannot edit somebody else's text. Deletion hides an owner's draft/archive irreversibly from the product; it does not physically erase Firestore history or private Storage files. No restore/delete-others endpoint is offered. Retention/maintenance remains separate. Previously downloaded bytes cannot be recalled; public image responses can remain cached for 60 seconds after archival.
+Administrators may author their own content, but cannot edit somebody else's text. Administrative returns and archives retain a private note for the author, in addition to atomic history. Deletion hides an owner's draft/archive irreversibly from the product; it does not physically erase Firestore history or private Storage files. No restore/delete-others endpoint is offered. Retention/maintenance remains separate. Previously downloaded bytes cannot be recalled; public image responses can remain cached for 60 seconds after archival.
 
 Each protected request verifies JWT issuer/audience/kind and asks Users `/internal/session` for the current identity/role. No client `userId` or role header is authoritative, and Content does not read Users collections. A Users outage returns 503 for protected operations; anonymous public reads remain independent. This is a per-request check, not a distributed transaction spanning services.
 
@@ -72,4 +72,4 @@ Start emulators separately first; see [development](development.md). Seed input 
 
 Runtime variables: `PORT`, `NODE_ENV`, `JWT_SECRET`, `SERVICE_AUTH_SECRET`, `USERS_SERVICE_URL`, Firebase project/bucket and emulator or server credential variables. Production service URLs require HTTPS and keys at least 32 bytes. No credentials are frontend variables.
 
-M4A verifies the API lifecycle and connected public reading, including actual Firestore/Storage emulator data, concurrency, authorization, uploads, real browser search/reading and injected-error recovery. The author editor and moderation screens are M4B, not yet delivered. Interactions, Firebase cloud, Hosting/Render and real CI/CD remain pending.
+M4A verifies the API lifecycle and connected public reading, including actual Firestore/Storage emulator data, concurrency, authorization, uploads, real browser search/reading and injected-error recovery. M4B connects the owner editor and administration screens, including autosave/version-conflict recovery, authenticated image previews, approval/return/archive and deletion. See [frontend](frontend.md). Interactions, Firebase cloud, Hosting/Render and real CI/CD remain pending.

@@ -238,6 +238,7 @@ test('moderation rejection, withdrawal, archiving and deletion follow the docume
   publication = await transition(publication, 'published', users.admin)
   assert.equal((await http('PATCH', url(publication.id, '/status'), { user: users.admin, version: publication.version, body: { status: 'archived' } })).status, 400)
   publication = await transition(publication, 'archived', users.admin, 'Revisión de una referencia.')
+  assert.equal(publication.moderationNote.reason, 'Revisión de una referencia.')
   assert.equal((await http('GET', url(publication.id))).status, 404)
   assert.equal((await http('GET', publication.image)).status, 404)
   assert.equal((await http('PATCH', url(publication.id, '/status'), { user: users.admin, version: publication.version, body: { status: 'draft' } })).status, 409)

@@ -228,7 +228,8 @@ h3 {
   background: var(--ink);
   color: var(--white);
   font-weight: 800;
-  transition: background var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
+  /* Theme snapshots must keep contrasting foreground/background pairs. */
+  transition: transform var(--duration-fast) var(--ease-standard);
 }
 
 .primary-button:hover {

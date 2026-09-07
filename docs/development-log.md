@@ -1,5 +1,15 @@
 # Development log
 
+## Author editor and publication moderation — 2026-09-07
+
+- Connected own-publication management, status filters, cursor navigation and idempotent draft creation to Content.
+- Built the five-block editor with metadata, cover/inline uploads, accessible controls, reordering/removal and authenticated private previews. Preserved existing typefaces, spacing language, themes and supplied imagery without introducing a UI framework.
+- Added versioned manual/autosave that preserves typing during pending saves, conflict detection/local JSON backup, explicit server recovery, network retry and pending-operation navigation protection.
+- Connected review submission/withdrawal, archive/recovery and logical deletion, with confirmations. Administrators now review without editing other authors, approve, return with a reason and archive. Archival notes remain visible to the author as well as in atomic audit history.
+- Diagnosed a genuine transient contrast failure caused by independently interpolated button colors during theme changes; kept contrasting color pairs and retained the circular theme transition. Did not disable accessibility assertions or conceal the failing run.
+- Verified 23 Node tests, 21 integration tests, 18 visual regressions and 20 actual E2E journeys in desktop/mobile, plus lint/build. Reviewed genuine editor, moderation and conflict screenshots. Failures and final passing logs remain private.
+- This completes local M4B, not the full delivery. GraphQL interactions, final cross-area/motion/performance work and real cloud CI/CD remain pending. No push or billing activation.
+
 ## Persistent Content and public reading — 2026-09-07
 
 - Implemented Content-owned block documents, draft/review/published/archived transitions, image ownership, logical deletion and atomic audit entries. Authoring and moderation screens remain the next sub-milestone.

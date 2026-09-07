@@ -18,6 +18,10 @@ const router = createBrowserRouter([{
     { path: '/register', lazy: async () => ({ Component: (await import('./pages/RegisterPage')).default }) },
     { path: '/account', lazy: async () => ({ Component: (await import('./pages/AccountPage')).default }) },
     { path: '/admin/users', lazy: async () => ({ Component: (await import('./pages/AdminUsersPage')).default }) },
+    { path: '/admin/publications', lazy: async () => ({ Component: (await import('./pages/AdminPublicationsPage')).default }) },
+    { path: '/admin/publications/:id', lazy: async () => ({ Component: (await import('./pages/PublicationReviewPage')).default }) },
+    { path: '/author', lazy: async () => ({ Component: (await import('./pages/AuthorPage')).default }) },
+    { path: '/author/publications/:id', lazy: async () => ({ Component: (await import('./pages/PublicationEditorPage')).default }) },
     { path: '*', element: <NotFoundPage /> },
   ],
 }])

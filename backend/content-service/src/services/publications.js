@@ -157,7 +157,7 @@ export function createPublicationsService({ firebase = getFirebase, now = Date.n
       if (!owner && (to === 'draft' || to === 'archived') && !input.reason) fail(400, 'moderation_reason_required', 'Explica el motivo de esta decisión de moderación.')
       if (to === 'review' || to === 'published') { requirePublishable(publication); await validateAssets(db, publication) }
       const changes = { status: to, isPublic: to === 'published', version: publication.version + 1, updatedAt: time(),
-        moderationNote: to === 'draft' && admin && !owner ? { reason: input.reason, at: time() } : null }
+        moderationNote: ['draft', 'archived'].includes(to) && admin && !owner ? { reason: input.reason, at: time() } : null }
       if (to === 'published') Object.assign(changes, { publishedAt: time(), firstPublishedAt: publication.firstPublishedAt ?? time() })
       if (to === 'archived') changes.archivedAt = time()
       if (from === 'archived') changes.archivedAt = null

@@ -1,0 +1,48 @@
+.author-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 1.5rem; margin-bottom: 2rem; }
+.author-toolbar .form-field { min-width: 12rem; }
+.author-publications { border-top: 1px solid var(--line); }
+.author-publication { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2rem; align-items: center; padding-block: 2rem; border-bottom: 1px solid var(--line); }
+.author-publication h2 { margin: .75rem 0; }
+.author-publication p { margin: 0; color: var(--graphite); }
+.publication-status { font-family: var(--font-ui); font-size: var(--text-small); font-weight: 800; }
+.moderation-note { margin-top: 1rem !important; border-left: 2px solid var(--ink); padding: .5rem 1rem; background: var(--paper-grey); }
+.editor-page { padding-bottom: 5rem; }
+.editor-heading { padding-block: 2.5rem 1.5rem; border-bottom: 1px solid var(--line); }
+.editor-heading h1 { font-size: clamp(2.5rem, 6vw, 4.25rem); margin: 1rem 0; }
+.editor-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; padding-block: 1.25rem; border-bottom: 1px solid var(--line); }
+.editor-toolbar p { margin: 0 auto 0 0; font-size: var(--text-small); }
+.editor-layout { display: grid; grid-template-columns: minmax(0, 1fr) 18rem; gap: 3rem; padding-top: 2rem; }
+.editor-document, .editor-block__fields { display: grid; gap: 1.5rem; min-width: 0; }
+.editor-document fieldset, .editor-block__fields { margin: 0; padding: 0; border: 0; }
+.editor-document legend { font-family: var(--font-title); font-size: 2rem; margin-bottom: 1.5rem; }
+.editor-metadata { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.editor-span { grid-column: 1 / -1; }
+.editor-block { border-top: 1px solid var(--line); padding-top: 1.5rem; }
+.editor-block__header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.editor-block__header h3 { font-family: var(--font-ui); font-size: 1rem; margin: 0; }
+.editor-block__tools { display: flex; gap: .25rem; }
+.editor-block__tools button { width: 2.75rem; height: 2.75rem; display: inline-grid; place-items: center; border: 1px solid var(--line); background: var(--paper); color: var(--ink); }
+.editor-block__tools button:hover:not(:disabled) { background: var(--paper-grey); }
+.editor-block__tools button:disabled { opacity: .4; }
+.editor-checkbox { display: inline-flex; align-items: center; gap: .75rem; min-height: 2.75rem; }
+.editor-checkbox input { width: 1.2rem; height: 1.2rem; accent-color: var(--ink); }
+.editor-image-preview { display: block; width: 100%; max-height: 24rem; object-fit: contain; margin-bottom: 1rem; background: var(--paper-grey); }
+.editor-image-state { min-height: 12rem; display: grid; place-content: center; border: 1px solid var(--line); padding: 1.5rem; }
+.editor-image-field .field-help { margin-bottom: 0; }
+.editor-block-picker { border: 1px solid var(--line); padding: 1.25rem; margin-top: 1.5rem; }
+.editor-block-picker h3 { font-family: var(--font-ui); font-size: 1rem; margin: 0 0 1rem; }
+.editor-block-picker .form-actions { gap: .5rem; }
+.editor-block-picker button { flex: 1 1 7rem; }
+.editor-aside { align-self: start; border-left: 1px solid var(--line); padding-left: 1.5rem; }
+.editor-aside h2 { font-family: var(--font-ui); font-size: 1rem; margin-top: 0; }
+.editor-aside p { color: var(--graphite); line-height: 1.7; }
+.editor-aside .form-actions { align-items: stretch; flex-direction: column; }
+.editor-preview { max-width: 58rem; margin: 3rem auto; }
+.editor-preview h2 { font-size: clamp(2.75rem, 7vw, 5rem); line-height: 1.06; overflow-wrap: anywhere; }
+.editor-preview__summary { font-family: var(--font-reading); font-size: 1.4rem; line-height: 1.6; }
+.editor-preview__cover { width: 100%; height: auto; margin-block: 2rem; }
+.editor-preview .article-prose { max-width: 44rem; margin: 2rem auto; }
+.editor-preview .article-prose h3 { font-family: var(--font-title); font-size: 2.25rem; }
+.editor-preview .article-prose h4 { font-family: var(--font-title); font-size: 1.6rem; }
+@media (max-width: 63.99rem) { .editor-layout { grid-template-columns: minmax(0, 1fr); } .editor-aside { border-left: 0; border-top: 1px solid var(--line); padding: 1.5rem 0 0; } }
+@media (max-width: 47.99rem) { .author-toolbar { align-items: stretch; flex-direction: column; } .author-publication { grid-template-columns: 1fr; gap: 1rem; } .editor-metadata { grid-template-columns: 1fr; } .editor-toolbar { align-items: stretch; } .editor-toolbar p { width: 100%; } .editor-toolbar button { flex: 1; } }
