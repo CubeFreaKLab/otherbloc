@@ -24,6 +24,33 @@ test('emulator commands reject unknown actions and accept explicit imports only 
   for (const args of [['typo'], ['start', '--import='], ['export', '--force'], ['test', '--import=x'], ['start', '--import=x', '--force']]) assert.throws(() => parseEmulatorArgs(args))
 })
 
+test('local load verification fixes the required workload and rejects incomplete or remote media datasets', async () => {
+  const { loadGateway, loadOptions, parseLoadArgs, selectLoadDataset, loadRoutes } = await import('../scripts/load-config.mjs')
+  assert.equal(loadGateway, 'http://127.0.0.1:3000')
+  assert.equal(parseLoadArgs([]), 'load')
+  assert.equal(parseLoadArgs(['--smoke']), 'smoke')
+  for (const args of [['--vus=1'], ['--duration=1s'], ['--smoke', '--smoke']]) assert.throws(() => parseLoadArgs(args))
+  assert.throws(() => loadOptions('unknown'))
+  const options = loadOptions('load')
+  assert.deepEqual(options.scenarios.reading, { executor: 'constant-vus', vus: 50, duration: '60s', gracefulStop: '10s' })
+  assert.equal(loadOptions('smoke').scenarios.reading.iterations, 1)
+  assert.deepEqual(options.thresholds.http_req_failed, ['rate==0'])
+  assert.deepEqual(options.thresholds.checks, ['rate==1'])
+  assert.deepEqual(options.thresholds.http_req_duration, ['p(95)<400'])
+  for (const route of loadRoutes) assert.deepEqual(options.thresholds['http_req_duration{name:' + route + '}'], ['p(95)<400'])
+  const items = Array.from({ length: 7 }, (_, index) => ({ id: 'demo-' + index, authorId: 'author-' + index % 4, image: '/api/publications/demo-' + index + '/media/test-cover', demo: true, status: 'published', title: 'Not retained in evidence' }))
+  const dataset = selectLoadDataset({ items })
+  assert.equal(dataset.publications.length, 7)
+  assert.equal(dataset.authorIds.length, 4)
+  assert.deepEqual(Object.keys(dataset.publications[0]), ['id', 'authorId', 'image'])
+  assert.throws(() => selectLoadDataset({ error: 'upstream_unavailable' }))
+  assert.throws(() => selectLoadDataset({ items: items.slice(0, 6) }))
+  assert.throws(() => selectLoadDataset({ items: [...items, items[0]] }))
+  for (const image of ['https://example.test/private', '/api/publications/demo-0/media/../../users/me', '/api/publications/demo-0/media/x?token=private']) {
+    assert.throws(() => selectLoadDataset({ items: [{ ...items[0], image }, ...items.slice(1)] }))
+  }
+})
+
 const services = [
   {
     directory: 'api-gateway',

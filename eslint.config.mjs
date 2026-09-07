@@ -20,4 +20,5 @@ export default [
     rules: { 'react-hooks/rules-of-hooks': 'error', 'react-hooks/exhaustive-deps': 'error' },
   },
   { files: ['tests/browser/**/*.js', 'tests/e2e/**/*.js'], languageOptions: { globals: globals.browser } },
+  { files: ['tests/load/**/*.js'], languageOptions: { globals: { __ENV: 'readonly', open: 'readonly' } } },
 ]

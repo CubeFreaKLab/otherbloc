@@ -1,5 +1,11 @@
 # Development log
 
+## Measured local reading load — 2026-09-07
+
+- Added a loopback/demo-only k6 runner with discovered seed IDs, fresh private evidence directories, script hashes, exact environment/options and preserved exit codes. The fixed 50-VU/60-second closed workload reads publications, four profiles, composed GraphQL and real Storage images, with one-second reader think time and independent per-route thresholds.
+- Passed 11,476 requests and 22,952 business checks with zero HTTP errors. Overall P95 is 31.63 ms; route P95 values are 23.98/14.54/39.22/34.53 ms for publications/profiles/composition/media. Recorded hardware, the 60.983-second completion window, normal security limits and the limits of same-host emulator inference.
+- Kept the initial smoke's incorrect image query as failed diagnostic evidence; fixed the test parameter to the existing API contract before the passing smoke/full run. No product/security behavior changed. Node checks increase to 37, lint/build pass, and public browser reading is rechecked after load. No cloud performance, push or deployment is claimed.
+
 ## Clean installation and independent data — 2026-09-07
 
 - Verified a separate clone of `7e24e12` with `npm ci`, generated private configuration and an initially empty emulator database. Both seeds created six demo accounts and seven published readings with Storage images through their real service workflows.

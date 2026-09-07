@@ -115,6 +115,12 @@ On that checkout, all 36 Node checks, lint and build pass, as do all 30 API inte
 
 The original environment was exported and stopped before the clean suite occupied its ports. The clone used its own temporary storage and exported to its own snapshot on interactive shutdown. The original then imported its separate `current` snapshot, with live public-content/Storage reading verified again. No private configuration or test data was transferred between the two copies. The nine disclosed moderate dependency findings remain; clean installation does not resolve advisories or prove cloud delivery.
 
+## Load acceptance — M7D
+
+The local k6 run passes 50 constant virtual users for 60 seconds, with 11,476 real gateway requests, 22,952 successful business checks and no failed HTTP requests. Overall P95 is 31.63 ms; each of the four independent route thresholds also passes below 400 ms. The workload includes actual public REST data, owner-service GraphQL composition and Storage image bytes. See [load testing](load-testing.md) for reproducible commands, exact routes, hardware, per-route results, retained diagnostic failures and limitations. This is neither a cloud result nor an authenticated-write stress test.
+
+The new workload/configuration contract brings Node checks to 37; lint and build pass. Reading UI remains unchanged and is checked against the live services after the run. The previously verified clean checkout remains `7e24e12`; load tooling was added afterward.
+
 ## Dependency review
 
 M2 audit on 2026-09-07: zero high/critical issues; nine moderate findings, five in the optional Storage SDK dependency chain and four in development tooling. The UUID advisory concerns buffer handling in UUID v3/v5/v6, while the Storage HTTP helper imports v4. Firebase CLI also includes older stream-json/OpenTelemetry branches. Do not apply `npm audit fix --force`: the suggested downgrade breaks the current Firebase runtime. Track upstream fixes and rerun audit/integration before production. These findings are disclosed, not counted as resolved by passing tests.
