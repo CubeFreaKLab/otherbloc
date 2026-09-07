@@ -14,10 +14,14 @@ async function hydrate(items, options) {
   const ids = [...new Set(items.map((item) => item.authorId))]
   const profiles = await publicRequest('/users/profiles?ids=' + ids.map(encodeURIComponent).join(','), options)
   const byId = new Map(profiles.items.map((user) => [user.id, user]))
-  return items.map((item) => ({ ...item, authorProfile: byId.get(item.authorId) ?? null, author: byId.get(item.authorId)?.name ?? 'Cuenta no disponible',
+  return items.map((item) => publicationToArticle(item, byId.get(item.authorId) ?? null))
+}
+
+export function publicationToArticle(item, authorProfile) {
+  return { ...item, authorProfile, author: authorProfile?.name ?? 'Cuenta no disponible',
     readTime: item.readingMinutes + ' min de lectura', image: gatewayMediaUrl(item.image),
     imageSrcSet: item.coverWidth ? [...[640, 960].filter((width) => width < item.coverWidth).map((width) => gatewayMediaUrl(item.image) + '?width=' + width + ' ' + width + 'w'), gatewayMediaUrl(item.image) + ' ' + item.coverWidth + 'w'].join(', ') : undefined,
-  }))
+  }
 }
 
 export async function loadPublications(path, options) {

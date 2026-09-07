@@ -1,5 +1,14 @@
 # Development log
 
+## Composed GraphQL and personal interactions — 2026-09-07
+
+- Implemented current-session GraphQL context, public Content/Users HTTP composition, bounded selections/pages/work, private error-safe transport and actual Apollo Client integration through the existing gateway.
+- Added comments, one-kind reactions, saved publications and author follows with deterministic relation IDs, idempotent desired-state writes and atomic counter updates. Comment attempt UUIDs survive uncertain response failures. Only writers delete their comments; unavailable public targets remain removable from private lists.
+- Connected reading controls, public comments and followable profiles; added saved/followed account routes with loading, cursor pagination, empty/error/retry and account isolation. Preserved the editorial fonts, monochrome palette, original photography, keyboard controls and themes.
+- Verified 31 Node checks, 30 real emulator integration checks, 18 visual checks and 28 E2E journeys (4.5 minutes), plus lint/build. A genuinely committed comment with a lost response is retried without duplication; account changes in the same browser document do not reuse private state. Manual LAN verification confirms actual comment/save writes and their own removal.
+- Corrected library heading spacing after genuine screenshot review. Added cryptographic UUID-v4 fallback for non-loopback HTTP previews and kept Apollo out of Home's preload graph with explicit manual chunks. No new performance score is claimed.
+- Deployment, k6/load performance and final cross-area recovery remain pending. In particular, revoked sessions must not silently discard unsent editor/comment work; M6 addresses this separately. No push, paid-resource activation or cloud verification is claimed.
+
 ## Author editor and publication moderation — 2026-09-07
 
 - Connected own-publication management, status filters, cursor navigation and idempotent draft creation to Content.

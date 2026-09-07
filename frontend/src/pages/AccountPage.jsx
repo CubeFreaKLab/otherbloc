@@ -48,6 +48,7 @@ function ProfileEditor({ user }) {
   }
   return <>
     <UnsavedChanges dirty={dirty} />
+    <nav className="account-library form-actions" aria-label="Tu biblioteca"><Link className="text-link" to="/account/saved">Publicaciones guardadas</Link><Link className="text-link" to="/account/following">Autores que sigues</Link></nav>
     <section className="account-profile" aria-labelledby="profile-edit-title">
       <div className="account-profile__heading"><div><span className="eyebrow">{roleNames[user.role]}</span><h2 id="profile-edit-title">Tu perfil</h2></div><Link className="text-link" to={'/profile/' + user.id}>Ver perfil público</Link></div>
       <div className="account-avatar">

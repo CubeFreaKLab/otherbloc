@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { BookmarkSimple, ShareNetwork } from '@phosphor-icons/react'
+import { ShareNetwork } from '@phosphor-icons/react'
 import { Link, useParams } from 'react-router-dom'
 import AuthorCard from '../components/AuthorCard/AuthorCard'
 import CategoryTag from '../components/CategoryTag/CategoryTag'
 import { useResource } from '../hooks/useResource'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { loadPublication } from '../services/publications'
+import { loadInteractionPublication } from '../services/interactionQueries'
+import { useSession } from '../hooks/useSession'
+import { SaveControl, ReactionControl, FollowControl } from '../components/Interactions/InteractionControls'
+import CommentSection from '../components/Interactions/CommentSection'
 import { gatewayMediaUrl } from '../services/gatewayClient'
 import ContentState from '../components/ContentState/ContentState'
 import { PublicationLoading } from '../components/PublicationFeed/PublicationFeed'
@@ -22,9 +25,8 @@ export function ArticleBlocks({ blocks }) {
   })
 }
 
-export default function ArticlePage() {
-  const { slug } = useParams()
-  const { data, status, error, retry } = useResource('/publications/' + encodeURIComponent(slug), loadPublication)
+function ReadingPage({ slug, viewer }) {
+  const { data, status, error, retry } = useResource('/publications/' + encodeURIComponent(slug) + '?viewer=' + viewer, loadInteractionPublication)
   const article = data?.publication
   usePageTitle(article?.title ?? (error?.status === 404 ? 'Publicación no encontrada' : 'Publicación'))
   const [shareMessage, setShareMessage] = useState('')
@@ -59,7 +61,7 @@ export default function ArticlePage() {
           </div>
         </div>
         <div className="article-page__actions" aria-label="Acciones de la publicación">
-          <Link to={'/login?returnTo=' + encodeURIComponent('/article/' + article.slug)}><BookmarkSimple size={19} aria-hidden="true" /> Guardar</Link>
+          <SaveControl publicationId={article.id} initialSaved={article.saved} />
           <button type="button" onClick={share}><ShareNetwork size={19} aria-hidden="true" /> Compartir</button>
         </div>
       </header>
@@ -73,7 +75,16 @@ export default function ArticlePage() {
         </aside>
       </div>
       <AuthorCard author={article.authorProfile} />
+      <div className="reading-interactions"><ReactionControl publicationId={article.id} initial={article.reactions} />{article.authorProfile && <FollowControl author={article.authorProfile} initialFollowing={article.followingAuthor} />}</div>
       {article.demo && <p className="demo-label">Publicación de demostración · {article.type}</p>}
+      <CommentSection publicationId={article.id} initial={article.comments} initialCount={article.commentCount} />
     </main>
   )
+}
+
+export default function ArticlePage() {
+  const { slug } = useParams(), { user, status } = useSession()
+  if (status === 'loading') return <main id="main-content" tabIndex={-1} className="page-width page-main"><h1 className="visually-hidden">Publicación</h1><PublicationLoading feature /></main>
+  const viewer = user?.id ?? 'anonymous'
+  return <ReadingPage key={slug + ':' + viewer} slug={slug} viewer={viewer} />
 }

@@ -2,6 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { articles, authors, filterArticles, publicationTypes } from '../src/data/articles.js'
 import { readThemePreference, resolveTheme } from '../src/utils/theme.js'
+import { createId } from '../src/utils/createId.js'
 
 test('demo edition covers every publication type with independent content and valid author references', () => {
   assert.deepEqual(new Set(articles.map((article) => article.type)), new Set(publicationTypes))
@@ -29,4 +30,11 @@ test('theme handles system preferences, invalid stored values and unavailable st
   assert.equal(readThemePreference({ getItem: () => 'invalid' }), 'system')
   assert.equal(readThemePreference({ getItem: () => { throw new Error('blocked') } }), 'system')
   assert.equal(readThemePreference({ getItem: () => 'dark' }), 'dark')
+})
+
+test('draft and comment IDs remain valid UUIDs in local LAN previews without randomUUID', () => {
+  const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/
+  assert.match(createId(), uuid)
+  assert.match(createId({ getRandomValues: (bytes) => globalThis.crypto.getRandomValues(bytes) }), uuid)
+  assert.equal(createId({ getRandomValues: (bytes) => bytes.fill(255) }), 'ffffffff-ffff-4fff-bfff-ffffffffffff')
 })

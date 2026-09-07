@@ -6,6 +6,7 @@ import { PublicationLoading, PublicationPagination } from '../components/Publica
 import { useResource } from '../hooks/useResource'
 import { gatewayRequest } from '../services/gatewayClient'
 import { statusLabels } from '../services/publicationEditor'
+import { createId } from '../utils/createId'
 import '../styles/editor.css'
 
 function AuthorWorkspace() {
@@ -19,7 +20,7 @@ function AuthorWorkspace() {
   async function create() {
     if (pending.current) return
     pending.current = true; setBusy(true); setCreateError('')
-    creation.current ??= crypto.randomUUID()
+    creation.current ??= createId()
     try {
       const { publication } = await gatewayRequest('/publications', { method: 'POST', body: { id: creation.current } })
       navigate('/author/publications/' + publication.id)

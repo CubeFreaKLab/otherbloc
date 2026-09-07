@@ -15,7 +15,7 @@ npm run test:ui
 npm run test:e2e
 ```
 
-`npm test` first checks the repository layout, independent service entry points, assigned ports, and frontend-to-gateway boundaries. It then runs each backend workspace's tests against an ephemeral local server. The Interactions suite also executes the initial GraphQL operation.
+`npm test` first checks the repository layout, independent service entry points, assigned ports, and frontend-to-gateway boundaries. It then runs each backend workspace's tests against an ephemeral local server. Interactions also checks GraphQL schema/input/index/privacy contracts, internal access, HTTP batching/selection limits and safe errors.
 
 `npm run build` compiles the React application with Vite. This catches module resolution, asset, JSX, and production bundling failures.
 
@@ -46,6 +46,16 @@ Ten new E2E checks (five scenarios × desktop/mobile) use the actual gateway, Us
 Controlled request delays prove that typing during an in-flight save survives the next save and reload, and that in-app navigation cannot discard a pending operation. Two tabs provoke a real 409 without overwriting server data; downloading local changes and explicitly reloading the server copy are tested. A 503 is deliberately injected only for the failed-save case; the later retry hits the real service. Invalid local tags do not prevent confirmed draft deletion. UUID test publications are logically deleted through the owning author's API, not by touching development collections directly.
 
 The first full editor run passed 8/10 and exposed transient 3.99:1 primary-button contrast during theme changes. Production CSS now switches foreground/background together while preserving the circular transition. A subsequent full E2E run passed 20/20 in 3.3 minutes, alongside 23 Node checks, 21 emulator integration checks, 18 visual regression checks, lint and build. Screenshots and Axe checks cover both editor themes and responsive viewports. Dialog screenshots wait for the actual entrance animation to finish; they are not synthetic mockups. Visual inspection is separate from automated accessibility results. Cloud and load-test acceptance remain pending.
+
+## GraphQL and personal interactions — M5
+
+Nine Interactions API scenarios bring the isolated emulator suite to 30 passing checks. They start all four real HTTP applications and use each domain's own Admin client in `demo-otherbloc-test`: public composition, identity spoofing/role/privacy negatives, concurrent idempotent reactions/comments/follows with exact counters, own comment deletion, saved/followed/comment cursors, archived references, current session revocation, upstream outages and persistence after replacing the Interactions HTTP app. No extra storage substitute or cross-domain database access is used.
+
+The Node suite passes 31 checks, including the UUID-v4 LAN fallback and rejection of oversized GraphQL selection sets and HTTP batches. The 18 visual regressions pass with explicit GraphQL reading fixtures, not live success replacements. Eight new E2E checks (four scenarios × desktop/mobile) cover real save/react/follow/comment, reload persistence, own deletion/undo, private library error/retry, visitor access, unsent-comment navigation focus and account isolation inside the same loaded browser document. The entire E2E suite passes 28 checks; lint and production build pass.
+
+The lost-response test calls the real server and confirms that the comment was committed before aborting its browser response. The UI retries the same UUID/text and the persisted list contains exactly one matching comment after reload. The library-isolation test changes accounts through actual SPA links, confirms that the document was not reloaded, and verifies the second account cannot see the first account's saved relation. Both tests remove their own public comments/relations afterward through UI/API, without clearing development collections.
+
+Manual IAB verification on the HTTP LAN address also created a synthetic reader comment and saved a reading, confirmed the saved item in Mi cuenta, and then removed both test interactions. This exercises the cryptographic ID fallback on a non-loopback HTTP origin. Genuine desktop/mobile light/dark captures were inspected; a library heading spacing defect was corrected and recaptured. These are local results, not Firebase cloud persistence or k6 throughput. Total session revocation during unsaved editing remains an explicit M6 recovery case.
 
 ## Dependency review
 

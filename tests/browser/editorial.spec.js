@@ -13,6 +13,19 @@ test.beforeEach(async ({ page }) => {
     return route.fulfill(author ? { status: 200, json: { user: { ...author, biography: author.bio, role: 'author' } } } : { status: 404, json: { error: 'user_not_found' } })
   })
   const fixture = (item) => ({ ...item, id: item.slug, status: 'published', version: 4, readingMinutes: 1, image: '/api/publications/' + item.slug + '/media/cover', blocks: item.blocks.map((block) => ({ ...block, ...(block.type === 'heading' ? { level: 2 } : {}) })) })
+  await page.route('**/api/interactions', async (route) => {
+    const { operationName, variables } = route.request().postDataJSON()
+    if (operationName !== 'ReadingPublication') return route.fulfill({ status: 400, json: { errors: [{ message: 'Unsupported visual fixture operation', extensions: { code: 'BAD_USER_INPUT' } }] } })
+    const article = articles.find((item) => item.slug === variables.id)
+    if (!article) return route.fulfill({ json: { data: { publication: null }, errors: [{ message: 'No se encontró la publicación.', extensions: { code: 'NOT_FOUND' } }] } })
+    const author = authors.find((item) => item.id === article.authorId)
+    const publication = { ...fixture(article), publishedAt: article.date + 'T12:00:00.000Z', coverWidth: null, coverHeight: null,
+      author: { ...author, biography: author.bio, role: 'author', avatarUrl: null, demo: true },
+      blocks: fixture(article).blocks.map((block, index) => ({ id: 'fixture-' + index, text: null, level: null, items: null, ordered: null, attribution: null, assetId: null, alt: null, caption: null, url: null, ...block })),
+      comments: { items: [], nextCursor: null }, commentCount: 0, reactions: { active: false, count: 0 }, saved: false, followingAuthor: false,
+    }
+    return route.fulfill({ json: { data: { publication } } })
+  })
   await page.route('**/api/publications**', async (route) => {
     const address = new URL(route.request().url()), params = address.searchParams
     const id = address.pathname.split('/')[3]

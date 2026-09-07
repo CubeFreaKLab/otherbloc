@@ -6,6 +6,7 @@ import { usePageTitle } from '../hooks/usePageTitle'
 import { loadPublications, publicRequest } from '../services/publications'
 import '../styles/account.css'
 import NotFoundPage from './NotFoundPage'
+import { ProfileFollow } from '../components/Interactions/InteractionControls'
 
 export default function ProfilePage() {
   const { id } = useParams()
@@ -21,6 +22,7 @@ export default function ProfilePage() {
   return (
     <main id="main-content" tabIndex={-1} className="page-width page-main profile-page">
       <AuthorCard author={author} />
+      <ProfileFollow author={author} />
       <section className="section-space" aria-labelledby="author-writing">
         <div className="section-heading">
           <h1 id="author-writing">Publicaciones de {author.name}</h1>

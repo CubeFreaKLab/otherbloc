@@ -1,0 +1,23 @@
+.interaction-button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: .5rem 1rem; font-family: var(--font-ui); font-size: var(--text-small); }
+.interaction-button:hover { border-color: var(--ink); }
+.interaction-button[aria-pressed='true'] { background: var(--paper-grey); border-color: var(--ink); }
+.interaction-control { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; min-width: 0; }
+.interaction-control .form-feedback { flex-basis: 100%; margin: .5rem 0; }
+.interaction-count { font-size: var(--text-small); color: var(--graphite); }
+.reading-interactions { display: flex; flex-wrap: wrap; gap: 1.5rem; padding: 1.5rem 0; border-block: 1px solid var(--line); margin-bottom: 3rem; }
+.comments-section { max-width: 46rem; margin-block: 4rem; }
+.comments-section h2 { font-size: clamp(2.25rem, 5vw, 3.25rem); }
+.comment-form { margin-block: 2rem; }
+.comment-list { list-style: none; padding: 0; margin-block: 2rem; }
+.comment-item { padding-block: 1.5rem; border-top: 1px solid var(--line); }
+.comment-item__header { display: flex; flex-wrap: wrap; align-items: baseline; gap: .75rem; }
+.comment-item__header a, .comment-item__header strong { font-size: 1rem; font-weight: 800; }
+.comment-item__header time { font-size: var(--text-small); color: var(--graphite); }
+.comment-item p { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--font-reading); line-height: 1.7; }
+.comment-item .text-button { font-size: var(--text-small); }
+.library-item { display: grid; gap: 1rem; padding-block: 2rem; border-bottom: 1px solid var(--line); }
+.library-item h2 { font-size: 2rem; margin: 0; }
+.library-item p { line-height: 1.6; margin: 0; }
+.library-item__meta { color: var(--graphite); font-size: var(--text-small); }
+.library-heading__top { display: flex; flex-wrap: wrap; align-items: baseline; gap: .75rem 1.5rem; }
+@media (max-width: 47.99rem) { .reading-interactions { align-items: stretch; flex-direction: column; } .article-page__actions .interaction-control { width: 100%; } .article-page__actions .interaction-button { width: 100%; } }

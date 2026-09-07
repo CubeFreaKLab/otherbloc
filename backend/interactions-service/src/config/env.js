@@ -8,4 +8,18 @@ function port(value, fallback) {
 export const env = Object.freeze({
   port: port(process.env.PORT, 3003),
   firebaseProjectId: process.env.FIREBASE_PROJECT_ID ?? '',
+  nodeEnv: process.env.NODE_ENV ?? 'development',
+  jwtSecret: process.env.JWT_SECRET ?? '',
+  serviceAuthSecret: process.env.SERVICE_AUTH_SECRET ?? '',
+  usersServiceUrl: process.env.USERS_SERVICE_URL ?? 'http://127.0.0.1:3001',
+  contentServiceUrl: process.env.CONTENT_SERVICE_URL ?? 'http://127.0.0.1:3002',
+  upstreamTimeoutMs: 10000,
 })
+
+export function validateRuntime(config = env) {
+  if (Buffer.byteLength(config.jwtSecret) < 32 || Buffer.byteLength(config.serviceAuthSecret) < 32) throw new Error('JWT_SECRET and SERVICE_AUTH_SECRET must each contain at least 32 bytes')
+  for (const value of [config.usersServiceUrl, config.contentServiceUrl]) {
+    const url = new URL(value)
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || (config.nodeEnv === 'production' && url.protocol !== 'https:')) throw new Error('Invalid domain service URL')
+  }
+}

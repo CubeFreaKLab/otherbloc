@@ -1,5 +1,20 @@
 # Firebase data boundary
 
+## Interactions-owned collections and indexes — M5
+
+| Collection / ID | Fields and relationships | Access/query |
+| --- | --- | --- |
+| `comments/{attemptUuid}` | `id`, `publicationId`, `userId`, plain `text`, ISO `createdAt`, `isDeleted`, nullable `deletedAt` | Public only through a currently published Content record; publication + nondeleted filter, creation date/ID ascending. Only its writer can logically delete |
+| `reactions/{sha256Tuple}` | `userId`, `publicationId`, `active`, ISO `createdAt`, `updatedAt` | Direct relation lookup for current caller; one kind of reaction |
+| `savedPublications/{sha256Tuple}` | Same relation fields | Caller-only active list; update date descending, ID ascending |
+| `follows/{sha256Tuple}` | `userId`, `authorId`, `active`, ISO `createdAt`, `updatedAt` | Caller-only active list; update date descending, ID ascending |
+| `publicationInteractionStats/{publicationId}` | `commentCount`, `reactionCount`, ISO `updatedAt` (absent counters mean zero) | Public through publication composition; changed atomically with the underlying interaction |
+| `authorInteractionStats/{authorId}` | `followerCount`, ISO `updatedAt` | Public through active author composition; changed atomically with the follow |
+
+`sha256Tuple` hashes the JSON array `[currentUserId, targetId]`; identities are derived from current Users-validated sessions. This avoids ambiguous delimiter collisions. Comments and relationships reference other domains only by ID; public records/profiles are resolved over their owning HTTP APIs. Private emails, passwords and session tokens are never duplicated into interaction documents.
+
+Three compound indexes supplement the 19 Content indexes (22 total): comments by publication/nondeleted/creation/ID and saved/followed lists by owner/active/update/ID. Comment bodies are excluded from single-field indexes. Cursor scope is verified before queries. Atomic create or version-preconditioned batches maintain relation/comment state and aggregate increments together; retries do not overcount. Inactive relations and logically deleted comments remain server-private pending a separately reviewed retention policy. Domain visibility checks over HTTP are not cross-service transactions. Cloud index deployment and load behavior still require verification.
+
 ## Content-owned collections and indexes — M4A
 
 | Collection / ID | Fields and relationships | Access/query |

@@ -37,7 +37,9 @@ async function send(path, options = {}, access = false) {
   if (access && token) headers.Authorization = 'Bearer ' + token
   let response
   try {
-    response = await fetch(apiUrl + path, { ...options, body, headers, credentials: 'include', signal: options.signal ?? AbortSignal.timeout(20000) })
+    const timeout = AbortSignal.timeout(20000)
+    const signal = options.signal ? AbortSignal.any([options.signal, timeout]) : timeout
+    response = await fetch(apiUrl + path, { ...options, body, headers, credentials: 'include', signal })
   } catch (error) {
     if (error.name === 'AbortError') throw error
     throw new ApiError('No se pudo conectar con otherbloc. Comprueba tu conexión e inténtalo de nuevo.')

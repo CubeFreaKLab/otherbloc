@@ -5,9 +5,10 @@ import { createApp } from '../src/app.js'
 let apolloServer
 let httpServer
 let baseUrl
+const config = { serviceAuthSecret: 'local-test-service-key-32-characters', jwtSecret: 'local-test-jwt-key-at-least-32-characters', nodeEnv: 'test' }
 
 before(async () => {
-  const application = await createApp()
+  const application = await createApp({ config })
   apolloServer = application.apolloServer
   httpServer = application.app.listen(0)
   await new Promise((resolve) => httpServer.once('listening', resolve))
@@ -37,7 +38,7 @@ test('reports the interactions service health', async () => {
 test('serves the GraphQL foundation query', async () => {
   const response = await fetch(`${baseUrl}/graphql`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-Service-Key': config.serviceAuthSecret },
     body: JSON.stringify({
       query: 'query ServiceStatus { serviceStatus { service status transport } }',
     }),
@@ -50,4 +51,33 @@ test('serves the GraphQL foundation query', async () => {
     status: 'ok',
     transport: 'GraphQL',
   })
+})
+
+test('rejects direct GraphQL access, oversized requests and unauthenticated private state', async () => {
+  const headers = { 'Content-Type': 'application/json', 'X-Service-Key': config.serviceAuthSecret }
+  const direct = await fetch(baseUrl + '/graphql', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: '{ serviceStatus { status } }' }) })
+  assert.equal(direct.status, 403)
+  const oversized = await fetch(baseUrl + '/graphql', { method: 'POST', headers, body: JSON.stringify({ query: 'x'.repeat(130 * 1024) }) })
+  assert.equal(oversized.status, 413)
+  const privateState = await fetch(baseUrl + '/graphql', { method: 'POST', headers, body: JSON.stringify({ query: '{ savedPublications(userId: "someone") { items { id } } }' }) })
+  const result = await privateState.json()
+  assert.equal(result.errors[0].extensions.code, 'UNAUTHENTICATED')
+  assert.equal('stacktrace' in result.errors[0].extensions, false)
+})
+
+test('HTTP GraphQL rejects batching and oversized selection sets before domain work', async () => {
+  const headers = { 'Content-Type': 'application/json', 'X-Service-Key': config.serviceAuthSecret }
+  const bodies = [
+    [{ query: '{ serviceStatus { status } }' }, { query: '{ serviceStatus { status } }' }],
+    { query: '{ ' + Array.from({ length: 7 }, (_, index) => 'a' + index + ': serviceStatus { status }').join(' ') + ' }' },
+    { query: '{ serviceStatus { ' + Array.from({ length: 301 }, (_, index) => 'a' + index + ': status').join(' ') + ' } }' },
+  ]
+  for (const body of bodies) {
+    const response = await fetch(baseUrl + '/graphql', { method: 'POST', headers, body: JSON.stringify(body) })
+    assert.equal(response.status, 400)
+    const result = await response.json()
+    assert.ok(result.errors.length)
+    assert.equal(result.data, undefined)
+    assert.equal(JSON.stringify(result).includes('stacktrace'), false)
+  }
 })

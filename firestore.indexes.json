@@ -1,6 +1,33 @@
 {
   "indexes": [
     {
+      "collectionGroup": "comments", "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "publicationId", "order": "ASCENDING" },
+        { "fieldPath": "isDeleted", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "ASCENDING" },
+        { "fieldPath": "__name__", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "savedPublications", "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "active", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" },
+        { "fieldPath": "__name__", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "follows", "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "active", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" },
+        { "fieldPath": "__name__", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "publications",
       "queryScope": "COLLECTION",
       "fields": [
@@ -488,6 +515,7 @@
     }
   ],
   "fieldOverrides": [
+    { "collectionGroup": "comments", "fieldPath": "text", "indexes": [] },
     { "collectionGroup": "publications", "fieldPath": "blocks", "indexes": [] },
     { "collectionGroup": "publications", "fieldPath": "searchText", "indexes": [] },
     { "collectionGroup": "publications", "fieldPath": "moderationNote", "indexes": [] },
