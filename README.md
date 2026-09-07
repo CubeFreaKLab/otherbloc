@@ -107,7 +107,7 @@ npm run test:integration:running
 npm run test:e2e
 ```
 
-La integración API usa el proyecto separado `demo-otherbloc-test` dentro de los emuladores. Los recorridos E2E usan APIs reales del entorno local y crean cuentas `e2e-*` que permanecen disponibles para inspección. `npm run test:integration` es la alternativa que inicia sus propios emuladores: detén y exporta primero los de desarrollo.
+La integración API exige `demo-otherbloc-test` y usa una base con nombre y un bucket nuevos por archivo de prueba dentro de los emuladores; cambiar solo el ID de proyecto no garantiza aislamiento de datos importados. Los recorridos E2E usan APIs reales del entorno local y crean cuentas `e2e-*` que permanecen disponibles para inspección. `npm run test:integration` es la alternativa que inicia sus propios emuladores: detén y exporta primero los de desarrollo.
 
 `npm run test:ui` ejecuta la regresión visual/accesibilidad con **fixtures explícitos**; no sustituye las pruebas de persistencia. Puede reutilizar Vite localmente, pero con `CI=true` exige arrancar su propio servidor antes de los servicios del recorrido real. `npm run test:ci` exige un checkout desechable sin configuración ni snapshots previos; no lo ejecutes sobre tu entorno de trabajo. Consulta [pruebas](docs/testing.md) y [reproducción de CI](docs/ci-cd.md#reproduce-the-ci-commands-locally).
 
@@ -124,13 +124,13 @@ Los hitos y sus alcances están registrados en [pruebas](docs/testing.md) y el [
 
 ## Despliegue: preparación y paso pendiente
 
-Los destinos acordados son Firebase Hosting para el frontend y cuatro servicios web en Render para el gateway y los tres propietarios. La preparación está en [CI/CD](docs/ci-cd.md) y [Render](docs/render-deployment.md); los nombres de variables, sin valores reales, están en [deploy/.env.example](deploy/.env.example).
+Los destinos acordados son Firebase Hosting para el frontend y cuatro servicios web en Render para el gateway y los tres propietarios. La preparación está en [Firebase y carga inicial controlada](docs/firebase-deployment.md), [CI/CD](docs/ci-cd.md) y [Render](docs/render-deployment.md); los nombres de variables, sin valores reales, están en [deploy/.env.example](deploy/.env.example).
 
 `deploy/render.blueprint.example.json` contiene región y plan sin elegir. El comando `node scripts/render-blueprint.mjs --region=<región-aprobada> --plan=<plan-aprobado>` prepara un `render.yaml` local y no sobrescribe uno existente ni crea recursos. No ejecutes la plantilla sin revisar primero los costos y las opciones con el propietario.
 
 El primer push lo controla el propietario. Después de revisar la configuración, ese push permite ejecutar **Platform CI** realmente en GitHub. La provisión inicial de Firebase/Render requiere proyecto, región, permisos y costos aprobados; Storage requiere revisar la dependencia de Blaze y una cuenta de facturación. El workflow **Production release** necesita además el entorno `production` protegido y las credenciales de despliegue; vuelve a ejecutar CI del mismo commit, pide aprobación, actualiza Render secuencialmente y publica Hosting solo después de verificar sus cuatro servicios.
 
-Todavía faltan la configuración autorizada de las cuentas, la carga inicial en Firebase real, ejecuciones reales de CI/CD, URLs verificadas y recorridos de lector/autor/administrador contra la versión desplegada. No hay enlaces de despliegue ni insignias de éxito ficticias. Los pasos que implican cuentas, credenciales, facturación o publicación requieren coordinación; no envíes contraseñas, claves privadas ni códigos de acceso por chat.
+La carga inicial en nube tiene un comando de operador separado, con plan sin conexión y aplicación por etapa/proyecto confirmado; reutiliza las mismas operaciones verificadas en los emuladores y no crea recursos ni restaura roles o contraseñas al repetirlo. Consulta sus guardas antes de usarlo. Todavía faltan la configuración autorizada de las cuentas, ejecutar esa carga en Firebase real, ejecuciones reales de CI/CD, URLs verificadas y recorridos de lector/autor/administrador contra la versión desplegada. No hay enlaces de despliegue ni insignias de éxito ficticias. Los pasos que implican cuentas, credenciales, facturación o publicación requieren coordinación; no envíes contraseñas, claves privadas ni códigos de acceso por chat.
 
 ## Documentación
 
@@ -138,6 +138,6 @@ Todavía faltan la configuración autorizada de las cuentas, la carga inicial en
 - [Arquitectura](docs/architecture.md), [Firestore/Storage](docs/database.md), [REST del gateway](docs/gateway.md) y [GraphQL](docs/graphql.md).
 - [Usuarios](docs/users-service.md), [Contenido](docs/content-service.md) e [Interacciones](docs/interactions-service.md).
 - [Frontend](docs/frontend.md), [sistema visual](docs/design-system.md), [carga k6](docs/load-testing.md) e [historial técnico](docs/development-log.md).
-- [CI/CD](docs/ci-cd.md) y [preparación Render](docs/render-deployment.md).
+- [CI/CD](docs/ci-cd.md), [Firebase y datos iniciales](docs/firebase-deployment.md) y [preparación Render](docs/render-deployment.md).
 
 La configuración real, los datos locales y el registro académico con sus capturas permanecen privados y fuera de Git. Este README es la guía técnica del producto, no la acreditación final de su entrega en nube.

@@ -3,11 +3,13 @@ import { randomUUID } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { after, before, test } from 'node:test'
 import { deleteApp } from 'firebase-admin/app'
-import { FieldValue } from 'firebase-admin/firestore'
+import { FieldValue, getFirestore } from 'firebase-admin/firestore'
+import { getStorage } from 'firebase-admin/storage'
 import { assertFails, initializeTestEnvironment } from '@firebase/rules-unit-testing'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { ref, uploadBytes } from 'firebase/storage'
-import { getFirebase, validateFirebaseEnvironment } from '../../backend/users-service/src/config/firebase.js'
+import { validateFirebaseEnvironment } from '../../backend/users-service/src/config/firebase.js'
+import { getUsersFirebase as getFirebase, testDatabaseId, testBucketName } from './firebase-clients.js'
 
 let firebase
 let ruleEnvironment
@@ -33,6 +35,7 @@ after(async () => {
 })
 
 test('Firestore retains writes across independent SDK reads and concurrent atomic increments', async () => {
+  assert.equal(firebase.db.databaseId, testDatabaseId)
   const record = firebase.db.collection('_checks').doc(id)
   await record.set({ count: 0, label: 'Demostración de persistencia del emulador' })
   await Promise.all(Array.from({ length: 20 }, () => record.update({ count: FieldValue.increment(1) })))
@@ -42,15 +45,18 @@ test('Firestore retains writes across independent SDK reads and concurrent atomi
     transaction.update(record, { count: snapshot.data().count + 1 })
   })
   assert.equal((await record.get()).data().count, 21)
+  assert.equal((await getFirestore(firebase.app).collection('_checks').doc(id).get()).exists, false, 'Named test writes must not reach the default database.')
 })
 
 test('Storage retains bytes and metadata and can be read by its owning server', async () => {
+  assert.equal(firebase.bucket.name, testBucketName)
   const object = firebase.bucket.file('_checks/' + id)
   const content = Buffer.from('otherbloc emulator persistence check')
   await object.save(content, { resumable: false, metadata: { contentType: 'text/plain' } })
   const [download] = await object.download()
   assert.deepEqual(download, content)
   assert.equal((await object.getMetadata())[0].contentType, 'text/plain')
+  assert.equal((await getStorage(firebase.app).bucket().file('_checks/' + id).exists())[0], false, 'Test uploads must not reach the default bucket.')
 })
 
 test('direct client reads and writes are denied, including fake Firebase-authenticated identities', async () => {

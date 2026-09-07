@@ -19,6 +19,8 @@ Release-controller source lives in `scripts/release/`, guarded commands in `scri
 
 `deploy/render.blueprint.example.json` is an intentionally unconfigured infrastructure example. `scripts/render-blueprint.mjs` can prepare the final root `render.yaml` after explicit owner-approved region/plan choices, without overwriting one that already exists. No active Blueprint is silently created from defaults.
 
+`scripts/seed-demo.mjs` contains orchestration shared by the guarded local seed commands and the separate `scripts/bootstrap-cloud.mjs` operator entry. Backend applications never import this tooling or another service's implementation. Cloud bootstrap has an offline plan and explicitly confirmed apply stages; `deploy/bootstrap/.env.example` lists private operator settings without values. The [Firebase guide](firebase-deployment.md) separates initial resource/IAM setup, demo data and actual cloud acceptance.
+
 ## Private development context
 
 `.agent`, `.project`, and `resources` are local development inputs and are excluded from Git. Real environment files, dependencies, build output, logs, coverage, and editor state are also ignored. `.env.example` files are intentionally tracked because they document runtime configuration without containing credentials.

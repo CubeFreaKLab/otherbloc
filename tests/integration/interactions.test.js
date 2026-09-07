@@ -8,9 +8,7 @@ import { createApp as createUsersApp } from '../../backend/users-service/src/app
 import { createApp as createContentApp } from '../../backend/content-service/src/app.js'
 import { createApp as createInteractionsApp } from '../../backend/interactions-service/src/app.js'
 import { createApp as createGatewayApp } from '../../backend/api-gateway/src/app.js'
-import { getFirebase as getUsersFirebase } from '../../backend/users-service/src/config/firebase.js'
-import { getFirebase as getContentFirebase } from '../../backend/content-service/src/config/firebase.js'
-import { getFirebase as getInteractionsFirebase } from '../../backend/interactions-service/src/config/firebase.js'
+import { getUsersFirebase, getContentFirebase, getInteractionsFirebase } from './firebase-clients.js'
 import { createUsersService } from '../../backend/users-service/src/services/users.js'
 import { digest } from '../../backend/users-service/src/lib/sessions.js'
 

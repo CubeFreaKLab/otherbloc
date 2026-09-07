@@ -247,7 +247,7 @@ export function createUsersService({ config, firebase = getFirebase, now = Date.
     },
 
     async seed(input) {
-      // Only invoked by the local seed command. Never exposed as an HTTP route.
+      // Only invoked by controlled seed commands. Never exposed as an HTTP route.
       const existing = await emailRef(input.email).get()
       if (existing.exists) {
         const user = withId(await userRef(existing.data().userId).get())

@@ -1,5 +1,13 @@
 # Development log
 
+## Controlled cloud bootstrap and isolated seed verification — 2026-09-07
+
+- Prepared a separate offline-plan/confirmed-apply operator command for demo Users/Content initialization after approved cloud setup. It checks exact clean revision, project/bucket/credential configuration and four public service versions before data writes; no project creation, deployment, billing, public privilege endpoint or automatic rollback is included.
+- Reused the local seed orchestration while retaining its emulator-only guards, transactional owner methods, image uploads and editorial transitions through the gateway. Prevalidated all accounts, rejected exact-role mismatches and redirects, preserved existing records and made session-cleanup failures visible.
+- Corrected a discovered emulator-isolation assumption: different project labels still accessed the imported default database. Integration clients now use named databases/buckets unique to each test process, without changing product Firebase factories. Retained two collision rejections and read-only diagnostics; no existing records were removed.
+- Passed 85 Node contracts, lint/build, all 31 real API tests (69.85 seconds), six-account/seven-publication creation and preservation checks, actual local seed reruns, two desktop/mobile reading checks (13.2 seconds) and a desktop author/moderation journey (28.5 seconds). Inspected both editor themes. Final before/after hashes match all 2,395 development documents and 267 images; a prior active-session-only drift is disclosed.
+- Added the Firebase setup/IAM/cost-boundary guide and private operator variable example. Actual cloud access, costs, initial push, Actions and deployment evidence still require the owner; none is claimed by these local tests.
+
 ## Clean-start and three-role README — 2026-09-07
 
 - Completed the technical README with prerequisites, ordered startup/seeds, private configurable credentials, three-role journeys, snapshot preservation, test modes and a documentation index. Removed the obsolete note that the README should remain empty.

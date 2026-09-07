@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken'
 import sharp from 'sharp'
 import { createApp as createUsersApp } from '../../backend/users-service/src/app.js'
 import { createApp as createGatewayApp } from '../../backend/api-gateway/src/app.js'
-import { getFirebase } from '../../backend/users-service/src/config/firebase.js'
+import { getUsersFirebase as getFirebase } from './firebase-clients.js'
 import { createUsersService } from '../../backend/users-service/src/services/users.js'
 import { cookieOptions, digest } from '../../backend/users-service/src/lib/sessions.js'
 
