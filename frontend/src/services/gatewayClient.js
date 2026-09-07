@@ -69,8 +69,8 @@ export function refreshSession() {
 }
 
 export async function gatewayRequest(path, options = {}) {
-  try { return await send(path, options, true) } catch (error) {
-    if (error.status !== 401 || options.retryAuth === false) throw error
+  try { return await send(path, options, !options.anonymous) } catch (error) {
+    if (error.status !== 401 || options.retryAuth === false || options.anonymous) throw error
     await refreshSession()
     return send(path, options, true)
   }

@@ -16,7 +16,7 @@ export async function setupLocal() {
     'FIREBASE_STORAGE_EMULATOR_HOST=127.0.0.1:9199',
     'JWT_SECRET=' + randomBytes(48).toString('base64url'),
     'SERVICE_AUTH_SECRET=' + randomBytes(48).toString('base64url'),
-    'ALLOWED_ORIGINS=' + [...new Set(hosts)].map((host) => 'http://' + host + ':5173').join(','),
+    'ALLOWED_ORIGINS=' + [...new Set(hosts)].map((host) => 'http://' + host + ':5173').concat(['http://localhost:4173', 'http://127.0.0.1:4173']).join(','),
     'USERS_SERVICE_URL=http://127.0.0.1:3001',
     'CONTENT_SERVICE_URL=http://127.0.0.1:3002',
     'INTERACTIONS_SERVICE_URL=http://127.0.0.1:3003/graphql',

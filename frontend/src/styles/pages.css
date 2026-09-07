@@ -220,6 +220,12 @@
   font-weight: 800;
 }
 
+.article-prose blockquote cite { display: block; margin-top: 1rem; font-family: var(--font-ui); font-size: var(--text-small); font-style: normal; }
+.article-prose h3 { font-size: 1.6rem; margin-top: 2.5rem; }
+.article-prose figure { margin-inline: 0; }
+.article-prose figure img { width: 100%; height: auto; }
+.article-prose figcaption { font-family: var(--font-ui); font-size: var(--text-small); color: var(--graphite); margin-top: .75rem; }
+
 .form-field input {
   width: 100%;
   min-height: 3rem;

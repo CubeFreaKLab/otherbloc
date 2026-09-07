@@ -1,16 +1,19 @@
 import { useSearchParams } from 'react-router-dom'
-import ArticleCard from '../components/ArticleCard/ArticleCard'
 import SearchBar from '../components/SearchBar/SearchBar'
-import ContentState from '../components/ContentState/ContentState'
-import { articles, categories, filterArticles, normalizeSearch, publicationTypes } from '../data/articles'
+import PublicationFeed from '../components/PublicationFeed/PublicationFeed'
+import { useResource } from '../hooks/useResource'
+import { loadPublications, publicationQuery, publicRequest } from '../services/publications'
 
 export default function ExplorePage() {
   const [params, setParams] = useSearchParams()
   const category = params.get('category') ?? ''
   const type = params.get('type') ?? ''
-  const filtered = filterArticles(articles, { category, type, query: params.get('q') ?? '' })
+  const resource = useResource(publicationQuery(params), loadPublications)
+  const options = useResource('/publications/options', publicRequest)
+  const categories = options.data?.categories ?? [], publicationTypes = options.data?.types ?? []
   const update = (key, value) => {
     const next = new URLSearchParams(params)
+    next.delete('cursor')
     if (value) next.set(key, value)
     else next.delete(key)
     setParams(next, { preventScrollReset: true })
@@ -24,7 +27,7 @@ export default function ExplorePage() {
       <SearchBar />
       <div className="category-filter" aria-label="Filtrar por categoría">
         {['Todas', ...categories].map((label) => {
-          const value = label === 'Todas' ? '' : normalizeSearch(label)
+          const value = label === 'Todas' ? '' : label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
           return <button key={label} type="button" className={category === value ? 'is-active' : ''}
             aria-pressed={category === value} onClick={() => update('category', value)}>{label}</button>
         })}
@@ -34,13 +37,11 @@ export default function ExplorePage() {
           <option value="">Todos los tipos</option>
           {publicationTypes.map((item) => <option key={item}>{item}</option>)}
         </select></label>
-        <p role="status">{filtered.length} {filtered.length === 1 ? 'publicación' : 'publicaciones'}</p>
+        {resource.status === 'success' && <p role="status">{resource.data.items.length} {resource.data.items.length === 1 ? 'publicación' : 'publicaciones'}{resource.data.nextCursor || params.has('cursor') ? ' en esta página' : ''}</p>}
         {(category || type || params.get('q')) && <button type="button" className="text-link" onClick={() => setParams({})}>Limpiar filtros</button>}
       </div>
-      {filtered.length ? <div className="article-grid article-grid--explore">
-        {filtered.map((article, index) => <ArticleCard key={article.slug} article={article} featured={index === 0} />)}
-      </div> : <ContentState message="No encontramos publicaciones con estos filtros. Prueba otra búsqueda o limpia los filtros." />}
-      <p className="demo-label">Edición de muestra · Contenido de demostración.</p>
+      {options.status === 'error' && <p role="alert">No se pudieron cargar los filtros. <button className="text-link" onClick={options.retry}>Reintentar filtros</button></p>}
+      <PublicationFeed resource={resource} emptyMessage="No encontramos publicaciones con estos filtros. Prueba otra búsqueda o limpia los filtros." />
     </main>
   )
 }

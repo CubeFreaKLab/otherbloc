@@ -4,22 +4,22 @@ The React/Vite frontend preserves the editorial identity: Prumo titles, Adelle S
 
 ## Current milestone
 
-The editorial presentation is implemented locally. The seven Spanish publications in `src/data/articles.js` are **demonstration fixtures**, with synthetic author profiles, unique block content and explicit labels. They are not persisted in Firebase yet. The fictional news and review identify themselves inside the content. This module is temporary input for the reproducible seed, not a fallback for API failures.
+The editorial presentation reads actual Content records through the gateway. Seven Spanish publications and synthetic authors are reproducibly seeded into Firestore/Storage emulators and visibly marked as demonstration content. `src/data/articles.js` supplies seed and visual-test input only; production views do not import it or fall back to it. Fictional news and review identify themselves inside their content. Navigation taxonomy is separate from article fixtures.
 
 Authentication now uses the actual Users service through the gateway: register/login, HttpOnly-cookie refresh, explicit errors and server-revoked logout. Access tokens remain in memory. Account/profile/avatar forms and administrator user management are connected and tested with Firestore/Storage emulators. Authoring, publication moderation and interactions remain later integration milestones. The Save link still leads to sign-in until Interactions is connected; Share uses native sharing/clipboard with an explicit fallback.
 
 ## Routes and reading
 
-- `/`: featured publication and the remaining demo edition; no duplicated giant masthead or newsletter.
-- `/explore`: combined query, category and publication-type filters reflected in the URL. Search normalizes accents; empty results and clearing filters are real local behaviors.
+- `/`: seven latest public records, first featured; real loading, empty, failure and retry states, without a duplicated masthead or newsletter.
+- `/explore`: gateway search/category/type filters reflected in the URL; paginated date/ID cursors, next page and return-to-start controls. Changing search/filters clears the cursor. Counts describe the current page when paginated, not a fabricated global total.
 - `/article/:slug`: the matching publication's own blocks and author. Unknown slugs render 404 instead of unrelated content.
-- `/profile/:id`: actual public Users profile with loading/retry/404 states; listed publications still come from the labeled demo edition until Content integration.
+- `/profile/:id`: actual public Users profile and Content-owned published list filtered by author, with independent loading/error/retry and pagination.
 - `/login`, `/register`: the approved split photographic composition on desktop; form-only composition on mobile.
 - `/account`: own profile/avatar, author request, password change and server-revoked logout. Unsaved profile changes block navigation and refresh.
 - `/admin/users`: paginated user management, access-denied state for non-admins and a keyboard-trapped confirmation dialog. All role enforcement also occurs server-side.
 - Unknown paths render an explicit 404 view, without redirecting silently to home.
 
-The footer links only to existing destinations. The primary navigation checks category query parameters, avoiding multiple active categories.
+The footer links only to existing destinations. The primary navigation checks category query parameters, avoiding multiple active categories. Reading data is public and does not attach a stale access token; private author requests will use the authenticated client. Bounded profile lookup (`/users/profiles`, maximum 40 IDs) hydrates current public names without exposing private emails. Missing/suspended profiles are labeled unavailable, not replaced with an invented person. Async article/profile titles update after the data arrives. All five block types, heading levels, ordered lists, quote attribution and image captions render without HTML injection.
 
 ## Theme, images and accessibility
 
@@ -42,10 +42,10 @@ npm run build
 
 Vite uses port 5173. Browser tests cover desktop and mobile layouts, filtering/reload, 404, content/author mapping, theme persistence, system theme changes, reduced motion, keyboard fields, contrast and layout overflow. Automated accessibility checks complement visual review; they do not by themselves certify accessibility.
 
-`npm run test:e2e` separately drives registration, login, profile/avatar reload, author requests, role approval, denied administration and logout against real local services and emulators. See [development](development.md). Visual regression profile fixtures are explicitly separate from these persistence journeys. This remains a local milestone, not cloud-deployment or production-readiness evidence.
+`npm run test:e2e` drives account journeys and actual public reading/search/filter/profile/reload/image journeys against services and emulators. Ten scenarios pass across desktop/mobile, including an explicitly injected failure followed by a retry against the real gateway. Visual regression fixtures are separate and are not persistence evidence. See [development](development.md). Author editor and moderation screens are still M4B; GraphQL interactions and deployment remain pending.
 
 ## Asset and performance maintenance
 
-Original font files remain available; the browser loads WOFF2 derivatives. Responsive 640/960/1536-pixel images preserve the supplied photographs. Rebuild derivatives with `node scripts/optimize-assets.cjs`, optionally passing a directory containing the three original PNG files. This is an optional maintenance step, not required for a normal install.
+Original font files remain available; the browser loads WOFF2 derivatives. Static access imagery uses local derivatives. Publication originals and 640/960-width derivatives now live in Storage with server-verified ownership, actual dimensions and responsive `srcset` URLs through the gateway. Rebuild static asset derivatives with `node scripts/optimize-assets.cjs`; existing demo Storage derivatives can be added with `node scripts/seed-content.mjs --prepare-images`. Neither changes supplied source masters.
 
-To audit the production bundle, build, start the Vite preview on port 4173, then run `node scripts/audit-performance.mjs`. Reports and the dedicated temporary browser profile stay under ignored `.project/evidence/`. The first local audit exposed oversized assets; the optimized run scored 97/100/100/100 for performance/accessibility/best practices/SEO. Scores depend on environment and content and must be measured again after integration. The configured Apollo client will be mounted with real GraphQL features; the demo-only home does not download an unused GraphQL client.
+To audit the production bundle, build, start Vite preview on port 4173 with live gateway/services/emulators, then run `node scripts/audit-performance.mjs`. Preview origins must be included in local `ALLOWED_ORIGINS`; new setup files include loopback 4173 origins. Reports remain ignored/private. M1's static 97/100/100/100 is not the integrated score: M4A measured 70/100/96/100 initially and 75/100/96/100 after Storage derivatives, with mobile LCP 4.4 s and CLS 0.168 in that run. Image transfer fell substantially, but asynchronous discovery/loading layout still need performance work in M7. The 96 best-practices score records the expected unauthenticated refresh 401, not a hidden successful login. These are disclosed local measurements, not k6 or cloud evidence. Apollo will be mounted with the actual GraphQL features.

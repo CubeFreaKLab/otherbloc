@@ -11,6 +11,7 @@ export const profileSchema = z.object({ name, biography: z.string().trim().max(6
 export const adminSchema = z.object({ role: z.enum(roles), status: z.enum(['active', 'suspended']) }).strict()
 export const passwordSchema = z.object({ currentPassword: z.string().min(1).max(128), password }).strict()
 export const listSchema = z.object({ limit: z.coerce.number().int().min(1).max(50).default(20), cursor: idSchema.optional() }).strict()
+export const publicProfilesSchema = z.object({ ids: z.string().max(3240).transform((value) => [...new Set(value.split(','))]).pipe(z.array(idSchema).min(1).max(40)) }).strict()
 
 export function publicUser(user) {
   return { id: user.id, name: user.name, biography: user.biography, role: user.role,

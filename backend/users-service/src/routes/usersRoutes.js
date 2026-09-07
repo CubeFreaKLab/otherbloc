@@ -1,5 +1,5 @@
 import express, { Router } from 'express'
-import { adminSchema, idSchema, listSchema, loginSchema, passwordSchema, privateUser, profileSchema, registerSchema } from '../models/user.js'
+import { adminSchema, idSchema, listSchema, loginSchema, passwordSchema, privateUser, profileSchema, publicProfilesSchema, registerSchema } from '../models/user.js'
 import { cookieName, cookieOptions, readRefreshCookie } from '../lib/sessions.js'
 import { requireSessionRequest, requireUser } from '../middleware/security.js'
 
@@ -32,6 +32,7 @@ export function createUsersRouter(service, config) {
   })
   router.delete('/me/avatar', auth, async (request, response) => response.json({ user: await service.removeAvatar(request.identity) }))
   router.get('/', auth, async (request, response) => response.json(await service.list(request.identity, listSchema.parse(request.query))))
+  router.get('/profiles', async (request, response) => response.json({ items: await service.getPublicProfiles(publicProfilesSchema.parse(request.query).ids) }))
   router.patch('/:id/permissions', auth, async (request, response) => response.json({ user: await service.updatePermissions(request.identity, id(request), adminSchema.parse(request.body)) }))
   router.get('/:id/avatar', async (request, response) => {
     const bytes = await service.avatar(id(request), typeof request.query.v === 'string' ? request.query.v : null)

@@ -1,15 +1,27 @@
 const { test, expect } = require('@playwright/test')
 const AxeBuilder = require('@axe-core/playwright').default
 
-// Visual regression isolates Users responses. Real persistence journeys use test:e2e.
+// Visual regression explicitly fixtures domain responses; test:e2e proves persistence.
 test.beforeEach(async ({ page }) => {
-  const { authors } = await import('../../frontend/src/data/articles.js')
+  const { articles, authors, categories, publicationTypes, filterArticles } = await import('../../frontend/src/data/articles.js')
   await page.route('**/api/users/**', async (route) => {
     const id = new URL(route.request().url()).pathname.split('/').pop()
     const author = authors.find((item) => item.id === id)
     if (id === 'refresh') return route.fulfill({ status: 401, json: { error: 'invalid_session' } })
     if (id === 'register') return route.fulfill({ status: 503, json: { error: 'users_unavailable', message: 'No se pudo completar la operación. Inténtalo de nuevo.' } })
+    if (id === 'profiles') return route.fulfill({ status: 200, json: { items: authors.map((item) => ({ ...item, biography: item.bio, role: 'author' })) } })
     return route.fulfill(author ? { status: 200, json: { user: { ...author, biography: author.bio, role: 'author' } } } : { status: 404, json: { error: 'user_not_found' } })
+  })
+  const fixture = (item) => ({ ...item, id: item.slug, status: 'published', version: 4, readingMinutes: 1, image: '/api/publications/' + item.slug + '/media/cover', blocks: item.blocks.map((block) => ({ ...block, ...(block.type === 'heading' ? { level: 2 } : {}) })) })
+  await page.route('**/api/publications**', async (route) => {
+    const address = new URL(route.request().url()), params = address.searchParams
+    const id = address.pathname.split('/')[3]
+    if (id === 'options') return route.fulfill({ status: 200, json: { types: publicationTypes, categories } })
+    const article = articles.find((item) => item.slug === id)
+    if (article && address.pathname.includes('/media/')) return route.fulfill({ status: 200, contentType: 'image/webp', path: require('node:path').join(__dirname, '../../frontend/public', article.image) })
+    if (id) return route.fulfill(article ? { status: 200, json: { publication: fixture(article) } } : { status: 404, json: { error: 'publication_not_found' } })
+    const items = filterArticles(articles, { category: params.get('category'), type: params.get('type'), query: params.get('q') ?? '' }).filter((item) => !params.get('authorId') || item.authorId === params.get('authorId'))
+    return route.fulfill({ status: 200, json: { items: items.slice(0, Number(params.get('limit') ?? 12)).map(fixture), nextCursor: null } })
   })
 })
 
@@ -88,6 +100,8 @@ for (const theme of ['light', 'dark']) {
     await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' })
     for (const path of ['/', '/explore', '/article/primer-borrador', '/profile/elena-rivas', '/login', '/register', '/no-existe']) {
       await page.goto(path)
+      await page.locator('main').waitFor()
+      await expect(page.locator('.publication-loading')).toHaveCount(0)
       await page.evaluate(() => document.fonts.ready)
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
       const accessibility = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()
@@ -99,6 +113,7 @@ for (const theme of ['light', 'dark']) {
 test('image focus reveals actual color without shifting the grid; touch uses color directly', async ({ page, isMobile }) => {
   await page.goto('/')
   const picture = page.locator('.featured-article__image img')
+  await expect(picture).toBeVisible()
   const before = await picture.boundingBox()
   if (isMobile) await expect(picture).toHaveCSS('filter', 'grayscale(0)')
   else {
@@ -116,6 +131,7 @@ test('narrow phone and tablet breakpoints do not overflow', async ({ page }) => 
     for (const route of ['/', '/login', '/register', '/explore']) {
       await page.goto(route)
       await page.locator('main').waitFor()
+      await expect(page.locator('.publication-loading')).toHaveCount(0)
       await page.evaluate(() => document.fonts.ready)
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     }

@@ -5,6 +5,7 @@ import Footer from './components/Footer/Footer'
 import Header from './components/Header/Header'
 import './styles/layout.css'
 import './styles/pages.css'
+import './styles/account.css'
 
 function NavigationFocus() {
   const location = useLocation()

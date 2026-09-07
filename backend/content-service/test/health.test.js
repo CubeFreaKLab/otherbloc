@@ -30,17 +30,10 @@ test('reports the content service health', async () => {
   })
 })
 
-test('exposes only foundation metadata at the content boundary', async () => {
+test('requires an internal key at the content boundary', async () => {
   const response = await fetch(`${baseUrl}/api/publications`)
   const body = await response.json()
 
-  assert.equal(response.status, 200)
-  assert.equal(body.status, 'foundation-ready')
-  assert.deepEqual(body.capabilities, [
-    'publications',
-    'publication-lifecycle',
-    'categories',
-    'tags',
-    'search',
-  ])
+  assert.equal(response.status, 403)
+  assert.equal(body.error, 'service_access_required')
 })

@@ -22,7 +22,9 @@ The frontend is on port 5173, gateway 3000, Users 3001, Content 3002 and Interac
 
 With emulators running, use `npm run seed:users`. It creates a reader, four synthetic editorial authors and an administrator, all marked `demo=true`. The main test accounts use `SEED_READER_EMAIL`, `SEED_AUTHOR_EMAIL`, `SEED_ADMIN_EMAIL` and `SEED_PASSWORD` from the private local file. Default placeholder emails are reader/author/admin at `example.test`; no password is committed or printed. Additional author addresses use their demo IDs at that reserved test domain. Re-running keeps existing accounts unchanged and refuses collisions with unrelated accounts.
 
-Open `/login` to use any seeded role. `/account` provides profile/avatar/session controls and reader author requests; `/admin/users` is administrator-only. Author publication tools are the next milestone. Public registration creates readers only.
+With services running, use `npm run seed:content` after `seed:users`. Seven Spanish publications are created, saved with Storage portadas, submitted, approved and publicly read through the gateway. Existing marked demo publications are preserved; dates reflect actual seed publication time, not invented past events. If a previous seed was interrupted, the remaining draft can be continued by its owner. `node scripts/seed-content.mjs --prepare-images` adds missing responsive derivatives to existing demo assets without replacing original images or editorial text.
+
+Open `/login` to use any seeded role. `/account` provides profile/avatar/session controls and reader author requests; `/admin/users` is administrator-only. Public home/explore/article/profile now read persisted publications. The API supports full authoring/moderation; their screens are M4B. Public registration creates readers only.
 
 `npm run test:e2e` requires the development services, emulators and seed to be running. It drives real browser account journeys at 1440×1000 and 390×844, without replacing business API responses. It creates clearly named local `e2e-*` test accounts that remain in the demo database for inspection. Authentication traces/video are disabled to avoid retaining request-body credentials. `npm run test:ui` is a separate visual regression suite with explicit profile/error fixtures, not a persistence test.
 
@@ -40,4 +42,4 @@ If the default Java is older than 21, set `OTHERBLOC_JAVA_HOME` in the private l
 
 ## Current milestone boundary
 
-M3 verifies persisted accounts, revocable sessions, roles, profiles and avatar files through the gateway and browser. Publications and interactions remain subsequent domain milestones; static editorial demo publication content is still labeled. A failed API is never represented as successful persistence. Hosting configuration exists but has not been deployed. README remains intentionally empty pending final documentation.
+M4A adds persisted blocks, images, lifecycle, search and public reading to M3's accounts and sessions. Author editor/moderation screens and GraphQL interactions remain pending. Browser regression explicitly fixtures data; end-to-end tests use real emulator APIs. A failed API is never represented as successful persistence. Hosting/Render/real CI/CD have not been completed. README remains intentionally empty pending final documentation.

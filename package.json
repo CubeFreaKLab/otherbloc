@@ -21,6 +21,7 @@
     "lint": "eslint . --max-warnings 0",
     "setup:local": "node scripts/setup-local.mjs",
     "seed:users": "node scripts/seed-users.mjs",
+    "seed:content": "node scripts/seed-content.mjs",
     "emulators": "node scripts/emulators.mjs",
     "emulators:export": "node scripts/emulators.mjs export",
     "test:integration": "node scripts/emulators.mjs test",

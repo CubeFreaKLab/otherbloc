@@ -11,7 +11,7 @@ export default function FeaturedArticle({ article }) {
         <h1>{article.title}</h1>
         <p>{article.summary}</p>
         <div className="featured-article__meta">
-          <Link to={`/profile/${article.authorId}`}>{article.author}</Link>
+          {article.authorProfile ? <Link to={`/profile/${article.authorId}`}>{article.author}</Link> : <span>{article.author}</span>}
           <span>{article.readTime}</span>
           <time dateTime={article.date}>{formatDate(article.date)}</time>
         </div>
@@ -20,7 +20,7 @@ export default function FeaturedArticle({ article }) {
         </Link>
       </div>
       <Link className="featured-article__image" to={`/article/${article.slug}`} tabIndex={-1}>
-        <img src={article.image} srcSet={article.image.replace('.webp', '-640.webp') + ' 640w, ' + article.image.replace('.webp', '-960.webp') + ' 960w, ' + article.image + ' 1536w'} sizes="(max-width: 767px) 100vw, 60vw" width="1536" height="1024" alt={article.imageAlt} fetchPriority="high" />
+        <img src={article.image} srcSet={article.imageSrcSet} sizes="(max-width: 767px) 100vw, 60vw" width={article.coverWidth ?? 1536} height={article.coverHeight ?? 1024} alt={article.imageAlt} fetchPriority="high" />
       </Link>
     </article>
   )

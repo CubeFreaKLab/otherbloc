@@ -1,5 +1,16 @@
 # Development log
 
+## Persistent Content and public reading — 2026-09-07
+
+- Implemented Content-owned block documents, draft/review/published/archived transitions, image ownership, logical deletion and atomic audit entries. Authoring and moderation screens remain the next sub-milestone.
+- Enforced current Users identity over HTTP, owner-only editing, admin approval/rejection, private drafts and image previews, strict inputs and versioned writes. Competing saves and moderation decisions cannot lose updates.
+- Added 19 declared Firestore query indexes, scoped keyset cursors, bounded metadata-prefix search and original/640/960 Storage media through the gateway. Index deployment still needs real-cloud verification.
+- Seeded seven labeled Spanish publications with four authors and actual save/review/approval/read operations. Repetition preserves existing records; local exports preserve emulator data.
+- Replaced static publication reads on home, exploration, article and author profile with gateway APIs, real loading/error/retry/empty states and bounded public author lookup. Preserved typography, photography, themes and layout; moved navigation constants out of the fixture module.
+- Verified 23 Node checks, 21 emulator integration scenarios, 18 visual regression scenarios and ten real browser journeys. Visual fixtures remain explicitly separate from persistence tests. Manual browser inspection confirms public reading and the retained dark editorial layout.
+- Measured an integrated performance regression: initial mobile Lighthouse 70/100/96/100, then 75/100/96/100 with smaller Storage derivatives. LCP 4.4 s / CLS 0.168 still require M7 work; M1's static 97 is not claimed for the integrated site. The expected anonymous refresh 401 affects the best-practices score. No k6 or cloud success is claimed.
+- No push, billing activation or deployment; Content API and public reading are M4A, not completion of the full goal.
+
 ## Persistent Users and account integration — 2026-09-07
 
 - Implemented strict reader registration, normalized unique email reservations, scrypt passwords, short JWT access tokens and revocable/rotating HttpOnly-cookie sessions.

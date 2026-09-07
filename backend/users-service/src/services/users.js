@@ -136,6 +136,11 @@ export function createUsersService({ config, firebase = getFirebase, now = Date.
       return publicUser(user)
     },
 
+    async getPublicProfiles(ids) {
+      const records = await clients().db.getAll(...ids.map(userRef))
+      return records.map(withId).filter((user) => user?.status === 'active').map(publicUser)
+    },
+
     async updateProfile(identity, input) {
       return clients().db.runTransaction(async (transaction) => {
         const user = await transactionActor(transaction, identity)

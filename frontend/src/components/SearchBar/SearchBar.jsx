@@ -10,6 +10,7 @@ export default function SearchBar({ compact = false }) {
     event.preventDefault()
     const query = new FormData(event.currentTarget).get('query').trim()
     const next = new URLSearchParams(compact ? '' : params)
+    next.delete('cursor')
     if (query) next.set('q', query)
     else next.delete('q')
     navigate('/explore' + (next.size ? '?' + next : ''))
@@ -20,7 +21,7 @@ export default function SearchBar({ compact = false }) {
       <div className="search-bar__control">
         <MagnifyingGlass aria-hidden="true" size={18} />
         <input key={params.get('q') ?? ''} id={id} name="query" type="search"
-          defaultValue={params.get('q') ?? ''} maxLength={120} placeholder="Título, autor o tema" />
+          defaultValue={params.get('q') ?? ''} maxLength={80} placeholder="Título, autor o tema" />
         {!compact && <button type="submit">Buscar</button>}
       </div>
     </form>

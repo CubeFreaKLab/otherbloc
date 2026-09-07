@@ -3,25 +3,36 @@ import { BookmarkSimple, ShareNetwork } from '@phosphor-icons/react'
 import { Link, useParams } from 'react-router-dom'
 import AuthorCard from '../components/AuthorCard/AuthorCard'
 import CategoryTag from '../components/CategoryTag/CategoryTag'
-import { articles, authors } from '../data/articles'
+import { useResource } from '../hooks/useResource'
+import { usePageTitle } from '../hooks/usePageTitle'
+import { loadPublication } from '../services/publications'
+import { gatewayMediaUrl } from '../services/gatewayClient'
+import ContentState from '../components/ContentState/ContentState'
+import { PublicationLoading } from '../components/PublicationFeed/PublicationFeed'
 import { formatDate } from '../utils/formatDate'
 import NotFoundPage from './NotFoundPage'
 
 export function ArticleBlocks({ blocks }) {
   return blocks.map((block, index) => {
-    if (block.type === 'heading') return <h2 key={index} id={'section-' + index}>{block.text}</h2>
-    if (block.type === 'quote') return <blockquote key={index}>{block.text}</blockquote>
-    if (block.type === 'list') return <ul key={index}>{block.items.map((item, i) => <li key={i}>{item}</li>)}</ul>
-    if (block.type === 'image') return <figure key={index}><img src={block.url} alt={block.alt} loading="lazy" />{block.caption && <figcaption>{block.caption}</figcaption>}</figure>
+    if (block.type === 'heading') { const Heading = block.level === 3 ? 'h3' : 'h2'; return <Heading key={block.id ?? index} id={'section-' + index}>{block.text}</Heading> }
+    if (block.type === 'quote') return <blockquote key={block.id ?? index}>{block.text}{block.attribution && <cite>{block.attribution}</cite>}</blockquote>
+    if (block.type === 'list') { const List = block.ordered ? 'ol' : 'ul'; return <List key={block.id ?? index}>{block.items.map((item, i) => <li key={i}>{item}</li>)}</List> }
+    if (block.type === 'image') return <figure key={block.id ?? index}><img src={gatewayMediaUrl(block.url)} alt={block.alt} loading="lazy" />{block.caption && <figcaption>{block.caption}</figcaption>}</figure>
     return <p key={index} className={index === 0 ? 'article-prose__lead' : undefined}>{block.text}</p>
   })
 }
 
 export default function ArticlePage() {
   const { slug } = useParams()
-  const article = articles.find((item) => item.slug === slug)
+  const { data, status, error, retry } = useResource('/publications/' + encodeURIComponent(slug), loadPublication)
+  const article = data?.publication
+  usePageTitle(article?.title ?? (error?.status === 404 ? 'Publicación no encontrada' : 'Publicación'))
   const [shareMessage, setShareMessage] = useState('')
-  if (!article) return <NotFoundPage resource="publicación" />
+  if (error?.status === 404) return <NotFoundPage resource="publicación" />
+  if (status !== 'success') return <main id="main-content" tabIndex={-1} className="page-width page-main">
+    <h1 className="visually-hidden">Publicación</h1>
+    {status === 'loading' ? <PublicationLoading feature /> : <ContentState status="error" message={error.message} onRetry={retry} />}
+  </main>
   async function share() {
     try {
       if (navigator.share) await navigator.share({ title: article.title, url: location.href })
@@ -42,7 +53,7 @@ export default function ArticlePage() {
           <h1>{article.title}</h1>
           <p>{article.summary}</p>
           <div className="article-page__meta">
-            <Link to={'/profile/' + article.authorId}>{article.author}</Link>
+            {article.authorProfile ? <Link to={'/profile/' + article.authorId}>{article.author}</Link> : <span>{article.author}</span>}
             <span>{article.readTime}</span>
             <time dateTime={article.date}>{formatDate(article.date)}</time>
           </div>
@@ -61,8 +72,8 @@ export default function ArticlePage() {
           {article.blocks.map((block, index) => block.type === 'heading' && <a key={index} href={'#section-' + index}>{block.text}</a>)}
         </aside>
       </div>
-      <AuthorCard author={authors.find((author) => author.id === article.authorId)} />
-      <p className="demo-label">Publicación de demostración · {article.type}</p>
+      <AuthorCard author={article.authorProfile} />
+      {article.demo && <p className="demo-label">Publicación de demostración · {article.type}</p>}
     </main>
   )
 }

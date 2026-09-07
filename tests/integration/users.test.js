@@ -101,6 +101,13 @@ test('registration is persisted, unique and never returns credentials or accepts
   const duplicate = await http('POST', '/api/users/register', { body: { name: 'Otra', email: owned.get(user.id).toUpperCase(), password } })
   assert.equal(duplicate.status, 409)
   assert.equal((await http('GET', '/api/users/' + prefix + '-missing')).status, 404)
+  const profiles = await http('GET', '/api/users/profiles?ids=' + user.id + ',' + prefix + '-missing,' + user.id)
+  assert.equal(profiles.status, 200)
+  assert.equal(profiles.body.items.length, 1)
+  assert.equal(profiles.body.items[0].id, user.id)
+  for (const field of ['email', 'passwordHash', 'status', 'authVersion']) assert.equal(field in profiles.body.items[0], false)
+  assert.equal((await http('GET', '/api/users/profiles?ids=' + Array.from({ length: 41 }, () => randomUUID()).join(','))).status, 400)
+  assert.equal((await http('GET', '/api/users/profiles?ids=invalid%2Fid')).status, 400)
 })
 
 test('registration uses an atomic email reservation under concurrency', async () => {
@@ -195,6 +202,7 @@ test('only administrators change permissions; changes revoke sessions and suspen
   assert.ok(next.body.items.every((item) => !listing.body.items.some((previous) => previous.id === item.id)))
   assert.equal((await http('PATCH', '/api/users/' + author.id + '/permissions', { token: admin.token, body: { role: 'author', status: 'suspended' } })).status, 200)
   assert.equal((await http('GET', '/api/users/' + author.id)).status, 404)
+  assert.deepEqual((await http('GET', '/api/users/profiles?ids=' + author.id)).body.items, [])
   assert.equal((await http('GET', '/api/users/me', { token: author.token })).status, 401)
   assert.equal((await http('POST', '/api/users/login', { body: { email: owned.get(author.id), password } })).status, 401)
 })

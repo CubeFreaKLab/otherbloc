@@ -19,6 +19,7 @@ All public paths below enter through the gateway. The owning service requires it
 | `POST /api/users/me/author-request` | Reader requests author access; does not grant that role |
 | `POST /api/users/me/password` | Current password required; changes hash and invalidates every existing session |
 | `GET /api/users/:id` | Public active profile only; no email, status or credential fields |
+| `GET /api/users/profiles?ids=:id1,:id2` | Up to 40 unique public active profiles by bounded key lookups; missing/suspended IDs omitted, no private fields |
 | `GET /api/users/:id/avatar?v=:assetId` | Only the current avatar, streamed through the gateway; no bucket download token |
 | `GET /api/users?limit=20&cursor=:id` | Admin-only account listing; maximum 50, document-ID cursor |
 | `PATCH /api/users/:id/permissions` | Admin-only role/status changes, excluding self; preserves an active administrator |

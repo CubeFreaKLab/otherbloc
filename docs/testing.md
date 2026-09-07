@@ -33,6 +33,12 @@ M3 adds seven API integration tests (11 total with Firebase infrastructure check
 
 Six end-to-end browser tests (three scenarios × desktop/mobile) drive actual account APIs, including registration, reload persistence, avatar, public/private profile separation, author request/approval, denied administration, unsaved-navigation protection and logout. Start the services/emulators and seed first. Screenshots and Axe checks cover the account in both themes; no auth trace/video retains credentials. Publication editor/interactions/cloud journeys are not yet covered at M3.
 
+## Content integration — M4A
+
+M4A adds ten Content integration scenarios (21 total) and four public-reading browser scenarios (10 total), plus four schema/index unit contracts (23 Node checks total). Actual HTTP + Firebase checks cover all blocks across an application restart, guarded optimistic concurrency, competing moderation/audit commits, cross-owner restrictions, draft secrecy including same-state admin retries, upload format/size/MIME/ownership, 640/960 derivative access, the lifecycle, logical deletion, keyset pagination and filter-scoped cursors, service failure and current role/session revocation. Bounded Users profile lookup is tested for privacy, missing/suspended accounts and limits.
+
+E2E uses seeded Storage images, live account and publication APIs, desktop/mobile, both themes, reloaded search/content and current author profiles. One Content failure is explicitly injected to verify no fallback and successful retry; successful data responses are not mocked. The 18-test visual suite now explicitly fixtures Users and Content, including image bytes, and waits for real loading boundaries before layout checks. Performance remains open: integrated local Lighthouse 75/100/96/100 after responsive images, LCP 4.4 s / CLS 0.168; not the static M1 score and not a k6 result. Author editor/moderation UI acceptance is M4B.
+
 ## Dependency review
 
 M2 audit on 2026-09-07: zero high/critical issues; nine moderate findings, five in the optional Storage SDK dependency chain and four in development tooling. The UUID advisory concerns buffer handling in UUID v3/v5/v6, while the Storage HTTP helper imports v4. Firebase CLI also includes older stream-json/OpenTelemetry branches. Do not apply `npm audit fix --force`: the suggested downgrade breaks the current Firebase runtime. Track upstream fixes and rerun audit/integration before production. These findings are disclosed, not counted as resolved by passing tests.
