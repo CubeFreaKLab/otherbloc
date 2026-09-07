@@ -1,5 +1,11 @@
 # Development log
 
+## Clean installation and independent data — 2026-09-07
+
+- Verified a separate clone of `7e24e12` with `npm ci`, generated private configuration and an initially empty emulator database. Both seeds created six demo accounts and seven published readings with Storage images through their real service workflows.
+- Passed 36 Node checks, lint/build, 30 API integration checks (60.73 seconds) and fourteen targeted desktop journeys (2.6 minutes), including all three roles, author/moderation, persistence, errors and GraphQL interactions. Inspected genuine home-light/editor-dark screenshots.
+- Preserved the original environment before pausing it; the clean copy kept independent secrets, temporary storage and exit snapshot. Restarted the original from its own snapshot and verified public reading again. Node/npm, Java 21 and the per-user Chromium cache were existing prerequisites. No push, deployment or claim that dependency advisories were resolved.
+
 ## Verified snapshots and isolated emulator storage — 2026-09-07
 
 - Added explicit snapshot imports with fail-closed argument/manifest validation. Timestamped exports now use the supported Firebase Tools module API, preserve existing snapshots and require both Firestore and Storage in the output manifest.

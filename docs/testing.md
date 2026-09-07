@@ -107,6 +107,14 @@ The supported Firebase Tools module export completes with exit code 0 and a mani
 
 After the final restore, all 30 API integration checks pass (58.25 seconds), all ten targeted desktop user/content/editor journeys pass (1.7 minutes), and 36 Node checks, lint and build pass. This is local emulator evidence; clean installation, k6, cloud persistence and CI/CD still require separate verification.
 
+## Clean checkout verification — M7C
+
+A separate local clone of commit `7e24e12` installed with `npm ci`, without inherited `node_modules`, `.env.local` or emulator snapshots. Setup generated independent secrets. Its Firestore instance had zero collections before seeding; `seed:users` created six demo accounts, and `seed:content` created, reviewed, published and publicly read all seven demo publications with Storage images. The existing Node/npm, Java 21 installation and per-user Chromium cache were prerequisites, not newly installed operating-system components.
+
+On that checkout, all 36 Node checks, lint and build pass, as do all 30 API integration checks (60.73 seconds) and fourteen targeted desktop E2E checks (2.6 minutes): users, content, editor/moderation and interactions. These include actual registration/avatar, three roles, save/reload/conflict, publication visibility, lost-response comment retry and cross-account library isolation. Genuine home-light/editor-dark captures were inspected; this is not a new full desktop/mobile regression run.
+
+The original environment was exported and stopped before the clean suite occupied its ports. The clone used its own temporary storage and exported to its own snapshot on interactive shutdown. The original then imported its separate `current` snapshot, with live public-content/Storage reading verified again. No private configuration or test data was transferred between the two copies. The nine disclosed moderate dependency findings remain; clean installation does not resolve advisories or prove cloud delivery.
+
 ## Dependency review
 
 M2 audit on 2026-09-07: zero high/critical issues; nine moderate findings, five in the optional Storage SDK dependency chain and four in development tooling. The UUID advisory concerns buffer handling in UUID v3/v5/v6, while the Storage HTTP helper imports v4. Firebase CLI also includes older stream-json/OpenTelemetry branches. Do not apply `npm audit fix --force`: the suggested downgrade breaks the current Firebase runtime. Track upstream fixes and rerun audit/integration before production. These findings are disclosed, not counted as resolved by passing tests.
