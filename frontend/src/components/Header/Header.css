@@ -1,8 +1,7 @@
 .site-header {
-  position: relative;
   z-index: var(--layer-nav);
   border-bottom: 1px solid var(--line);
-  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  background: var(--paper);
 }
 
 .site-header__utility {
@@ -29,11 +28,11 @@
   gap: var(--space-5);
 }
 
-.site-header__actions > a {
+.site-header__actions > .session-access {
   color: var(--ink);
   font-size: var(--text-small);
   font-weight: 800;
-  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .site-header__search {
@@ -159,7 +158,18 @@
   .site-header__actions { gap: .4rem; }
 }
 
-.account-access { position: relative; display: block; width: 2.25rem; height: 2.25rem; flex: 0 0 2.25rem; background: var(--paper-grey); border: 1px solid var(--line); }
+.account-access { position: relative; display: grid; place-items: center; width: 2.25rem; height: 2.25rem; flex: 0 0 2.25rem; background: var(--ink); color: var(--white); }
 .account-access img { width: 100%; height: 100%; object-fit: cover; }
+.account-access__initials { font: 700 .85rem var(--font-title); }
+.write-access { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; flex: 0 0 2.25rem; color: var(--ink); background: transparent; border: 1px solid var(--line); }
+.write-access:hover { border-color: var(--ink); }
+.session-access { font: 800 .8rem var(--font-ui); white-space: nowrap; }
+.session-access:hover { text-decoration: underline; text-underline-offset: .25em; }
+@media (max-width: 25rem) {
+  .site-header__brand img { width: 6.2rem; }
+  .site-header__actions { gap: .4rem; }
+  .site-header__menu-button, .site-header__actions .theme-control { width: 2.5rem; height: 2.5rem; flex-basis: 2.5rem; }
+  .site-header__actions .session-access { font-size: .72rem; }
+}
 .account-access__help { position: absolute; z-index: 20; right: 0; top: calc(100% + .6rem); background: var(--ink); color: var(--paper); padding: .35rem .6rem; font: .75rem var(--font-ui); white-space: nowrap; visibility: hidden; pointer-events: none; }
 .account-access:hover .account-access__help, .account-access:focus-visible .account-access__help { visibility: visible; }

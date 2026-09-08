@@ -7,6 +7,8 @@ import SearchBar from '../SearchBar/SearchBar'
 import ThemeControl from '../ThemeControl/ThemeControl'
 import './Header.css'
 import AccountAvatar from './AccountAvatar'
+import WriteAccess from './WriteAccess'
+import ScrollHeader from './ScrollHeader'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 export default function Header() {
@@ -18,7 +20,7 @@ export default function Header() {
   const selected = new URLSearchParams(location.search).get('category')
   const closeMenu = () => setMenuKey(null)
   return (
-    <header className="site-header" onKeyDown={(event) => {
+    <ScrollHeader className="site-header" keepVisible={menuOpen} onKeyDown={(event) => {
       if (event.key === 'Escape' && menuOpen) { closeMenu(); buttonRef.current?.focus() }
     }}>
       <div className="site-header__utility page-width">
@@ -28,6 +30,7 @@ export default function Header() {
         <div className="site-header__actions">
           <div className="site-header__search"><SearchBar compact /></div>
           <ThemeControl />
+          <WriteAccess onClick={closeMenu} />
           <AccountAvatar onClick={closeMenu} />
           <button ref={buttonRef} className="site-header__menu-button" type="button"
             aria-controls="site-navigation" aria-expanded={menuOpen} onClick={() => setMenuKey(menuOpen ? null : location.key)}>
@@ -46,6 +49,6 @@ export default function Header() {
         <Link className="site-header__more" to="/explore" onClick={closeMenu}
           aria-current={location.pathname === '/explore' && !selected ? 'page' : undefined}>Explorar</Link>
       </nav>
-    </header>
+    </ScrollHeader>
   )
 }

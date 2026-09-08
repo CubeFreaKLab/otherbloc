@@ -36,6 +36,7 @@ async function logout(page) {
 
 test('real registration, live header avatar, profile persistence, immediate writing and logout', async ({ page, context }, testInfo) => {
   const user = await register(page)
+  await expect(page.locator('.account-access__initials')).toHaveText('P' + user.name.split(' ')[1][0].toUpperCase())
   const requests = []
   page.on('request', (request) => { if (request.resourceType() === 'fetch') requests.push(new URL(request.url())) })
   await page.getByLabel('Biografía', { exact: true }).fill('Perfil de demostración guardado en Firestore, no en el navegador.')
@@ -59,6 +60,8 @@ test('real registration, live header avatar, profile persistence, immediate writ
   await expect(page.locator('main').getByRole('link', { name: 'Mis publicaciones', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Quitar avatar', exact: true }).click()
   await expect(page.locator('.account-access img')).toHaveCount(0)
+  await expect(page.locator('.account-access__initials')).toHaveText('P' + user.name.split(' ')[1][0].toUpperCase())
+  await expect(page.locator('.account-avatar__initial')).toHaveText('P' + user.name.split(' ')[1][0].toUpperCase())
   await page.reload()
   await expect(page.locator('.account-access img')).toHaveCount(0)
   for (const colorScheme of ['light', 'dark']) {

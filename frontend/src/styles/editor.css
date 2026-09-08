@@ -57,8 +57,12 @@
 .writing-action:hover { text-decoration: underline; text-underline-offset: .3em; }
 .writing-header .writing-submit { padding: .7rem .95rem; font: 800 .8rem var(--font-ui); min-height: 2.6rem; }
 .writing-page { width: min(100% - 4rem, 46rem); margin: clamp(3rem, 8vh, 6rem) auto 6rem; }
-.writing-eyebrow { color: var(--grey); font: .75rem var(--font-ui); margin: 0 0 1.75rem; }
-.writing-title { display: block; width: 100%; min-height: 1.3em; max-height: none; padding: 0 0 .12em; margin: 0 0 2rem; resize: none; overflow: hidden; border: 0; border-radius: 0; background: transparent; color: var(--ink); font: 700 clamp(2.8rem, 5.4vw, 4.5rem)/1.07 var(--font-title); letter-spacing: -.035em; }
+.writing-eyebrow { color: var(--grey); font: .75rem var(--font-ui); margin: 0; }
+.writing-intro { display: flex; align-items: center; gap: 1rem; justify-content: space-between; margin-bottom: 1.5rem; }
+.writing-cover-action { display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; padding: .4rem 0; border: 0; background: transparent; color: var(--graphite); font: .8rem var(--font-ui); }
+.writing-cover-action:hover { color: var(--ink); text-decoration: underline; text-underline-offset: .25em; }
+.writing-cover { width: 100%; height: auto; max-height: 22rem; object-fit: cover; margin-bottom: 2rem; }
+.writing-title { display: block; width: 100%; min-height: 1.3em; max-height: none; padding: 0 0 .12em; margin: 0 0 2rem; resize: none; overflow: hidden; overflow-wrap: anywhere; border: 0; border-radius: 0; background: transparent; color: var(--ink); font: 700 clamp(2.8rem, 5.4vw, 4.5rem)/1.07 var(--font-title); letter-spacing: -.035em; }
 .writing-title::placeholder { color: var(--grey); opacity: 1; }
 .writing-title:focus-visible { outline: none; box-shadow: -2px 0 0 -1px var(--line); }
 .writing-surface { position: relative; }
@@ -118,17 +122,19 @@
 @media (max-width: 75rem) { .writing-header { padding-inline: 1rem; gap: .8rem; } .writing-header__identity, .writing-header__actions { gap: .6rem; } .writing-back span { display: none; } .writing-back::after { content: 'Volver'; } }
 @media (max-width: 47.99rem) {
   .writing-header { display: grid; grid-template-columns: 1fr; gap: .5rem; padding: .7rem 1rem; }
-  .writing-header__identity { justify-content: space-between; padding-right: 6.25rem; }
+  .writing-header__identity { justify-content: space-between; padding-right: 9.4rem; min-height: 2rem; }
   .writing-header__actions { flex-wrap: wrap; gap: .35rem .75rem; }
   .writing-header__actions .theme-control { position: absolute; top: .3rem; right: 3.6rem; }
   .writing-header__actions .account-access { position: absolute; top: .55rem; right: 1rem; }
+  .writing-header__actions .write-access { position: absolute; top: .55rem; right: 6.75rem; }
   .writing-header__actions .writing-save { margin-right: auto; font-size: .68rem; }
   .writing-header .writing-action { font-size: .73rem; }
   .writing-header .writing-submit { font-size: .72rem; padding-inline: .65rem; }
   .writing-page { width: calc(100% - 2.5rem); margin-top: 2.5rem; }
   .writing-title { font-size: clamp(2.4rem, 10vw, 3.7rem); margin-bottom: 1.5rem; }
   .writing-prose { font-size: 1.06rem; }
-  .writing-eyebrow { margin-bottom: 1.25rem; }
+  .writing-intro { margin-bottom: 1rem; }
   .writing-details { margin: auto; }
 }
+@media (max-width: 23.5rem) { .writing-brand { width: 6.2rem; } .writing-back::after { display: none; } }
 @media (prefers-reduced-motion: reduce) { .writing-menu, .writing-format { animation: none; } }

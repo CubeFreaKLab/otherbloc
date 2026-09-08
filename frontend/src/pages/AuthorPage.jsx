@@ -1,34 +1,20 @@
-import { useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Link from '../components/MotionLink'
-import { useMotionNavigate as useNavigate } from '../hooks/useMotionNavigate'
 import SessionBoundary from '../components/SessionBoundary'
 import ContentState from '../components/ContentState/ContentState'
 import { PublicationLoading, PublicationPagination } from '../components/PublicationFeed/PublicationFeed'
 import { useResource } from '../hooks/useResource'
-import { gatewayRequest } from '../services/gatewayClient'
 import { statusLabels } from '../services/publicationEditor'
-import { createId } from '../utils/createId'
+import { useCreatePublication } from '../hooks/useCreatePublication'
 import '../styles/editor.css'
 
 function AuthorWorkspace() {
-  const [params, setParams] = useSearchParams(), navigate = useNavigate()
+  const [params, setParams] = useSearchParams()
   const query = new URLSearchParams()
   if (params.get('status')) query.set('status', params.get('status'))
   if (params.get('cursor')) query.set('cursor', params.get('cursor'))
   const { data, status, error, retry } = useResource('/publications/mine?' + query)
-  const creation = useRef(null), pending = useRef(false)
-  const [busy, setBusy] = useState(false), [createError, setCreateError] = useState('')
-  async function create() {
-    if (pending.current) return
-    pending.current = true; setBusy(true); setCreateError('')
-    creation.current ??= createId()
-    try {
-      const { publication } = await gatewayRequest('/publications', { method: 'POST', body: { id: creation.current } })
-      navigate('/author/publications/' + publication.id)
-    } catch (error) { setCreateError(error.message) }
-    finally { pending.current = false; setBusy(false) }
-  }
+  const { create, busy, error: createError } = useCreatePublication()
   return <>
     <div className="author-toolbar"><button type="button" className="primary-button" onClick={create} disabled={busy}>{busy ? 'Creando borrador…' : 'Nueva publicación'}</button>
       <label className="form-field">Estado <select value={params.get('status') ?? ''} onChange={(event) => setParams(event.target.value ? { status: event.target.value } : {})}><option value="">Todos los estados</option>{Object.entries(statusLabels).map(([value, name]) => <option value={value} key={value}>{name}</option>)}</select></label>

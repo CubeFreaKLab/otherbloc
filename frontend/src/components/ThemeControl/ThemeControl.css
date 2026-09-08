@@ -3,5 +3,10 @@
 .theme-control__sun { opacity: 0; transform: rotate(-60deg) scale(.65); }
 .theme-control[data-theme-choice='dark'] .theme-control__sun { opacity: 1; transform: none; }
 .theme-control[data-theme-choice='dark'] .theme-control__moon { opacity: 0; transform: rotate(60deg) scale(.65); }
-.theme-control:hover { background: var(--paper-grey); }
+.theme-control:hover { background: transparent; }
+html[data-theme-transition]::view-transition { pointer-events: none; }
+html[data-theme-transition]::view-transition-old(root),
+html[data-theme-transition]::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+html[data-theme-transition]::view-transition-new(root) { z-index: 2; }
+html[data-theme-transition]::view-transition-old(root) { z-index: 1; }
 @media (prefers-reduced-motion: reduce) { .theme-control svg { transition: none; } }

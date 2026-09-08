@@ -51,7 +51,7 @@ test('a direct reading fragment waits for content and focuses its real section',
   const fragment = await heading.getAttribute('id')
   await page.goto('/article/leer-sin-prisa#' + fragment)
   await expect(page.locator('#' + fragment)).toBeFocused()
-  await expect.poll(() => page.locator('#' + fragment).evaluate((node) => Math.abs(node.getBoundingClientRect().top))).toBeLessThan(3)
+  await expect.poll(() => page.locator('#' + fragment).evaluate((node) => Math.abs(node.getBoundingClientRect().top - parseFloat(getComputedStyle(node).scrollMarginTop)))).toBeLessThan(3)
 })
 
 test('mobile menu enters and exits without moving the reading and immediately releases keyboard access', async ({ page }, testInfo) => {

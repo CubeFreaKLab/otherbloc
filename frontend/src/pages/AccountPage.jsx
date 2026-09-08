@@ -8,6 +8,7 @@ import UnsavedChanges from '../components/UnsavedChanges'
 import { RecoveryChoice } from '../components/DraftRecovery'
 import { useDraftRecovery } from '../hooks/useDraftRecovery'
 import { hasRecovery } from '../services/draftRecovery'
+import { initials } from '../utils/initials'
 import '../styles/account.css'
 
 const roleNames = { reader: 'Leer y escribir', author: 'Leer y escribir', admin: 'Administrador' }
@@ -60,7 +61,7 @@ function ProfileEditor({ user }) {
     <section className="account-profile" aria-labelledby="profile-edit-title">
       <div className="account-profile__heading"><div><span className="eyebrow">{roleNames[user.role]}</span><h2 id="profile-edit-title">Tu perfil</h2></div><Link className="text-link" to={'/profile/' + user.id}>Ver perfil público</Link></div>
       <div className="account-avatar">
-        {user.avatarUrl ? <img src={gatewayMediaUrl(user.avatarUrl)} width="88" height="88" alt="Tu avatar actual" /> : <span className="account-avatar__initial" aria-hidden="true" />}
+        {user.avatarUrl ? <img src={gatewayMediaUrl(user.avatarUrl)} width="88" height="88" alt="Tu avatar actual" /> : <span className="account-avatar__initial" aria-hidden="true">{initials(user.name)}</span>}
         <div><div className="form-actions"><button className="secondary-button" onClick={() => fileInput.current?.click()} disabled={blocked}>Cambiar avatar</button>{user.avatarUrl && <button className="text-button" disabled={blocked} onClick={() => perform(() => gatewayRequest('/users/me/avatar', { method: 'DELETE' }), 'Se quitó tu avatar.')}>Quitar avatar</button>}</div><p className="field-help">JPEG, PNG o WebP · Hasta 2 MB</p></div>
         <input ref={fileInput} className="visually-hidden" tabIndex={-1} type="file" accept="image/jpeg,image/png,image/webp" aria-label="Archivo de avatar" onChange={upload} />
       </div>

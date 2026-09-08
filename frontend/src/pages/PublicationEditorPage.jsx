@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ArrowLeft, X } from '@phosphor-icons/react'
+import { ArrowLeft, Image, X } from '@phosphor-icons/react'
 import Link from '../components/MotionLink'
 import { useMotionNavigate as useNavigate } from '../hooks/useMotionNavigate'
 import SessionBoundary from '../components/SessionBoundary'
@@ -15,6 +15,9 @@ import EditorConfirmation from '../components/PublicationEditor/EditorConfirmati
 import EditorialDialog from '../components/EditorialDialog'
 import ThemeControl from '../components/ThemeControl/ThemeControl'
 import AccountAvatar from '../components/Header/AccountAvatar'
+import WriteAccess from '../components/Header/WriteAccess'
+import ScrollHeader from '../components/Header/ScrollHeader'
+import PrivateImage from '../components/PublicationEditor/PrivateImage'
 import { useResource } from '../hooks/useResource'
 import { useSession } from '../hooks/useSession'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -28,7 +31,7 @@ import '../components/Header/Header.css'
 import '../styles/editor.css'
 
 function Editor({ initial }) {
-  const navigate = useNavigate(), titleInput = useRef(null)
+  const navigate = useNavigate(), titleInput = useRef(null), coverTarget = useRef(false)
   const [uploads, setUploads] = useState(0), [acting, setActing] = useState(false), [deleted, setDeleted] = useState(false)
   const [details, setDetails] = useState(false), [revision, setRevision] = useState(0)
   const pendingTagKey = 'otherbloc-tag-input:' + initial.authorId + ':' + initial.id
@@ -45,6 +48,23 @@ function Editor({ initial }) {
   useEffect(() => { if (deleted) navigate('/author', { replace: true }) }, [deleted, navigate])
   useEffect(() => { try { if (tagInput) sessionStorage.setItem(pendingTagKey, tagInput); else sessionStorage.removeItem(pendingTagKey) } catch { /* The input remains in memory. */ } }, [tagInput, pendingTagKey])
   useLayoutEffect(() => { const node = titleInput.current; if (node) { node.style.height = 'auto'; node.style.height = node.scrollHeight + 'px' } }, [document.title, preview])
+  useLayoutEffect(() => {
+    const node = titleInput.current
+    let width = 0, alive = true
+    const resize = () => { if (alive && node.clientWidth) { node.style.height = 'auto'; node.style.height = node.scrollHeight + 'px' } }
+    const observer = new ResizeObserver(() => { if (width !== node.clientWidth) { width = node.clientWidth; resize() } })
+    observer.observe(node)
+    window.addEventListener('resize', resize)
+    window.document.fonts.ready.then(resize)
+    return () => { alive = false; observer.disconnect(); window.removeEventListener('resize', resize) }
+  }, [])
+  useLayoutEffect(() => {
+    if (details && coverTarget.current) {
+      coverTarget.current = false
+      const cover = window.document.getElementById('publication-cover-details')
+      cover?.focus({ preventScroll: true }); cover?.scrollIntoView({ block: 'start', behavior: 'instant' })
+    }
+  }, [details])
   const patch = (field, value) => update((current) => ({ ...current, [field]: value }))
   const uploadBusy = (value) => setUploads((count) => Math.max(0, count + (value ? 1 : -1)))
 
@@ -86,16 +106,16 @@ function Editor({ initial }) {
   }
   return <>
     <UnsavedChanges dirty={(dirty || Boolean(tagInput)) && !deleted} pending={inFlight && !deleted} />
-    <header className="writing-header">
+    <ScrollHeader className="writing-header" keepVisible={details || Boolean(action)}>
       <div className="writing-header__identity"><Link to="/" className="writing-brand"><img className="brand-logo" src="/brand/otherbloc-logo-black.svg" alt="otherbloc, inicio" width="1532" height="291" /></Link><Link className="writing-back" to="/author" aria-label="Mis publicaciones"><ArrowLeft size={17} aria-hidden="true" /><span>Mis publicaciones</span></Link></div>
       <div className="writing-header__actions"><p className="writing-save" role="status">{uploads ? 'Subiendo imagen…' : busy ? 'Guardando…' : error ? 'No se pudo guardar' : dirty ? 'Cambios sin guardar' : 'Guardado'}</p>
         {publication.status === 'draft' && (dirty || error) && <button type="button" className="text-button" disabled={operating} onClick={() => save().catch(() => {})}>{error ? 'Reintentar' : 'Guardar ahora'}</button>}
         <button type="button" className="writing-action" aria-expanded={details} onClick={() => setDetails(true)}>Detalles</button>
         <button type="button" className="writing-action" disabled={acting} aria-pressed={preview} onClick={() => setPreview((value) => !value)}>{preview ? 'Escribir' : 'Vista previa'}</button>
         {publication.status === 'draft' && <button type="button" className="primary-button writing-submit" disabled={operating || error?.code === 'version_conflict'} onClick={() => requestStatus('review')}>Enviar a revisión</button>}
-        <ThemeControl /><AccountAvatar />
+        <ThemeControl /><WriteAccess /><AccountAvatar />
       </div>
-    </header>
+    </ScrollHeader>
     <div className="writing-notices"><RecoveryChoice entry={recovery} versioned onRestore={(value) => { editor.restore(value); setTagInput(value.tagInput ?? ''); setRevision((value) => value + 1); setPreview(false) }} />
       {error && <div className="form-feedback" role="alert"><p>{error.message}</p>{error.fields?.length > 0 && <p>Revisa {error.fields.map(({ field }) => field.startsWith('tags') ? 'las etiquetas' : field.startsWith('blocks') ? 'la extensión del texto y sus imágenes' : ({ title: 'el título', summary: 'el resumen', coverAlt: 'la descripción de portada' }[field] || 'los detalles')).filter((field, index, all) => all.indexOf(field) === index).join(', ')}. Tus cambios siguen aquí.</p>}
         <div className="form-actions"><button type="button" className="text-button" onClick={exportChanges}>Descargar mis cambios</button><button type="button" className="text-button" disabled={operating} onClick={() => setAction({ kind: 'reload', title: '¿Recuperar la versión guardada?', message: 'Tus cambios locales sin guardar se descartarán. Descárgalos primero si necesitas conservar una copia.', label: 'Recuperar versión guardada' })}>Recuperar versión guardada</button></div>
@@ -105,7 +125,8 @@ function Editor({ initial }) {
     </div>
     {preview && <PublicationPreview publicationId={publication.id} document={document} />}
     <section className="writing-page" aria-label="Editor" hidden={preview}>
-      <p className="writing-eyebrow">{statusLabels[publication.status]}</p>
+      <div className="writing-intro"><p className="writing-eyebrow">{statusLabels[publication.status]}</p><button type="button" className="writing-cover-action" onClick={() => { coverTarget.current = true; setDetails(true) }}><Image size={17} aria-hidden="true" />{document.coverId ? 'Editar portada' : 'Añadir portada'}</button></div>
+      {document.coverId && <PrivateImage path={'/api/publications/' + publication.id + '/media/' + document.coverId} alt={document.coverAlt || 'Portada pendiente de descripción'} className="writing-cover" />}
       <h1 className="visually-hidden">Editor</h1>
       <textarea ref={titleInput} id="publication-title" className="writing-title" aria-label="Título" placeholder="Título de tu nota" value={document.title} rows={1} maxLength={160} disabled={locked} onChange={(event) => patch('title', event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.nativeEvent.isComposing) { event.preventDefault(); window.document.querySelector('.writing-prose')?.focus() } }} />
       <WritingSurface blocks={document.blocks} onChange={(blocks) => patch('blocks', blocks)} publicationId={publication.id} disabled={locked} onBusyChange={uploadBusy} revision={revision} />
@@ -117,7 +138,7 @@ function Editor({ initial }) {
         <div className="form-field"><label htmlFor="publication-type">Tipo de publicación</label><select id="publication-type" value={document.type} onChange={(event) => patch('type', event.target.value)}>{(options.data?.types ?? [document.type]).map((type) => <option key={type}>{type}</option>)}</select></div>
         <div className="form-field"><label htmlFor="publication-category">Categoría</label><select id="publication-category" value={document.category} onChange={(event) => patch('category', event.target.value)}>{(options.data?.categories ?? [document.category]).map((category) => <option key={category}>{category}</option>)}</select></div>
         <TagsField tags={document.tags} input={tagInput} onInput={setTagInput} onChange={(tags) => patch('tags', tags)} disabled={locked} />
-        <section><h3>Portada</h3><ImageField publicationId={publication.id} assetId={document.coverId} alt={document.coverAlt} label="Portada" onChange={(value) => patch('coverId', value)} disabled={locked} onBusyChange={uploadBusy} /><div className="form-field"><label htmlFor="publication-cover-alt">Descripción de la portada</label><input id="publication-cover-alt" value={document.coverAlt} maxLength={300} onChange={(event) => patch('coverAlt', event.target.value)} /><small>Describe lo que se ve para quienes no pueden ver la fotografía.</small></div></section>
+        <section id="publication-cover-details" tabIndex={-1}><h3>Portada</h3><ImageField publicationId={publication.id} assetId={document.coverId} alt={document.coverAlt} label="Portada" onChange={(value) => patch('coverId', value)} disabled={locked} onBusyChange={uploadBusy} /><div className="form-field"><label htmlFor="publication-cover-alt">Descripción de la portada</label><input id="publication-cover-alt" value={document.coverAlt} maxLength={300} onChange={(event) => patch('coverAlt', event.target.value)} /><small>Describe lo que se ve para quienes no pueden ver la fotografía.</small></div></section>
       </fieldset>
       {options.status === 'error' && <p role="alert">No se pudieron cargar las categorías. <button className="text-button" type="button" onClick={options.retry}>Reintentar</button></p>}
       <section className="writing-state"><h3>{statusLabels[publication.status]}</h3><div className="form-actions">

@@ -24,6 +24,7 @@ const router = createBrowserRouter([{
     { path: '/admin/publications', lazy: async () => ({ Component: (await import('./pages/AdminPublicationsPage')).default }) },
     { path: '/admin/publications/:id', lazy: async () => ({ Component: (await import('./pages/PublicationReviewPage')).default }) },
     { path: '/author', lazy: async () => ({ Component: (await import('./pages/AuthorPage')).default }) },
+    { path: '/author/new', lazy: async () => ({ Component: (await import('./pages/NewPublicationPage')).default }) },
     { path: '/author/publications/:id', lazy: async () => ({ Component: (await import('./pages/PublicationEditorPage')).default }) },
     { path: '*', element: <NotFoundPage /> },
   ],

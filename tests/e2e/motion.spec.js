@@ -71,7 +71,7 @@ test('reading transitions do not scale thumbnails in either direction', async ({
   }
 })
 
-test('main destinations fade, private navigation reverses, and theme toggles without an extra route transition', async ({ page }) => {
+test('main destinations fade, private navigation reverses, and theme retains its own circular transition', async ({ page }) => {
   await observeTransitions(page)
   await page.goto('/')
   await expect(page.locator('.featured-article')).toBeVisible()
@@ -96,7 +96,8 @@ test('main destinations fade, private navigation reverses, and theme toggles wit
   await page.getByRole('button', { name: 'Activar tema oscuro' }).click()
   await expect(page.locator('html')).not.toHaveAttribute('data-theme-transition')
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
-  expect(await page.evaluate(() => window.routeTransitions.length)).toBe(beforeTheme)
+  await expect.poll(() => page.evaluate(() => window.routeTransitions.length)).toBe(beforeTheme + 1)
+  expect(await page.evaluate(() => window.routeTransitions.at(-1).mode)).toBe('theme')
   await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click()
 })
 

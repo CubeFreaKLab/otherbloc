@@ -1,0 +1,5 @@
+.scroll-header { position: sticky; top: 0; z-index: 30; flex-shrink: 0; width: 100%; background: var(--paper); transform: translateY(0); transition: transform 220ms var(--ease-standard); }
+.scroll-header[data-collapsed='true'] { transform: translateY(calc(-100% - 1px)); }
+.scroll-header:has(:focus-visible) { transform: translateY(0); }
+main [id] { scroll-margin-top: calc(var(--header-height, 5rem) + 1rem); }
+@media (prefers-reduced-motion: reduce) { .scroll-header { transition: none; } }
