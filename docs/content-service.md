@@ -11,9 +11,9 @@ All paths below start with `/api/publications`.
 | `GET /` | Published list: `limit` (default 12, maximum 40), `cursor`, `q`, `type`, `category`, `authorId` |
 | `GET /options` | Supported seven Spanish publication types and four categories |
 | `GET /:id` | Published detail; own private detail; administrators can inspect review/published/archived, not another author's draft |
-| `GET /mine` | Current author/admin's non-deleted publications, optional status and pagination |
+| `GET /mine` | Current active account's own non-deleted publications, optional status and pagination |
 | `GET /moderation` | Administrator queue, status review (default), published or archived, paginated |
-| `POST /` | Author/admin: strict `{id: UUID, title?}`; creates draft version 1; same owner/ID retry returns existing record without overwriting |
+| `POST /` | Any active account: strict `{id: UUID, title?}`; creates draft version 1; same owner/ID retry returns existing record without overwriting |
 | `PUT /:id`, `PATCH /:id` | Own draft only; complete editor document and `If-Match` version |
 | `PATCH /:id/status` | `{status, reason?}` and `If-Match`; permitted transitions below |
 | `DELETE /:id` | Own draft/archived only, `If-Match`; logical deletion, repeated requests return 204 |
@@ -32,17 +32,17 @@ Strict top-level fields: `title` (160), `summary` (400), nullable `coverId`, `co
 - `quote`: `text` up to 6,000 and `attribution` up to 160.
 - `image`: nullable `assetId`, `alt` up to 300 and `caption` up to 500.
 
-Drafts may be incomplete so work can be recovered. Review and publication require title length 5+, summary 20+, a cover with alternative text and at least one complete block. All referenced assets must belong to that publication and author. Clients cannot submit ownership, status, search indexes, timestamps or storage paths in editor updates. Plain strings render through React, never untrusted HTML.
+Drafts may be incomplete so work can be recovered. Review and publication require title length 5+, summary 20+, a cover with alternative text and complete content. All referenced assets must belong to that publication and author. Clients cannot submit ownership, status, search indexes, timestamps or storage paths in editor updates. Optional `formatted` runs and `formattedItems` preserve bold, italic and HTTP(S)/mailto links. The schema verifies that their joined text exactly matches the existing plain-text fields. REST, GraphQL, preview and public reading retain the same formatting; rendering uses React text, never untrusted HTML. Existing notes need no migration.
 
 ## Lifecycle and permissions
 
 | From → to | Who | Meaning |
 | --- | --- | --- |
-| Draft → review | Owner with author/admin role | Submit complete content; editing stops |
+| Draft → review | Owner with an active account | Submit complete content; editing stops |
 | Review → draft | Owner, or admin with a reason | Withdraw or request correction; owner receives the moderation note |
 | Review → published | Administrator | Approve for public reading |
 | Published → archived | Owner, or admin with a reason | Remove from public lists/detail/media without destroying content |
-| Archived → draft | Owner with author/admin role | Recover for editing and a new review cycle |
+| Archived → draft | Owner with an active account | Recover for editing and a new review cycle |
 
 Administrators may author their own content, but cannot edit somebody else's text. Administrative returns and archives retain a private note for the author, in addition to atomic history. Deletion hides an owner's draft/archive irreversibly from the product; it does not physically erase Firestore history or private Storage files. No restore/delete-others endpoint is offered. Retention/maintenance remains separate. Previously downloaded bytes cannot be recalled; public image responses can remain cached for 60 seconds after archival.
 

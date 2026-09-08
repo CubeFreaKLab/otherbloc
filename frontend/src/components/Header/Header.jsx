@@ -6,11 +6,10 @@ import { categories, normalizeSearch } from '../../data/navigation'
 import SearchBar from '../SearchBar/SearchBar'
 import ThemeControl from '../ThemeControl/ThemeControl'
 import './Header.css'
-import { useSession } from '../../hooks/useSession'
+import AccountAvatar from './AccountAvatar'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 export default function Header() {
-  const { user } = useSession()
   const [menuKey, setMenuKey] = useState(null)
   const mobile = useMediaQuery('(max-width: 47.99rem)')
   const buttonRef = useRef(null)
@@ -29,7 +28,7 @@ export default function Header() {
         <div className="site-header__actions">
           <div className="site-header__search"><SearchBar compact /></div>
           <ThemeControl />
-          <Link to={user ? '/account' : '/login'} onClick={closeMenu}>{user ? 'Mi cuenta' : 'Entrar'}</Link>
+          <AccountAvatar onClick={closeMenu} />
           <button ref={buttonRef} className="site-header__menu-button" type="button"
             aria-controls="site-navigation" aria-expanded={menuOpen} onClick={() => setMenuKey(menuOpen ? null : location.key)}>
             {menuOpen ? <X size={22} aria-hidden="true" /> : <List size={22} aria-hidden="true" />}

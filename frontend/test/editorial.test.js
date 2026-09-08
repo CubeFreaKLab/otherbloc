@@ -23,12 +23,12 @@ test('search ignores accents, preserves combined filters and reports truly empty
   assert.equal(filterArticles(articles, { query: 'inexistente-123' }).length, 0)
 })
 
-test('theme handles system preferences, invalid stored values and unavailable storage', () => {
-  assert.equal(resolveTheme('system', true), 'dark')
+test('theme defaults to light regardless of system and preserves only an explicit dark choice', () => {
+  assert.equal(resolveTheme('system', true), 'light')
   assert.equal(resolveTheme('system', false), 'light')
   assert.equal(resolveTheme('light', true), 'light')
-  assert.equal(readThemePreference({ getItem: () => 'invalid' }), 'system')
-  assert.equal(readThemePreference({ getItem: () => { throw new Error('blocked') } }), 'system')
+  for (const value of [null, 'system', 'invalid', 'light']) assert.equal(readThemePreference({ getItem: () => value }), 'light')
+  assert.equal(readThemePreference({ getItem: () => { throw new Error('blocked') } }), 'light')
   assert.equal(readThemePreference({ getItem: () => 'dark' }), 'dark')
 })
 

@@ -9,11 +9,11 @@ test('published Firestore content and Storage images render through the gateway 
   await page.goto('/')
   await expect(page.locator('.featured-article h1')).toHaveText('Leer también es una forma de quedarse.')
   await expect(page.locator('main article')).toHaveCount(7)
-  const cover = page.locator('.featured-article__image img')
+  const cover = page.locator('.featured-article__image .reading-thumbnail__grey')
   await expect(cover).toHaveAttribute('src', /\/api\/publications\/leer-sin-prisa\/media\//)
   await expect.poll(() => cover.evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true)
   for (const theme of ['light', 'dark']) {
-    await page.getByRole('combobox', { name: 'Tema de color' }).selectOption(theme)
+    if (await page.locator('html').getAttribute('data-theme') !== theme) await page.getByRole('button', { name: theme === 'dark' ? 'Activar tema oscuro' : 'Activar tema claro' }).click()
     await page.locator('main').focus()
     expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([])
     await page.screenshot({ path: testInfo.outputPath('persisted-home-' + theme + '.png'), fullPage: true })

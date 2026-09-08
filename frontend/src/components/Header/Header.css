@@ -157,6 +157,9 @@
 @media (max-width: 23rem) {
   .site-header__brand img { width: 6.2rem; }
   .site-header__actions { gap: .4rem; }
-  .site-header .theme-control svg { display: none; }
-  .site-header .theme-control select { width: 4rem; font-size: .72rem; }
 }
+
+.account-access { position: relative; display: block; width: 2.25rem; height: 2.25rem; flex: 0 0 2.25rem; background: var(--paper-grey); border: 1px solid var(--line); }
+.account-access img { width: 100%; height: 100%; object-fit: cover; }
+.account-access__help { position: absolute; z-index: 20; right: 0; top: calc(100% + .6rem); background: var(--ink); color: var(--paper); padding: .35rem .6rem; font: .75rem var(--font-ui); white-space: nowrap; visibility: hidden; pointer-events: none; }
+.account-access:hover .account-access__help, .account-access:focus-visible .account-access__help { visibility: visible; }

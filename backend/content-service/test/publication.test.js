@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { randomUUID } from 'node:crypto'
 import { test } from 'node:test'
-import { decodeCursor, editorSchema, encodeCursor, normalize, publicQuerySchema, readVersion, searchFields } from '../src/models/publication.js'
+import { decodeCursor, editorSchema, encodeCursor, normalize, publicQuerySchema, readVersion, requirePublishable, searchFields } from '../src/models/publication.js'
 
 test('editor schemas bound content and normalize filters without accepting arbitrary fields', () => {
   const value = { title: '', summary: '', coverId: null, coverAlt: '', type: 'Artículo', category: 'Cultura', tags: [], blocks: [] }
@@ -23,6 +23,19 @@ test('version and cursor parsing reject missing, invalid or cross-filter state',
   assert.deepEqual(decodeCursor(encodeCursor(time, id, scope), scope), { time, id, scope })
   assert.throws(() => decodeCursor(encodeCursor(time, id, scope), 'other'), { status: 400 })
   assert.throws(() => decodeCursor('invalid', scope), { status: 400 })
+})
+
+test('incomplete drafts save; review validation and inline formatting cannot be bypassed', () => {
+  const draft = { title: 'Yo', summary: '', coverId: null, coverAlt: '', type: 'Artículo', category: 'Cultura', tags: [], blocks: [] }
+  assert.equal(editorSchema.safeParse(draft).success, true)
+  assert.throws(() => requirePublishable(draft), { code: 'publication_incomplete' })
+  const block = { id: randomUUID(), type: 'paragraph', text: 'Seguro', formatted: [{ text: 'Seguro', bold: true, italic: true, href: 'https://example.com' }] }
+  assert.equal(editorSchema.safeParse({ ...draft, blocks: [block] }).success, true)
+  for (const href of ['javascript:alert(1)', 'data:text/html,bad', '//example.com']) assert.equal(editorSchema.safeParse({ ...draft, blocks: [{ ...block, formatted: [{ text: 'Seguro', href }] }] }).success, false)
+  assert.equal(editorSchema.safeParse({ ...draft, blocks: [{ ...block, formatted: [{ text: 'Otro contenido' }] }] }).success, false)
+  const complete = { ...draft, title: 'Una nota', summary: 'Un resumen con suficientes caracteres', coverId: randomUUID(), coverAlt: 'Una fotografía', blocks: [block, { id: randomUUID(), type: 'paragraph', text: '' }] }
+  assert.doesNotThrow(() => requirePublishable(complete))
+  assert.throws(() => requirePublishable({ ...complete, blocks: [complete.blocks[1]] }), { code: 'publication_incomplete' })
 })
 
 test('search indexes metadata word prefixes and excludes unpublished body text', () => {

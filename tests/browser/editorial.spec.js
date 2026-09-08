@@ -126,20 +126,23 @@ test('article and profile resolve their own content and return 404 for missing r
   }
 })
 
-test('light, dark and system persist; reduced motion uses the immediate alternative', async ({ page }) => {
+test('first visit stays light, explicit dark persists, and legacy system falls back to light', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' })
   await page.goto('/')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+  await page.getByRole('button', { name: 'Activar tema oscuro' }).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
-  await page.getByRole('combobox', { name: 'Tema de color' }).selectOption('light')
+  await page.getByRole('button', { name: 'Activar tema claro' }).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
   await expect(page.locator('html')).not.toHaveAttribute('data-theme-transition')
   await page.reload()
-  await expect(page.getByRole('combobox', { name: 'Tema de color' })).toHaveValue('light')
-  await page.getByRole('combobox', { name: 'Tema de color' }).selectOption('system')
+  await expect(page.getByRole('button', { name: 'Activar tema oscuro' })).toBeVisible()
+  await page.evaluate(() => localStorage.setItem('otherbloc-theme', 'system'))
+  await page.reload()
   await page.emulateMedia({ colorScheme: 'light' })
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
   await page.emulateMedia({ colorScheme: 'dark' })
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
 })
 
 test('access composition is labeled, keyboard usable and never fakes an account', async ({ page, isMobile }) => {
@@ -174,16 +177,17 @@ for (const theme of ['light', 'dark']) {
   })
 }
 
-test('image focus reveals actual color without shifting the grid; touch uses color directly', async ({ page, isMobile }) => {
+test('thumbnail keyboard reveal keeps the grid fixed; touch rests in grey', async ({ page, isMobile }) => {
   await page.goto('/')
-  const picture = page.locator('.featured-article__image img')
+  const picture = page.locator('.featured-article__image .reading-thumbnail__grey')
   await expect(picture).toBeVisible()
   const before = await picture.boundingBox()
-  if (isMobile) await expect(picture).toHaveCSS('filter', 'grayscale(0)')
+  if (isMobile) await expect(picture).toHaveCSS('filter', 'grayscale(1)')
   else {
     await expect(picture).toHaveCSS('filter', 'grayscale(1)')
     await page.locator('.featured-article .text-link').focus()
-    await expect(picture).toHaveCSS('filter', 'grayscale(0)')
+    await page.keyboard.press('Tab')
+    await expect(page.locator('.featured-article__image .reading-thumbnail__color')).toHaveCSS('opacity', '1')
     const container = await page.locator('.featured-article__image').boundingBox()
     expect(container.width).toBeCloseTo(before.width + 1, 0)
   }

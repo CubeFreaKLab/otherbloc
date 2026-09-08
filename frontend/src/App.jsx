@@ -17,16 +17,17 @@ export default function App({ loading = false }) {
   const transitioning = useViewTransitionState(pathname)
   const navigation = useNavigation()
   const authRoute = pathname === '/login' || pathname === '/register'
+  const editorRoute = /^\/author\/publications\/[^/]+$/.test(pathname)
   return (
     <div className={'site-shell' + (transitioning ? ' site-shell--transitioning' : '')}>
       <a className="skip-link" href="#main-content">Saltar al contenido</a>
       <NavigationFocus />
       <RouteMotion />
-      {!authRoute && <Header />}
+      {!authRoute && !editorRoute && <Header />}
       <DraftRecoveryNotice />
       {navigation.state !== 'idle' && !loading && <p className="route-pending" role="status">Abriendo la página…</p>}
       {loading ? <main id="main-content" tabIndex={-1} className="page-width page-main"><h1 className="visually-hidden">Cargando otherbloc</h1><PublicationLoading feature /></main> : <Outlet />}
-      {!authRoute && <Footer />}
+      {!authRoute && !editorRoute && <Footer />}
       <ScrollRestoration />
     </div>
   )

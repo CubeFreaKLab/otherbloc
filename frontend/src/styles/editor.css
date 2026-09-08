@@ -46,3 +46,89 @@
 .editor-preview .article-prose h4 { font-family: var(--font-title); font-size: 1.6rem; }
 @media (max-width: 63.99rem) { .editor-layout { grid-template-columns: minmax(0, 1fr); } .editor-aside { border-left: 0; border-top: 1px solid var(--line); padding: 1.5rem 0 0; } }
 @media (max-width: 47.99rem) { .author-toolbar { align-items: stretch; flex-direction: column; } .author-publication { grid-template-columns: 1fr; gap: 1rem; } .editor-metadata { grid-template-columns: 1fr; } .editor-toolbar { align-items: stretch; } .editor-toolbar p { width: 100%; } .editor-toolbar button { flex: 1; } }
+
+.writing-header { position: sticky; top: 0; z-index: 30; display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; min-height: 4.5rem; padding: .65rem 2rem; border-bottom: 1px solid var(--line); background: var(--paper); }
+.writing-header__identity, .writing-header__actions { display: flex; align-items: center; gap: .9rem; }
+.writing-brand { display: inline-flex; width: 7rem; flex-shrink: 0; }
+.writing-brand img { width: 100%; height: auto; }
+.writing-back { display: flex; align-items: center; gap: .45rem; color: var(--graphite); font-size: .8rem; white-space: nowrap; }
+.writing-header .writing-save { color: var(--grey); font-size: .75rem; margin: 0; white-space: nowrap; }
+.writing-action, .writing-header .text-button { border: 0; background: transparent; color: var(--ink); padding: .6rem .25rem; min-height: 2.75rem; font: .8rem var(--font-ui); cursor: pointer; white-space: nowrap; }
+.writing-action:hover { text-decoration: underline; text-underline-offset: .3em; }
+.writing-header .writing-submit { padding: .7rem .95rem; font: 800 .8rem var(--font-ui); min-height: 2.6rem; }
+.writing-page { width: min(100% - 4rem, 46rem); margin: clamp(3rem, 8vh, 6rem) auto 6rem; }
+.writing-eyebrow { color: var(--grey); font: .75rem var(--font-ui); margin: 0 0 1.75rem; }
+.writing-title { display: block; width: 100%; min-height: 1.3em; max-height: none; padding: 0 0 .12em; margin: 0 0 2rem; resize: none; overflow: hidden; border: 0; border-radius: 0; background: transparent; color: var(--ink); font: 700 clamp(2.8rem, 5.4vw, 4.5rem)/1.07 var(--font-title); letter-spacing: -.035em; }
+.writing-title::placeholder { color: var(--grey); opacity: 1; }
+.writing-title:focus-visible { outline: none; box-shadow: -2px 0 0 -1px var(--line); }
+.writing-surface { position: relative; }
+.writing-tools { display: flex; align-items: center; gap: .25rem; margin: 0 0 .6rem -.65rem; color: var(--grey); }
+.writing-tools button, .writing-format button { display: grid; place-items: center; flex: 0 0 2.5rem; width: 2.5rem; height: 2.5rem; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; }
+.writing-tools button:hover, .writing-format button:hover, .writing-format button[aria-pressed='true'] { background: var(--paper-grey); color: var(--ink); }
+.writing-hint { font: .75rem var(--font-ui); flex: 1; }
+.writing-prose { min-height: 48vh; color: var(--ink); font: 1.18rem/1.85 var(--font-reading); overflow-wrap: anywhere; outline: none; }
+.writing-prose:focus-visible { outline: none; }
+.writing-prose p { margin: 0 0 1.1em; white-space: pre-wrap; }
+.writing-prose > :first-child { margin-top: 0; }
+.writing-prose h2, .writing-prose h3 { font-family: var(--font-title); line-height: 1.2; margin: 1.8em 0 .65em; }
+.writing-prose h2 { font-size: 2rem; }
+.writing-prose h3 { font-size: 1.6rem; }
+.writing-prose blockquote { border-left: 2px solid var(--line); padding-left: 1.5rem; margin: 1.5rem 0; font-style: italic; }
+.writing-quote details { margin: -.75rem 0 1.5rem; color: var(--grey); font: .75rem var(--font-ui); }
+.writing-quote summary { cursor: pointer; }
+.writing-quote label { display: grid; gap: .4rem; margin-top: .75rem; }
+.writing-quote input { padding: .5rem; border: 1px solid var(--line); background: var(--white); color: var(--ink); }
+.writing-prose ul, .writing-prose ol { padding-left: 1.4em; }
+.writing-prose li p { margin-bottom: .25em; }
+.writing-prose a, .article-prose a { text-decoration: underline; text-underline-offset: .15em; }
+.writing-prose p.is-editor-empty:first-child::before { color: var(--grey); content: attr(data-placeholder); float: left; height: 0; pointer-events: none; }
+.writing-format { display: flex; border: 1px solid var(--line); border-radius: .35rem; padding: .2rem; background: var(--paper); color: var(--ink); box-shadow: 0 5px 20px #0002; }
+.writing-menu { position: fixed; z-index: 40; width: 280px; max-height: min(330px, 70vh); overflow: auto; border: 1px solid var(--line); border-radius: .45rem; background: var(--white); color: var(--ink); padding: .4rem; box-shadow: 0 8px 28px #0002; font-family: var(--font-ui); }
+.writing-menu p { margin: .4rem .55rem .6rem; color: var(--grey); font-size: .75rem; }
+.writing-menu > input { width: 100%; padding: .6rem; margin-bottom: .35rem; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font: .85rem var(--font-ui); }
+.writing-menu button { display: flex; align-items: center; gap: .7rem; width: 100%; min-height: 2.6rem; padding: .5rem .65rem; border: 0; border-radius: .25rem; background: transparent; color: inherit; font: .9rem var(--font-ui); text-align: left; }
+.writing-menu button[aria-selected='true'], .writing-menu button:hover { background: var(--paper-grey); }
+.writing-menu .writing-menu__close { border-top: 1px solid var(--line); border-radius: 0; margin-top: .35rem; justify-content: space-between; font-size: .75rem; }
+.writing-notices { width: min(100% - 3rem, 46rem); margin: 1rem auto; }
+.writing-notices:empty { margin: 0; }
+.writing-details { width: min(32rem, calc(100% - 1.5rem)); max-height: calc(100dvh - 2rem); margin: auto 1rem auto auto; }
+.writing-details > header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.writing-details h2 { margin: 0; }
+.writing-metadata { display: grid; gap: 1.3rem; margin: 0; padding: 0; border: 0; }
+.writing-metadata h3, .writing-state h3 { font: 800 1rem var(--font-ui); }
+.writing-state { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.tags-field { display: flex; flex-wrap: wrap; gap: .4rem; border: 1px solid var(--line); padding: .5rem; background: var(--white); }
+.tags-field:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+.tag-piece { display: inline-flex; align-items: center; gap: .3rem; max-width: 100%; padding: .15rem .3rem .15rem .55rem; background: var(--paper-grey); font-size: .85rem; overflow-wrap: anywhere; }
+.tag-piece button { display: inline-grid; place-items: center; border: 0; background: transparent; color: var(--ink); min-width: 1.9rem; min-height: 1.9rem; }
+.tags-field input { flex: 1 1 7rem; width: 7rem; min-width: 0; border: 0; padding: .25rem; background: transparent; }
+.tags-field input:focus-visible { outline: none; box-shadow: none; }
+#tags-error:not(:empty) { color: var(--graphite); }
+#tags-error[role='alert'] { color: var(--error, #b64439); }
+.writing-image { margin: 1.75rem 0; font: .85rem/1.5 var(--font-ui); }
+.writing-image.ProseMirror-selectednode { outline: 2px solid var(--line); outline-offset: .5rem; }
+.writing-image .secondary-button { min-height: 2.4rem; font: 800 .8rem var(--font-ui); padding: .5rem .8rem; }
+.writing-image .text-button { font-size: .8rem; }
+.writing-image__details { margin-top: .6rem; }
+.writing-image__fields { display: grid; gap: .8rem; margin-top: .8rem; }
+.writing-image__fields label { display: grid; gap: .35rem; }
+.writing-image__fields input { width: 100%; border: 1px solid var(--line); padding: .6rem; background: var(--white); color: var(--ink); font: inherit; }
+.article-prose p, .article-prose li, .article-prose blockquote { white-space: pre-wrap; }
+.editor-page .editor-preview { padding-inline: 1.5rem; }
+@media (max-width: 75rem) { .writing-header { padding-inline: 1rem; gap: .8rem; } .writing-header__identity, .writing-header__actions { gap: .6rem; } .writing-back span { display: none; } .writing-back::after { content: 'Volver'; } }
+@media (max-width: 47.99rem) {
+  .writing-header { display: grid; grid-template-columns: 1fr; gap: .5rem; padding: .7rem 1rem; }
+  .writing-header__identity { justify-content: space-between; padding-right: 6.25rem; }
+  .writing-header__actions { flex-wrap: wrap; gap: .35rem .75rem; }
+  .writing-header__actions .theme-control { position: absolute; top: .3rem; right: 3.6rem; }
+  .writing-header__actions .account-access { position: absolute; top: .55rem; right: 1rem; }
+  .writing-header__actions .writing-save { margin-right: auto; font-size: .68rem; }
+  .writing-header .writing-action { font-size: .73rem; }
+  .writing-header .writing-submit { font-size: .72rem; padding-inline: .65rem; }
+  .writing-page { width: calc(100% - 2.5rem); margin-top: 2.5rem; }
+  .writing-title { font-size: clamp(2.4rem, 10vw, 3.7rem); margin-bottom: 1.5rem; }
+  .writing-prose { font-size: 1.06rem; }
+  .writing-eyebrow { margin-bottom: 1.25rem; }
+  .writing-details { margin: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .writing-menu, .writing-format { animation: none; } }

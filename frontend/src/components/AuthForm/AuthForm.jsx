@@ -52,7 +52,7 @@ export default function AuthForm({ mode }) {
         <section className="access-form" aria-labelledby="access-title" key={mode}>
           <span className="access-form__eyebrow">Bienvenido a otherbloc</span>
           <h1 id="access-title">{register ? 'Haz espacio para tus ideas.' : 'Qué bueno volver a leerte.'}</h1>
-          <p className="access-form__intro">{register ? 'Crea una cuenta para descubrir, guardar y compartir otras miradas.' : 'Entra a tu cuenta y continúa donde dejaste la lectura.'}</p>
+          <p className="access-form__intro">{register ? 'Una sola cuenta para leer, guardar y empezar a escribir tus propias notas.' : 'Entra a tu cuenta y continúa donde dejaste la lectura.'}</p>
           {!register && params.get('passwordChanged') === '1' && <p className="success-message" role="status">Contraseña actualizada. Inicia sesión con la nueva contraseña.</p>}
           <form onSubmit={submit} aria-busy={busy}>
             {register && <div className="form-field"><label htmlFor="access-name">Nombre</label><input id="access-name" name="name" autoComplete="name" required minLength={2} maxLength={80} aria-invalid={invalid('name')} /></div>}

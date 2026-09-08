@@ -25,10 +25,9 @@
     <title>otherbloc</title>
     <script>
       (() => {
-        let preference = 'system';
-        try { preference = localStorage.getItem('otherbloc-theme') || 'system'; } catch {}
-        document.documentElement.dataset.theme = preference === 'dark' ||
-          (preference !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        let preference = 'light';
+        try { preference = localStorage.getItem('otherbloc-theme'); } catch {}
+        document.documentElement.dataset.theme = preference === 'dark' ? 'dark' : 'light';
       })();
     </script>
   </head>

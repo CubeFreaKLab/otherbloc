@@ -20,7 +20,7 @@ export const resolvers = {
       personalization(context, userId)
       parse(userIdSchema, authorId)
       const author = await context.domains.profile(authorId)
-      if (!author || !['author', 'admin'].includes(author.role)) fail('NOT_FOUND', 'No encontramos este perfil de autor.')
+      if (!author) fail('NOT_FOUND', 'No encontramos este perfil de autor.')
       return { author, authorId }
     },
     savedPublications(_source, { userId, ...input }, context) { context.charge(); return context.service.savedPublications(owner(context, userId), input) },
@@ -44,7 +44,7 @@ export const resolvers = {
   },
   FollowItem: {
     followedAt: (item) => item.updatedAt,
-    author: async (item, _args, context) => { const value = await context.domains.profile(item.authorId); return value && ['author', 'admin'].includes(value.role) ? value : null },
+    author: (item, _args, context) => context.domains.profile(item.authorId),
   },
   AuthorInteractions: {
     following: (value, _args, context) => ownState(context, 'following', value.authorId),
@@ -71,7 +71,7 @@ export const resolvers = {
       const identity = owner(context, userId); parse(userIdSchema, authorId)
       if (following) {
         const author = await context.domains.profile(authorId)
-        if (!author || !['author', 'admin'].includes(author.role)) fail('NOT_FOUND', 'No encontramos este perfil de autor.')
+        if (!author) fail('NOT_FOUND', 'No encontramos este perfil de autor.')
       }
       context.charge(); return context.service.follow(identity, authorId, following)
     },

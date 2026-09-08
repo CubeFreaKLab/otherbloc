@@ -45,5 +45,5 @@ function AuthorWorkspace() {
 }
 
 export default function AuthorPage() {
-  return <main id="main-content" tabIndex={-1} className="page-width account-page"><header className="account-heading"><Link className="text-link" to="/account">Mi cuenta</Link><h1>Mis publicaciones</h1><p>Un espacio para escribir, revisar y compartir tus ideas.</p></header><SessionBoundary roles={['author', 'admin']}><AuthorWorkspace /></SessionBoundary></main>
+  return <main id="main-content" tabIndex={-1} className="page-width account-page"><header className="account-heading"><Link className="text-link" to="/account">Mi cuenta</Link><h1>Mis publicaciones</h1><p>Un espacio para escribir, revisar y compartir tus ideas.</p></header><SessionBoundary><AuthorWorkspace /></SessionBoundary></main>
 }

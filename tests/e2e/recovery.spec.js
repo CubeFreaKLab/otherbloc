@@ -49,7 +49,7 @@ test('revoked session keeps private profile edits in memory until the same accou
   await expect(page.getByLabel('Biografía', { exact: true })).toBeDisabled()
   await page.emulateMedia({ reducedMotion: 'reduce' })
   for (const theme of ['light', 'dark']) {
-    await page.getByRole('combobox', { name: 'Tema de color' }).selectOption(theme)
+    if (await page.locator('html').getAttribute('data-theme') !== theme) await page.getByRole('button', { name: theme === 'dark' ? 'Activar tema oscuro' : 'Activar tema claro' }).click()
     // Audit the resolved theme, not an accessibility scan spanning style invalidation.
     await expect(page.locator('body')).toHaveCSS('background-color', theme === 'dark' ? 'rgb(23, 23, 22)' : 'rgb(246, 245, 243)')
     await expect(page.locator('.account-email span')).toHaveCSS('color', theme === 'dark' ? 'rgb(208, 208, 203)' : 'rgb(55, 55, 53)')
@@ -128,7 +128,7 @@ for (const concurrent of [false, true]) test('author recovery ' + (concurrent ? 
   await submitLogin(page, process.env.SEED_AUTHOR_EMAIL, process.env.SEED_PASSWORD)
   await page.locator('main').getByRole('link', { name: 'Mis publicaciones', exact: true }).click()
   await page.getByRole('button', { name: 'Nueva publicación', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'Tu publicación' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Editor', exact: true })).toBeVisible()
   const id = new URL(page.url()).pathname.split('/').pop()
   const remote = await request.post('/api/users/login', { headers, data: { email: process.env.SEED_AUTHOR_EMAIL, password: process.env.SEED_PASSWORD } })
   const authorized = { ...headers, Authorization: 'Bearer ' + (await remote.json()).accessToken }
@@ -151,16 +151,16 @@ for (const concurrent of [false, true]) test('author recovery ' + (concurrent ? 
     await expect(page.getByLabel('Título', { exact: true })).toHaveValue('Texto local que necesita recuperación')
     if (concurrent) {
       await expect(page.getByRole('alert')).toContainText('El servidor cambió mientras tu sesión estaba interrumpida')
-      await page.getByRole('button', { name: 'Guardar ahora', exact: true }).click()
+      await page.getByRole('button', { name: 'Reintentar', exact: true }).click()
       await expect(page.getByRole('alert')).toContainText('versión')
-    } else await expect(page.locator('.editor-toolbar [role="status"]')).toHaveText('Borrador guardado')
+    } else await expect(page.locator('.writing-save')).toHaveText('Guardado')
     const verified = (await (await request.get('/api/publications/' + id, { headers: authorized })).json()).publication
     expect(verified.title).toBe(concurrent ? 'Trabajo posterior guardado por otra sesión' : 'Texto local que necesita recuperación')
     if (concurrent) {
       const download = page.waitForEvent('download')
       await page.getByRole('button', { name: 'Descargar mis cambios', exact: true }).click()
       await (await download).saveAs(testInfo.outputPath('recovered-draft.json'))
-      await page.getByRole('button', { name: 'Recargar contenido del servidor', exact: true }).click()
+      await page.getByRole('button', { name: 'Recuperar versión guardada', exact: true }).click()
       await page.getByRole('dialog').getByRole('button', { name: 'Recuperar versión guardada', exact: true }).click()
     }
     await expect(page.getByLabel('Título', { exact: true })).toHaveValue(verified.title)

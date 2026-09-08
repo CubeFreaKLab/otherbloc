@@ -50,7 +50,7 @@ export function ReactionControl({ publicationId, initial }) {
 export function FollowControl({ author, initialFollowing = false, onChange }) {
   const { user, status } = useSession(), pending = useRef(false)
   const [active, setActive] = useState(initialFollowing), [busy, setBusy] = useState(false), [error, setError] = useState('')
-  if (!['author', 'admin'].includes(author.role) || user?.id === author.id) return null
+  if (user?.id === author.id) return null
   async function toggle() {
     if (pending.current) return
     pending.current = true; setBusy(true); setError('')
@@ -72,7 +72,7 @@ function ProfileFollowLoader({ author, viewer }) {
 
 export function ProfileFollow({ author }) {
   const { user, status } = useSession()
-  if (!['author', 'admin'].includes(author.role) || user?.id === author.id) return null
+  if (user?.id === author.id) return null
   if (status === 'loading') return <p role="status">Comprobando seguimiento…</p>
   if (!user) return <FollowControl author={author} />
   return <ProfileFollowLoader author={author} viewer={user.id} />

@@ -2,6 +2,10 @@
 
 Node's built-in test runner verifies repository contracts, editorial filtering and HTTP behavior. Firebase Emulator Suite verifies data/rules integration. Playwright verifies browser behavior and accessibility.
 
+## Current local writing workflow — September 2026
+
+The continuous Editor replaces the earlier form-based editor described in the historical milestones below. Every active normal account now writes immediately; only administration approves publication. Targeted tests cover registration through public reading, rich-text/photo persistence, tag chips and pending input, incomplete drafts, slow/failed saves, concurrency and session recovery, default-light theme, avatar updates, unified search focus and circular thumbnail reveal without zoom. Tests use the existing local services and emulators, with per-process named resources for API integration; no reset or deployment is required. Earlier role restrictions and theme-motion results below describe their dated milestone, not the current behavior.
+
 ## Full local verification
 
 Run from the repository root after installing dependencies:

@@ -8,7 +8,7 @@ All public paths below enter through the gateway. The owning service requires it
 
 | Method and path | Permission and result |
 | --- | --- |
-| `POST /api/users/register` | Strict name/email/password input; creates a reader and session, never accepts a client role |
+| `POST /api/users/register` | Strict name/email/password input; creates a normal account ready to read/write and a session, never accepts a client role |
 | `POST /api/users/login` | Valid credentials and active account; issues a short access token and HttpOnly refresh cookie |
 | `POST /api/users/refresh` | Valid refresh cookie, explicit request header and allowed Origin; current session/account required |
 | `POST /api/users/logout` | Revokes the cookie session (or a valid bearer session) and clears the cookie; repeatable |
@@ -16,7 +16,7 @@ All public paths below enter through the gateway. The owning service requires it
 | `PATCH /api/users/me` | Own name and biography only |
 | `PUT /api/users/me/avatar` | Own raw JPEG/PNG/WebP, at most 2 MB; decoded and re-encoded server-side |
 | `DELETE /api/users/me/avatar` | Removes the public avatar reference |
-| `POST /api/users/me/author-request` | Reader requests author access; does not grant that role |
+| `POST /api/users/me/author-request` | Legacy compatibility only: returns the active account without a pending request or privilege change |
 | `POST /api/users/me/password` | Current password required; changes hash and invalidates every existing session |
 | `GET /api/users/:id` | Public active profile only; no email, status or credential fields |
 | `GET /api/users/profiles?ids=:id1,:id2` | Up to 40 unique public active profiles by bounded key lookups; missing/suspended IDs omitted, no private fields |
@@ -38,7 +38,7 @@ Local cookies use HttpOnly/SameSite=Lax. HTTPS production cookies additionally u
 
 ## Permissions and consistency
 
-All new accounts are readers. Only an existing administrator can grant author/admin permissions or suspend a different account. Administrative transactions re-read the acting account/session, target account and active-admin counter. A reader's author request only marks a pending request. Public profiles of suspended accounts return 404.
+New accounts retain the internal `reader` role for compatibility, but both `reader` and `author` can immediately write their own drafts. No administrative author request is required for new or existing active accounts. Only an administrator can approve publication, change roles or suspend another account. Administrative transactions re-read the acting account/session, target and active-admin counter. Public profiles of suspended accounts return 404.
 
 Registration atomically creates the email reservation, user and session using a write batch with create preconditions; concurrent registration cannot duplicate an email. Profile/password/permission operations use transactions. See [database](database.md) for fields and ownership.
 

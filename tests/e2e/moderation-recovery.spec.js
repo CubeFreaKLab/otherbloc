@@ -120,7 +120,7 @@ for (const scenario of ['return', 'archive', 'changed', 'inaccessible', 'other-a
         await expect(page.getByRole('button', { name: 'Archivar publicación', exact: true })).toBeDisabled()
         await page.emulateMedia({ reducedMotion: 'reduce' })
         for (const theme of ['light', 'dark']) {
-          await page.getByRole('combobox', { name: 'Tema de color' }).selectOption(theme)
+          if (await page.locator('html').getAttribute('data-theme') !== theme) await page.getByRole('button', { name: theme === 'dark' ? 'Activar tema oscuro' : 'Activar tema claro' }).click()
           await expect(page.locator('body')).toHaveCSS('background-color', theme === 'dark' ? 'rgb(23, 23, 22)' : 'rgb(246, 245, 243)')
           await expect(page.locator('.recovery-choice')).toHaveCSS('color', theme === 'dark' ? 'rgb(246, 245, 243)' : 'rgb(0, 0, 0)')
           expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([])

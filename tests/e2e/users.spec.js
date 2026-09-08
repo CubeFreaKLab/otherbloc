@@ -34,7 +34,7 @@ async function logout(page) {
   await expect(page).toHaveURL(/\/login$/)
 }
 
-test('real registration, avatar, profile persistence, author request and logout through the gateway', async ({ page, context }, testInfo) => {
+test('real registration, live header avatar, profile persistence, immediate writing and logout', async ({ page, context }, testInfo) => {
   const user = await register(page)
   const requests = []
   page.on('request', (request) => { if (request.resourceType() === 'fetch') requests.push(new URL(request.url())) })
@@ -50,16 +50,19 @@ test('real registration, avatar, profile persistence, author request and logout 
   await page.getByLabel('Archivo de avatar').setInputFiles({ name: 'avatar.png', mimeType: 'image/png', buffer: avatar })
   await expect(page.getByRole('status')).toContainText('Tu avatar se guardó')
   await expect(page.getByRole('img', { name: 'Tu avatar actual' })).toBeVisible()
+  await expect(page.locator('.account-access img')).toHaveAttribute('src', await page.getByRole('img', { name: 'Tu avatar actual' }).getAttribute('src'))
   await page.getByRole('link', { name: 'Ver perfil público' }).click()
   await expect(page.locator('main')).toContainText('Perfil de demostración guardado en Firestore')
   await expect(page.locator('main')).not.toContainText(user.email)
   await page.goto('/account')
-  await page.getByRole('button', { name: 'Solicitar acceso de autor' }).click()
-  await expect(page.getByRole('button', { name: 'Solicitud enviada' })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Solicitar acceso de autor' })).toHaveCount(0)
+  await expect(page.locator('main').getByRole('link', { name: 'Mis publicaciones', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Quitar avatar', exact: true }).click()
+  await expect(page.locator('.account-access img')).toHaveCount(0)
   await page.reload()
-  await expect(page.getByRole('button', { name: 'Solicitud enviada' })).toBeDisabled()
+  await expect(page.locator('.account-access img')).toHaveCount(0)
   for (const colorScheme of ['light', 'dark']) {
-    await page.getByRole('combobox', { name: 'Tema de color' }).selectOption(colorScheme)
+    if (await page.locator('html').getAttribute('data-theme') !== colorScheme) await page.getByRole('button', { name: colorScheme === 'dark' ? 'Activar tema oscuro' : 'Activar tema claro' }).click()
     await expect(page.locator('html')).toHaveAttribute('data-theme', colorScheme)
     expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([])
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
@@ -91,10 +94,9 @@ test('unsaved profile changes are protected, including keyboard focus in the con
   await expect(page.getByLabel('Biografía', { exact: true })).toHaveValue('')
 })
 
-test('reader is denied administration; admin approves an author and the new role survives login', async ({ page }, testInfo) => {
+test('normal accounts cannot administer users; administrative role changes still revoke sessions', async ({ page }, testInfo) => {
   const reader = await register(page)
-  await page.getByRole('button', { name: 'Solicitar acceso de autor' }).click()
-  await expect(page.getByRole('button', { name: 'Solicitud enviada' })).toBeDisabled()
+  await expect(page.locator('main').getByRole('link', { name: 'Mis publicaciones', exact: true })).toBeVisible()
   await page.goto('/admin/users')
   await expect(page.getByRole('heading', { name: 'Acceso no permitido' })).toBeVisible()
   await logout(page)
@@ -109,7 +111,7 @@ test('reader is denied administration; admin approves an author and the new role
     await expect(page.getByRole('button', { name: 'Cargando…', exact: true })).toHaveCount(0)
     row = page.locator('[data-user-id="' + reader.id + '"]')
   }
-  await expect(row).toContainText('Solicita ser autor')
+  await expect(row).not.toContainText('Solicita ser autor')
   await row.getByRole('button', { name: 'Gestionar a ' + reader.name }).click()
   const dialog = page.getByRole('dialog')
   await dialog.getByLabel('Rol de la cuenta').selectOption('author')
@@ -122,6 +124,6 @@ test('reader is denied administration; admin approves an author and the new role
   await page.screenshot({ path: testInfo.outputPath('admin-users.png'), fullPage: true })
   await logout(page)
   await login(page, reader.email, testPassword)
-  await expect(page.locator('.account-profile__heading .eyebrow')).toHaveText('Autor')
+  await expect(page.locator('.account-profile__heading .eyebrow')).toHaveText('Leer y escribir')
   await expect(page.getByRole('button', { name: 'Solicitar acceso de autor' })).toHaveCount(0)
 })

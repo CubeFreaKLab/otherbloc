@@ -39,9 +39,8 @@
   color: var(--grey);
 }
 
-.search-bar input:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--ink);
-}
+.search-bar__control:focus-within { outline: 2px solid var(--ink); outline-offset: 3px; }
+.search-bar input:focus-visible { outline: none; box-shadow: none; }
 
 .search-bar button {
   align-self: stretch;

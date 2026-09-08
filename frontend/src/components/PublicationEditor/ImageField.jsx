@@ -20,7 +20,7 @@ export default function ImageField({ publicationId, assetId, alt, label, onChang
       {assetId && <button type="button" className="text-button" disabled={disabled || busy} onClick={() => onChange(null)}>Quitar {label.toLowerCase()}</button>}
     </div>
     <input ref={input} type="file" className="visually-hidden" tabIndex={-1} accept="image/jpeg,image/png,image/webp" aria-label={'Archivo de ' + label.toLowerCase()} onChange={upload} disabled={disabled || busy} />
-    <p className="field-help">JPEG, PNG o WebP. Hasta 5 MB. La imagen se guarda en Storage y se vincula al guardar el borrador.</p>
+    <p className="field-help">JPEG, PNG o WebP · Hasta 5 MB</p>
     {error && <p className="form-feedback" role="alert">{error}</p>}
   </div>
 }

@@ -9,11 +9,13 @@ export const idSchema = z.string().regex(/^[A-Za-z0-9_-]{1,100}$/, 'Identificado
 const assetId = z.string().uuid()
 const text = z.string().max(6000)
 const blockId = z.string().uuid()
+const run = z.object({ text: z.string().max(6000), bold: z.boolean().optional(), italic: z.boolean().optional(), href: z.string().max(2048).regex(/^(https?:\/\/|mailto:)[^\s]+$/i).optional() }).strict()
+const formatted = z.array(run).max(1000).optional()
 const block = z.discriminatedUnion('type', [
-  z.object({ id: blockId, type: z.literal('paragraph'), text }).strict(),
-  z.object({ id: blockId, type: z.literal('heading'), text: z.string().max(200), level: z.union([z.literal(2), z.literal(3)]) }).strict(),
-  z.object({ id: blockId, type: z.literal('list'), items: z.array(z.string().max(500)).max(50), ordered: z.boolean() }).strict(),
-  z.object({ id: blockId, type: z.literal('quote'), text, attribution: z.string().max(160) }).strict(),
+  z.object({ id: blockId, type: z.literal('paragraph'), text, formatted }).strict(),
+  z.object({ id: blockId, type: z.literal('heading'), text: z.string().max(200), formatted, level: z.union([z.literal(2), z.literal(3)]) }).strict(),
+  z.object({ id: blockId, type: z.literal('list'), items: z.array(z.string().max(500)).max(50), formattedItems: z.array(z.object({ runs: z.array(run).max(500) }).strict()).max(50).optional(), ordered: z.boolean() }).strict(),
+  z.object({ id: blockId, type: z.literal('quote'), text, formatted, attribution: z.string().max(160) }).strict(),
   z.object({ id: blockId, type: z.literal('image'), assetId: assetId.nullable(), alt: z.string().max(300), caption: z.string().max(500) }).strict(),
 ])
 export const createSchema = z.object({ id: z.string().uuid(), title: z.string().trim().max(160).default('') }).strict()
@@ -22,6 +24,11 @@ export const editorSchema = z.object({
   type: z.enum(publicationTypes), category: z.enum(categories), tags: z.array(z.string().trim().min(1).max(30)).max(8),
   blocks: z.array(block).max(80),
 }).strict().superRefine((value, context) => {
+  for (const [index, item] of value.blocks.entries()) {
+    const joined = (runs) => runs.map((run) => run.text).join('')
+    if (item.formatted && joined(item.formatted) !== item.text) context.addIssue({ code: 'custom', message: 'El formato no coincide con el texto.', path: ['blocks', index] })
+    if (item.formattedItems && (item.items.length !== item.formattedItems.length || item.items.some((text, i) => joined(item.formattedItems[i].runs) !== text))) context.addIssue({ code: 'custom', message: 'El formato no coincide con la lista.', path: ['blocks', index] })
+  }
   if (new Set(value.blocks.map((item) => item.id)).size !== value.blocks.length) context.addIssue({ code: 'custom', message: 'Cada bloque debe tener un identificador único.', path: ['blocks'] })
   if (new Set(value.tags.map(normalize)).size !== value.tags.length) context.addIssue({ code: 'custom', message: 'No repitas etiquetas.', path: ['tags'] })
 })
@@ -46,12 +53,15 @@ export function searchFields(publication, authorName) {
 }
 
 export function requirePublishable(publication) {
-  if (publication.title.length < 5 || publication.summary.length < 20 || !publication.coverId || !publication.coverAlt.trim() || !publication.blocks.length) {
-    fail(400, 'publication_incomplete', 'Completa el título (5 caracteres), resumen (20), portada con descripción y al menos un bloque antes de enviar a revisión.')
+  const hasContent = publication.blocks.some((item) => item.type === 'image' ? item.assetId : item.type === 'list' ? item.items.some((text) => text.trim()) : item.text.trim())
+  if (publication.title.length < 5 || publication.summary.length < 20 || !publication.coverId || !publication.coverAlt.trim() || !hasContent) {
+    fail(400, 'publication_incomplete', 'Antes de enviar a revisión, escribe un título de al menos 5 caracteres y algo de texto. En Detalles, completa el resumen (20 caracteres) y una portada con descripción.')
   }
   for (const item of publication.blocks) {
+    // Blank prose lines are spacing in continuous writing, not incomplete form fields.
+    if (item.type === 'paragraph' && !item.text.trim()) continue
     const valid = item.type === 'image' ? item.assetId && item.alt.trim() : item.type === 'list' ? item.items.length && item.items.every((text) => text.trim()) : item.text.trim()
-    if (!valid) fail(400, 'incomplete_block', 'Completa o elimina los bloques vacíos antes de enviar a revisión.')
+    if (!valid) fail(400, 'incomplete_block', 'Completa o quita el texto vacío y describe cada imagen antes de enviar a revisión.')
   }
 }
 

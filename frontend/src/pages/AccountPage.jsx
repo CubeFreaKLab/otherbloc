@@ -10,7 +10,7 @@ import { useDraftRecovery } from '../hooks/useDraftRecovery'
 import { hasRecovery } from '../services/draftRecovery'
 import '../styles/account.css'
 
-const roleNames = { reader: 'Lector', author: 'Autor', admin: 'Administrador' }
+const roleNames = { reader: 'Leer y escribir', author: 'Leer y escribir', admin: 'Administrador' }
 
 function ProfileEditor({ user }) {
   const [name, setName] = useState(user.name)
@@ -60,7 +60,7 @@ function ProfileEditor({ user }) {
     <section className="account-profile" aria-labelledby="profile-edit-title">
       <div className="account-profile__heading"><div><span className="eyebrow">{roleNames[user.role]}</span><h2 id="profile-edit-title">Tu perfil</h2></div><Link className="text-link" to={'/profile/' + user.id}>Ver perfil público</Link></div>
       <div className="account-avatar">
-        {user.avatarUrl ? <img src={gatewayMediaUrl(user.avatarUrl)} width="88" height="88" alt="Tu avatar actual" /> : <span className="account-avatar__initial" aria-hidden="true">{user.name.slice(0, 1).toUpperCase()}</span>}
+        {user.avatarUrl ? <img src={gatewayMediaUrl(user.avatarUrl)} width="88" height="88" alt="Tu avatar actual" /> : <span className="account-avatar__initial" aria-hidden="true" />}
         <div><div className="form-actions"><button className="secondary-button" onClick={() => fileInput.current?.click()} disabled={blocked}>Cambiar avatar</button>{user.avatarUrl && <button className="text-button" disabled={blocked} onClick={() => perform(() => gatewayRequest('/users/me/avatar', { method: 'DELETE' }), 'Se quitó tu avatar.')}>Quitar avatar</button>}</div><p className="field-help">JPEG, PNG o WebP · Hasta 2 MB</p></div>
         <input ref={fileInput} className="visually-hidden" tabIndex={-1} type="file" accept="image/jpeg,image/png,image/webp" aria-label="Archivo de avatar" onChange={upload} />
       </div>
@@ -72,7 +72,7 @@ function ProfileEditor({ user }) {
       </form>
       {message && <p className="success-message" role="status">{message}</p>}{error && <p className="form-feedback" role="alert">{error}</p>}
     </section>
-    {user.role === 'reader' && <section className="account-section"><h2>Comparte tus ideas</h2><p>{user.authorRequested ? 'Tu solicitud de autor está pendiente de revisión por administración.' : 'Solicita acceso de autor para preparar y enviar publicaciones a revisión.'}</p><button className="secondary-button" disabled={blocked || user.authorRequested} onClick={() => perform(() => gatewayRequest('/users/me/author-request', { method: 'POST', body: {} }), 'Solicitud enviada a administración.')}>{user.authorRequested ? 'Solicitud enviada' : 'Solicitar acceso de autor'}</button></section>}
+    <section className="account-section"><h2>Comparte tus ideas</h2><p>Tu cuenta ya está lista para escribir. Cada nota pasa por revisión antes de publicarse.</p><Link className="text-link" to="/author">Escribir una nota</Link></section>
     <PasswordSection disabled={busy || dirty || recoveryPending} />
     <section className="account-section"><h2>Tu sesión</h2><p>Al salir, esta sesión se revoca en el servidor. Tus publicaciones y tu perfil se conservan.</p>{(dirty || recoveryPending) && <p className="field-help">Guarda o descarta los cambios antes de cerrar sesión.</p>}<button className="secondary-button" disabled={blocked || dirty || recoveryPending} onClick={() => perform(async () => { await signOut(); navigate('/login', { replace: true }) }, '')}>Cerrar sesión</button></section>
   </>
@@ -104,5 +104,5 @@ function PasswordSection({ disabled }) {
 
 export default function AccountPage() {
   const { user } = useSession()
-  return <main id="main-content" className="account-page page-width" tabIndex={-1}><header className="account-heading"><span className="eyebrow">Tu espacio en otherbloc</span><h1>Mi cuenta</h1><div className="form-actions">{['author', 'admin'].includes(user?.role) && <Link className="text-link" to="/author">Mis publicaciones</Link>}{user?.role === 'admin' && <><Link className="text-link" to="/admin/users">Administrar usuarios</Link><Link className="text-link" to="/admin/publications">Revisar publicaciones</Link></>}</div></header><SessionBoundary>{user && <ProfileEditor key={user.id} user={user} />}</SessionBoundary></main>
+  return <main id="main-content" className="account-page page-width" tabIndex={-1}><header className="account-heading"><span className="eyebrow">Tu espacio en otherbloc</span><h1>Mi cuenta</h1><div className="form-actions">{user && <Link className="text-link" to="/author">Mis publicaciones</Link>}{user?.role === 'admin' && <><Link className="text-link" to="/admin/users">Administrar usuarios</Link><Link className="text-link" to="/admin/publications">Revisar publicaciones</Link></>}</div></header><SessionBoundary>{user && <ProfileEditor key={user.id} user={user} />}</SessionBoundary></main>
 }

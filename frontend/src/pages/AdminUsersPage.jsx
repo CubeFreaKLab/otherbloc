@@ -44,13 +44,13 @@ function UserManagement() {
     finally { pending.current = false; setSaving(false) }
   }
   return <>
-    <p>Administra permisos y solicitudes de autor. Cambiar un rol o suspender una cuenta cierra sus sesiones existentes.</p>
+    <p>Todas las cuentas activas pueden leer y escribir. Cambiar un rol o suspender una cuenta cierra sus sesiones existentes.</p>
     {notice && <p className="success-message" role="status">{notice}</p>}
     {error && !selected && <div role="alert"><p className="form-feedback">{error}</p><button className="secondary-button" onClick={() => load()}>Reintentar</button></div>}
     {loading && !items.length && <div aria-busy="true" role="status"><div className="text-skeleton" /><p>Cargando usuarios…</p></div>}
     {!loading && !error && !items.length && <p role="status">No hay usuarios en esta vista.</p>}
     <ul className="admin-users-list">{items.map((item) => <li key={item.id} data-user-id={item.id}>
-      <div><h2>{item.name}</h2><p>{item.email}</p><span className="user-status">{labels[item.role]} · {item.status === 'active' ? 'Cuenta activa' : 'Suspendida'}{item.authorRequested ? ' · Solicita ser autor' : ''}</span></div>
+      <div><h2>{item.name}</h2><p>{item.email}</p><span className="user-status">{labels[item.role]} · {item.status === 'active' ? 'Cuenta activa' : 'Suspendida'}</span></div>
       <button className="secondary-button" disabled={item.id === user.id || loading} onClick={() => choose(item)} aria-label={'Gestionar a ' + item.name}>{item.id === user.id ? 'Tu cuenta' : 'Gestionar'}</button>
     </li>)}</ul>
     {cursor && <button className="secondary-button" disabled={loading} onClick={() => load(cursor)}>{loading ? 'Cargando…' : 'Cargar más usuarios'}</button>}

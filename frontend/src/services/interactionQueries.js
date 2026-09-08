@@ -7,7 +7,7 @@ const comment = gql`fragment CommentFields on Comment { id publicationId userId 
 const summary = gql`fragment PublicationSummary on Publication { id slug title summary authorId type category tags status version demo image imageAlt coverWidth coverHeight publishedAt date readingMinutes author { ...InteractionUser } } ${user}`
 const publicationQuery = gql`query ReadingPublication($id: ID!) { publication(id: $id) {
   ...PublicationSummary
-  blocks { id type text level items ordered attribution assetId alt caption url }
+  blocks { id type text formatted { text bold italic href } formattedItems { runs { text bold italic href } } level items ordered attribution assetId alt caption url }
   comments { items { ...CommentFields } nextCursor } commentCount reactions { active count } saved followingAuthor
 } } ${summary} ${comment}`
 const commentsQuery = gql`query PublicationComments($id: ID!, $cursor: String) { publication(id: $id) { id commentCount comments(cursor: $cursor) { items { ...CommentFields } nextCursor } } } ${comment}`

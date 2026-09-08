@@ -13,7 +13,7 @@ export function createPublicationsService({ firebase = getFirebase, now = Date.n
   const withId = (snapshot) => snapshot.exists ? { ...snapshot.data(), id: snapshot.id } : null
   const time = () => new Date(now()).toISOString()
   function authorOnly(identity) {
-    if (!identity || !['author', 'admin'].includes(identity.role)) fail(403, 'author_required', 'Necesitas permisos de autor para crear publicaciones.')
+    if (!identity || !['reader', 'author', 'admin'].includes(identity.role) || (identity.status && identity.status !== 'active')) fail(403, 'active_account_required', 'Necesitas una cuenta activa para escribir.')
   }
   function exists(publication) {
     if (!publication || publication.isDeleted) fail(404, 'publication_not_found', 'No encontramos esta publicación.')
@@ -142,7 +142,8 @@ export function createPublicationsService({ firebase = getFirebase, now = Date.n
       const reference = collection().doc(id)
       const snapshot = await reference.get()
       const publication = exists(withId(snapshot))
-      const owner = publication.authorId === identity.id && ['author', 'admin'].includes(identity.role)
+      authorOnly(identity)
+      const owner = publication.authorId === identity.id
       const admin = identity.role === 'admin'
       if (!owner && !admin) fail(403, 'forbidden', 'No tienes permiso para cambiar el estado de esta publicación.')
       canRead(publication, identity)

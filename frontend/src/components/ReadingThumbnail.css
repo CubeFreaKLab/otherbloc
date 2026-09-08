@@ -1,0 +1,7 @@
+.reading-thumbnail { position: relative; isolation: isolate; }
+.reading-thumbnail img { display: block; width: 100%; height: 100%; object-fit: cover; transform: none; }
+.reading-thumbnail .reading-thumbnail__grey { filter: grayscale(1); }
+.reading-thumbnail .reading-thumbnail__color { position: absolute; inset: 0; filter: none; clip-path: circle(0% at 50% 50%); opacity: 0; transition: opacity 200ms ease; pointer-events: none; }
+.reading-thumbnail[data-revealed='true'] .reading-thumbnail__color { opacity: 1; transition: none; }
+.reading-thumbnail:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) { .reading-thumbnail .reading-thumbnail__color { transition: none; } }

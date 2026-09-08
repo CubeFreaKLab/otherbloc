@@ -182,7 +182,8 @@ test('following authors is private per account, idempotent and restricted to an 
   const query = 'query($id: ID!) { authorInteractions(authorId: $id) { author { id name } following followerCount } }'
   assert.deepEqual(data(await gql(query, { id: people.author.id }, people.reader)).authorInteractions, { author: { id: people.author.id, name: 'Persona author' }, following: true, followerCount: 1 })
   assert.equal(errorCode(await gql(followQuery, variables, people.author)), 'BAD_USER_INPUT')
-  assert.equal(errorCode(await gql(followQuery, { id: people.other.id, active: true }, people.reader)), 'NOT_FOUND')
+  assert.equal(data(await gql(followQuery, { id: people.other.id, active: true }, people.reader)).followAuthor.active, true)
+  data(await gql(followQuery, { id: people.other.id, active: false }, people.reader))
   const list = 'query { followingAuthors { items { authorId followedAt author { name } } nextCursor } }'
   assert.equal(data(await gql(list, {}, people.reader)).followingAuthors.items.length, 1)
   assert.equal(data(await gql(list, {}, people.other)).followingAuthors.items.length, 0)

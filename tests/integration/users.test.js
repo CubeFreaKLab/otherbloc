@@ -177,7 +177,7 @@ test('own profile is editable without changing privileges and password change in
   assert.equal(updated.status, 200)
   assert.equal((await http('GET', '/api/users/' + user.id)).body.user.biography, 'Una biografía propia.')
   const requested = await http('POST', '/api/users/me/author-request', { token: user.token, body: {} })
-  assert.equal(requested.body.user.authorRequested, true)
+  assert.equal(requested.body.user.authorRequested, false)
   assert.equal(requested.body.user.role, 'reader')
   assert.equal((await http('GET', '/api/users', { token: user.token })).status, 403)
   const changed = await http('POST', '/api/users/me/password', { token: user.token, body: { currentPassword: password, password: 'Otra frase segura de demostración 2026' } })

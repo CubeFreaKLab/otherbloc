@@ -14,7 +14,9 @@ export const typeDefs = `#graphql
   }
 
   type PublicUser { id: ID!, name: String!, biography: String!, role: String!, avatarUrl: String, demo: Boolean! }
-  type PublicationBlock { id: ID!, type: String!, text: String, level: Int, items: [String!], ordered: Boolean, attribution: String, assetId: ID, alt: String, caption: String, url: String }
+  type FormattedRun { text: String!, bold: Boolean, italic: Boolean, href: String }
+  type FormattedItem { runs: [FormattedRun!]! }
+  type PublicationBlock { id: ID!, type: String!, text: String, formatted: [FormattedRun!], formattedItems: [FormattedItem!], level: Int, items: [String!], ordered: Boolean, attribution: String, assetId: ID, alt: String, caption: String, url: String }
   type Publication {
     id: ID!, slug: String!, title: String!, summary: String!, authorId: ID!, author: PublicUser
     type: String!, category: String!, tags: [String!]!, status: String!, version: Int!, demo: Boolean!

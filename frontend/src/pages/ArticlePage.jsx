@@ -15,6 +15,7 @@ import ContentState from '../components/ContentState/ContentState'
 import { PublicationLoading } from '../components/PublicationFeed/PublicationFeed'
 import { formatDate } from '../utils/formatDate'
 import NotFoundPage from './NotFoundPage'
+import FormattedText from '../components/PublicationEditor/FormattedText'
 import { fadeReadingMotion, prepareReadingCover, readingCoverSizes } from '../services/readingCover'
 
 const readingPath = (slug, viewer) => '/publications/' + encodeURIComponent(slug) + '?viewer=' + viewer
@@ -35,11 +36,11 @@ export async function loader({ params, request }) {
 
 export function ArticleBlocks({ blocks }) {
   return blocks.map((block, index) => {
-    if (block.type === 'heading') { const Heading = block.level === 3 ? 'h3' : 'h2'; return <Heading key={block.id ?? index} id={'section-' + index}>{block.text}</Heading> }
-    if (block.type === 'quote') return <blockquote key={block.id ?? index}>{block.text}{block.attribution && <cite>{block.attribution}</cite>}</blockquote>
-    if (block.type === 'list') { const List = block.ordered ? 'ol' : 'ul'; return <List key={block.id ?? index}>{block.items.map((item, i) => <li key={i}>{item}</li>)}</List> }
+    if (block.type === 'heading') { const Heading = block.level === 3 ? 'h3' : 'h2'; return <Heading key={block.id ?? index} id={'section-' + index}><FormattedText text={block.text} runs={block.formatted} /></Heading> }
+    if (block.type === 'quote') return <blockquote key={block.id ?? index}><FormattedText text={block.text} runs={block.formatted} />{block.attribution && <cite>{block.attribution}</cite>}</blockquote>
+    if (block.type === 'list') { const List = block.ordered ? 'ol' : 'ul'; return <List key={block.id ?? index}>{block.items.map((item, i) => <li key={i}><FormattedText text={item} runs={block.formattedItems?.[i]?.runs} /></li>)}</List> }
     if (block.type === 'image') return <figure key={block.id ?? index}><img src={gatewayMediaUrl(block.url)} alt={block.alt} loading="lazy" />{block.caption && <figcaption>{block.caption}</figcaption>}</figure>
-    return <p key={index} className={index === 0 ? 'article-prose__lead' : undefined}>{block.text}</p>
+    return <p key={index} className={index === 0 ? 'article-prose__lead' : undefined}><FormattedText text={block.text} runs={block.formatted} /></p>
   })
 }
 

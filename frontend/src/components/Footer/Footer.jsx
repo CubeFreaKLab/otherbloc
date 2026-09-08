@@ -10,7 +10,7 @@ export default function Footer() {
   const { user } = useSession()
   const personal = user ? { title: 'Tu espacio', links: [
     ['Mi cuenta', '/account'], ['Publicaciones guardadas', '/account/saved'], ['Autores que sigues', '/account/following'],
-    ...(['author', 'admin'].includes(user.role) ? [['Mis publicaciones', '/author']] : []),
+    ['Mis publicaciones', '/author'],
     ...(user.role === 'admin' ? [['Revisar publicaciones', '/admin/publications'], ['Administrar usuarios', '/admin/users']] : []),
   ] } : { title: 'Participar', links: [['Iniciar sesión', '/login'], ['Crear una cuenta', '/register']] }
   return (

@@ -153,9 +153,9 @@ export function createUsersService({ config, firebase = getFirebase, now = Date.
     async requestAuthor(identity) {
       return clients().db.runTransaction(async (transaction) => {
         const user = await transactionActor(transaction, identity)
-        if (user.role !== 'reader') fail(409, 'already_author', 'Esta cuenta ya tiene permisos editoriales.')
-        transaction.update(userRef(user.id), { authorRequested: true, updatedAt: new Date(now()).toISOString() })
-        return privateUser({ ...user, authorRequested: true })
+        // Compatibility for older clients: every active account can already write.
+        if (user.authorRequested) transaction.update(userRef(user.id), { authorRequested: false, updatedAt: new Date(now()).toISOString() })
+        return privateUser({ ...user, authorRequested: false })
       })
     },
 

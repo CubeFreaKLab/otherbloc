@@ -216,7 +216,7 @@
       "type": "subtle-hover-scale",
       "description": "Editorial images shift slightly on hover to confirm interaction.",
       "technology": "CSS",
-      "params": { "filter_pipeline": "grayscale and contrast", "hover_transform": "scale(1.015)", "reveal_animation": "none", "distortion_type": "none" }
+      "params": { "filter_pipeline": "grayscale base and circular color layer", "hover_transform": "none", "reveal_animation": "circle expanding from pointer entry", "distortion_type": "none" }
     },
     "glassmorphism_neumorphism": {
       "enabled": false,

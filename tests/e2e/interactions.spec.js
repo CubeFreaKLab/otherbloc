@@ -42,7 +42,7 @@ test('reader saves, reacts, follows and comments; private libraries persist and 
   await expect(page.getByRole('button', { name: 'Dejar de seguir a Elena Rivas', exact: true })).toHaveAttribute('aria-pressed', 'true')
   await page.emulateMedia({ reducedMotion: 'reduce' })
   for (const theme of ['light', 'dark']) {
-    await page.getByRole('combobox', { name: 'Tema de color' }).selectOption(theme)
+    if (await page.locator('html').getAttribute('data-theme') !== theme) await page.getByRole('button', { name: theme === 'dark' ? 'Activar tema oscuro' : 'Activar tema claro' }).click()
     await page.getByRole('heading', { name: /Conversación/ }).scrollIntoViewIfNeeded()
     expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([])
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
