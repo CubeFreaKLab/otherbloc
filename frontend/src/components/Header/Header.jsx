@@ -8,7 +8,8 @@ import ThemeControl from '../ThemeControl/ThemeControl'
 import './Header.css'
 import AccountAvatar from './AccountAvatar'
 import WriteAccess from './WriteAccess'
-import ScrollHeader from './ScrollHeader'
+import { useDockedHeader } from './useDockedHeader'
+import Bulletin from '../Bulletin/Bulletin'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 export default function Header() {
@@ -17,13 +18,14 @@ export default function Header() {
   const buttonRef = useRef(null)
   const location = useLocation()
   const menuOpen = menuKey === location.key
+  const headerRef = useDockedHeader(menuOpen, mobile)
   const selected = new URLSearchParams(location.search).get('category')
   const closeMenu = () => setMenuKey(null)
   return (
-    <ScrollHeader className="site-header" keepVisible={menuOpen} onKeyDown={(event) => {
+    <header ref={headerRef} className="site-header" onKeyDown={(event) => {
       if (event.key === 'Escape' && menuOpen) { closeMenu(); buttonRef.current?.focus() }
     }}>
-      <div className="site-header__utility page-width">
+      <div className="site-header__bar-slot"><div className="site-header__bar"><div className="site-header__utility page-width">
         <Link className="site-header__brand" to="/" onClick={closeMenu}>
           <img className="brand-logo" src="/brand/otherbloc-logo-black.svg" width="1532" height="291" alt="otherbloc, inicio" />
         </Link>
@@ -38,7 +40,8 @@ export default function Header() {
             <span className="visually-hidden">{menuOpen ? 'Cerrar menú' : 'Abrir menú'}</span>
           </button>
         </div>
-      </div>
+      </div></div></div>
+      <div className="site-header__nav-slot">
       <nav id="site-navigation" inert={mobile && !menuOpen} aria-hidden={mobile && !menuOpen ? true : undefined} className={'site-header__nav page-width' + (menuOpen ? ' site-header__nav--open' : '')} aria-label="Navegación principal">
         <Link to="/" aria-current={location.pathname === '/' ? 'page' : undefined} onClick={closeMenu}>Últimas</Link>
         {categories.map((category) => {
@@ -49,6 +52,8 @@ export default function Header() {
         <Link className="site-header__more" to="/explore" onClick={closeMenu}
           aria-current={location.pathname === '/explore' && !selected ? 'page' : undefined}>Explorar</Link>
       </nav>
-    </ScrollHeader>
+      </div>
+      <Bulletin />
+    </header>
   )
 }

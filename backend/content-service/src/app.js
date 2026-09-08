@@ -8,6 +8,7 @@ import { createContentRouter } from './routes/contentRoutes.js'
 import { healthRouter } from './routes/healthRoutes.js'
 import { createPublicationsService } from './services/publications.js'
 import { createUsersClient } from './services/usersClient.js'
+import { createBulletin } from './services/bulletin.js'
 
 export function createApp({ config = env, firebase, fetchImpl = fetch, now = Date.now } = {}) {
   const app = express()
@@ -18,7 +19,10 @@ export function createApp({ config = env, firebase, fetchImpl = fetch, now = Dat
   app.use('/health', healthRouter)
   app.use(requireService(config))
   app.use(express.json({ limit: '512kb' }))
-  app.use('/api/publications', createContentRouter(createPublicationsService({ firebase, now }), createUsersClient(config, fetchImpl)))
+  const publications = createPublicationsService({ firebase, now })
+  const bulletin = createBulletin({ fetchImpl, now, listPublic: publications.listPublic, external: config.bulletinExternal !== false })
+  app.get('/api/publications/bulletin', async (_request, response) => response.set('Cache-Control', 'no-store').json(await bulletin()))
+  app.use('/api/publications', createContentRouter(publications, createUsersClient(config, fetchImpl)))
   app.use(notFound)
   app.use(errorHandler)
 

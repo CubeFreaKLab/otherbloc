@@ -14,6 +14,7 @@ export const env = Object.freeze({
   serviceAuthSecret: process.env.SERVICE_AUTH_SECRET ?? '',
   usersServiceUrl: process.env.USERS_SERVICE_URL ?? 'http://127.0.0.1:3001',
   upstreamTimeoutMs: 10000,
+  bulletinExternal: process.env.BULLETIN_EXTERNAL_ENABLED !== 'false',
 })
 
 export function validateRuntime(config = env) {

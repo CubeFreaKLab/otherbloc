@@ -10,6 +10,7 @@ All paths below start with `/api/publications`.
 | --- | --- |
 | `GET /` | Published list: `limit` (default 12, maximum 40), `cursor`, `q`, `type`, `category`, `authorId` |
 | `GET /options` | Supported seven Spanish publication types and four categories |
+| `GET /bulletin` | Public optional weather, crypto and headline groups; no account information or writes |
 | `GET /:id` | Published detail; own private detail; administrators can inspect review/published/archived, not another author's draft |
 | `GET /mine` | Current active account's own non-deleted publications, optional status and pagination |
 | `GET /moderation` | Administrator queue, status review (default), published or archived, paginated |
@@ -21,6 +22,16 @@ All paths below start with `/api/publications`.
 | `GET /:id/media/:assetId` | Attached published image, owner preview, or attached moderator preview outside draft; optional `width=640` or `960` |
 
 IDs are opaque; named demo slugs preserve existing URLs. Unknown, deleted and unauthorized private resources return 404 on reads. Unauthorized edits return 403. Missing `If-Match` returns 428, stale state 409, invalid fields 400, invalid images 415, excessive size 413. JSON detail responses include ETag and `private, no-store`. Errors are explicit and never fall back to fixtures.
+
+## Optional editorial bulletin
+
+`services/bulletin.js` requests nine fixed Bolivia city centres from [Open-Meteo](https://open-meteo.com/en/docs) and BTC/ETH/SOL/XRP/ADA last-trade USD prices from [Kraken's public ticker](https://docs.kraken.com/api-reference/market-data/get-ticker-information). No keys, account identifiers, user location or credentials are sent to providers. Provider URLs/markets are fixed; redirects are rejected and fetch/JSON reads have a 4.5-second abort signal. This adds no service, database collection or third-party browser connection.
+
+Per-process single-flight caches last 15 minutes for weather, 5 minutes for prices and 1 minute for the four most recent public headlines. Headlines use the existing published-only query and expose only ID, slug and title. Each source fails independently to `null`, with a 60-second retry cooldown and no expired fallback or invented values. Responses carry `fetchedAt`/`expiresAt`, use `no-store`, and the frontend also excludes expired groups. New or archived headlines can take up to one minute to change. No scheduler wakes an idle Render instance.
+
+Weather is model-estimated, not a promise of station observations; current values over an hour from the service clock are excluded. The frontend rounds °C and maps WMO conditions to existing Phosphor icons. Its source panel credits Open-Meteo and [CC BY 4.0](https://open-meteo.com/en/license), states the rounding and reports query times. Prices identify Kraken/USD and their five-minute refresh, not global or streaming quotes. Open-Meteo's [free endpoint terms](https://open-meteo.com/en/terms) cover non-commercial use; before monetizing, review the provider plan. `BULLETIN_EXTERNAL_ENABLED=false` on Content disables external requests while preserving own headlines. No billing or provider account was enabled.
+
+Unit tests cover normalization, timestamps, independent expiry, coalescing, cooldown, partial failure, malformed payloads and external opt-out. Browser tests cover the full rotation, pause/keyboard/reduced motion, date rollover, source information, recovery and responsive contrast. Live local checks separately confirmed nine cities, five prices and four existing public titles through the gateway.
 
 ## Editor document
 

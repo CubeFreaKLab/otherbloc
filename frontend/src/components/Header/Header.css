@@ -1,8 +1,22 @@
 .site-header {
+  position: relative;
+  flex-shrink: 0;
   z-index: var(--layer-nav);
   border-bottom: 1px solid var(--line);
   background: var(--paper);
 }
+
+.site-header__bar-slot { height: var(--utility-height, 4.5rem); }
+.site-header__bar { background: var(--paper); }
+.site-header__nav-slot { min-height: 3rem; }
+.site-header[data-mode='away'] .site-header__bar,
+.site-header[data-mode='docked'] .site-header__bar { position: fixed; inset: 0 0 auto; z-index: var(--layer-nav); box-shadow: 0 1px 0 var(--line); }
+.site-header[data-mode='away'] .site-header__bar { transform: translateY(-101%); }
+.site-header[data-mode='docked'] .site-header__bar { animation: dock-header 260ms var(--ease-standard) both; }
+.site-header[data-mode='docked'] .site-header__menu-button { display: inline-flex; }
+@keyframes dock-header { from { transform: translateY(-101%); } to { transform: translateY(0); } }
+main [id] { scroll-margin-top: calc(var(--header-height, 4.5rem) + 1rem); }
+@media (prefers-reduced-motion: reduce) { .site-header[data-mode='docked'] .site-header__bar { animation: none; } }
 
 .site-header__utility {
   display: flex;
@@ -97,6 +111,8 @@
 }
 
 @media (max-width: 47.99rem) {
+  .site-header__bar-slot { height: var(--utility-height, 4rem); }
+  .site-header__nav-slot { min-height: 0; }
   .site-header__utility {
     min-height: 4rem;
   }
@@ -115,7 +131,7 @@
   .site-header__nav {
     display: none;
     position: absolute;
-    inset: 100% 0 auto;
+    inset: var(--utility-height, 4rem) 0 auto;
     width: 100%;
     background: var(--paper);
     border-bottom: 1px solid var(--line);
@@ -152,6 +168,26 @@
     margin-left: 0;
   }
 }
+
+.site-header[data-mode='docked'] .site-header__nav--open,
+.site-header[data-mode='docked'] .site-header__nav:has(:focus-visible) {
+  display: flex;
+  position: fixed;
+  inset: var(--utility-height) 0 auto;
+  z-index: var(--layer-nav);
+  width: 100%;
+  max-height: calc(100dvh - var(--utility-height));
+  overflow-y: auto;
+  padding-block: .75rem 1rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+.site-header[data-mode='docked'] .site-header__nav a { padding-block: .75rem; }
+.site-header[data-mode='docked'] .site-header__nav a::after { display: none; }
+.site-header[data-mode='docked'] .site-header__more { margin-left: 0; }
 
 @media (max-width: 23rem) {
   .site-header__brand img { width: 6.2rem; }
