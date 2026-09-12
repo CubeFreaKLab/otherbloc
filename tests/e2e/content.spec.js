@@ -14,6 +14,11 @@ test('published Firestore content and Storage images render through the gateway 
   await expect.poll(() => cover.evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true)
   for (const theme of ['light', 'dark']) {
     if (await page.locator('html').getAttribute('data-theme') !== theme) await page.getByRole('button', { name: theme === 'dark' ? 'Activar tema oscuro' : 'Activar tema claro' }).click()
+    // Audit a committed theme, not a mixture of styles captured during its update.
+    // These assertions also catch a genuine unreadable dark/light theme.
+    await expect(page.locator('html')).toHaveAttribute('data-theme', theme)
+    await expect(page.locator('body')).toHaveCSS('background-color', theme === 'dark' ? 'rgb(23, 23, 22)' : 'rgb(246, 245, 243)')
+    await expect(page.locator('.featured-article h1')).toHaveCSS('color', theme === 'dark' ? 'rgb(246, 245, 243)' : 'rgb(0, 0, 0)')
     await page.locator('main').focus()
     expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([])
     await page.screenshot({ path: testInfo.outputPath('persisted-home-' + theme + '.png'), fullPage: true })
