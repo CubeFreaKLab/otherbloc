@@ -57,6 +57,9 @@ test('circular image reveal uses entry point, resets after history, and respects
   await image.click()
   await expect(page.locator('.article-page__hero')).toHaveCSS('filter', 'none')
   await page.mouse.move(0, 0); await page.goBack()
+  // Finish history focus restoration before starting a new keyboard journey.
+  // A programmatic focus() does not represent user input that cancels restoration.
+  await expect(image).toBeFocused()
   await expect(image).toHaveAttribute('data-revealed', 'false')
   await expect(color).toHaveCSS('opacity', '0')
   await page.locator('.featured-article .text-link').focus()
