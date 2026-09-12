@@ -10,6 +10,7 @@ import { verifyAccess } from './middleware/verifyAccess.js'
 import { proxyTo } from './middleware/proxyTo.js'
 import { healthRouter } from './routes/healthRoutes.js'
 import { gatewayRouter } from './routes/gatewayRoutes.js'
+import { readiness } from './routes/readiness.js'
 
 export function createApp({ config = env, fetchImpl = fetch } = {}) {
   const app = express()
@@ -45,6 +46,7 @@ export function createApp({ config = env, fetchImpl = fetch } = {}) {
     skipSuccessfulRequests: true,
     message: { error: 'authentication_rate_limited', message: 'Demasiados intentos de acceso. Espera unos minutos.' },
   }))
+  app.get('/api/ready', readiness(config, fetchImpl))
   app.use('/api', verifyAccess(config))
   app.use('/api', express.raw({ type: () => true, limit: '6mb' }))
   app.use('/api/users', proxyTo(config.usersServiceUrl, '/api/users', config, fetchImpl))

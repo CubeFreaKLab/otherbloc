@@ -1,6 +1,8 @@
 import { captureRecovery, hasRecovery, reconcileRecovery } from './draftRecovery'
+import { createRuntimeReadiness } from './runtimeReadiness'
 
 export const apiUrl = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
+export const runtimeReadiness = createRuntimeReadiness(apiUrl)
 let token = null
 let refreshFlight = null
 let epoch = 0
@@ -31,6 +33,10 @@ function acceptSession(value) {
 }
 
 async function send(path, options = {}, access = false) {
+  try { await runtimeReadiness.ensure(options.signal) } catch (error) {
+    if (options.signal?.aborted) throw error
+    throw new ApiError(error.message, 503, 'runtime_starting')
+  }
   const headers = { 'X-Otherbloc-Request': '1', ...options.headers }
   let body = options.body
   if (body !== undefined && !(body instanceof Blob) && !(body instanceof ArrayBuffer)) {
