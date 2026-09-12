@@ -37,14 +37,26 @@ export function readBootstrapConfig(source, options, { revision, clean }) {
   const projectId = source.FIREBASE_PROJECT_ID
   requireValue(/^[a-z][a-z0-9-]{4,28}[a-z0-9]$/.test(projectId ?? '') && !projectId.startsWith('demo-'), 'An explicit real Firebase project ID is required.')
   const bucket = source.FIREBASE_STORAGE_BUCKET
-  requireValue([projectId + '.firebasestorage.app', projectId + '.appspot.com'].includes(bucket), 'Bootstrap requires the approved project default Storage bucket.')
+  const provider = source.MEDIA_STORAGE_PROVIDER || 'firebase'
+  requireValue(['firebase', 'cloudinary'].includes(provider), 'Choose a supported image storage provider.')
+  const cloudName = source.CLOUDINARY_CLOUD_NAME
+  if (provider === 'firebase') requireValue([projectId + '.firebasestorage.app', projectId + '.appspot.com'].includes(bucket), 'Bootstrap requires the approved project default Storage bucket.')
+  else {
+    requireValue(!bucket, 'Cloudinary bootstrap must not include a Firebase Storage bucket; migration is not automatic.')
+    requireValue(/^[a-z0-9_-]+$/i.test(cloudName ?? ''), 'An explicit Cloudinary cloud name is required.')
+  }
   if (options.mode === 'apply') requireValue(options.confirmProject === projectId, 'Project confirmation does not match the configured destination.')
   const render = readRenderConfig({ ...source, GITHUB_SHA: revision, APP_REVISION: revision })
-  return { mode: options.mode, stage: options.stage, projectId, bucket, revision, services: render.services,
+  return { mode: options.mode, stage: options.stage, projectId, provider, bucket, cloudName, revision, services: render.services,
     gateway: render.services.find(({ key }) => key === 'GATEWAY').origin }
 }
 
 export function validateBootstrapCredentials(source, config) {
+  if (config.provider === 'cloudinary') {
+    requireValue(source.CLOUDINARY_CLOUD_NAME === config.cloudName && /^\d+$/.test(source.CLOUDINARY_API_KEY ?? '')
+      && typeof source.CLOUDINARY_API_SECRET === 'string' && source.CLOUDINARY_API_SECRET.trim().length > 0,
+    'Valid server-only Cloudinary credentials are required; no credential value is logged.')
+  }
   const email = source.FIREBASE_CLIENT_EMAIL ?? ''
   requireValue(/^[a-z][a-z0-9-]{4,28}[a-z0-9]$/.test(email.split('@')[0]) && email.split('@').length === 2
     && email.endsWith('@' + config.projectId + '.iam.gserviceaccount.com'), 'The owner-service credential must belong to the approved project.')

@@ -31,7 +31,7 @@ Creation uses a create precondition. Editing compares the client's version and a
 
 The seed accepts only local `demo-otherbloc`, reserves seven marked publication IDs and runs their actual HTTP lifecycle. A second run preserves text/state and does not recreate files. Private data exports and synthetic test cleanup remain separate from cloud persistence evidence.
 
-Firestore and Firebase Storage remain the sole database/file infrastructure. Each of the three domain services owns its Firebase Admin client. Production configuration requires `FIREBASE_PROJECT_ID`, `FIREBASE_STORAGE_BUCKET` and either Application Default Credentials or the server-only `FIREBASE_CLIENT_EMAIL` / `FIREBASE_PRIVATE_KEY` pair. Do not send service-account material to the frontend.
+Firestore remains the document-oriented NoSQL database. The approved zero-dollar cloud configuration uses Firebase Spark for data and Cloudinary Free for authenticated image files; see [image storage](cloudinary-storage.md). Each domain service owns its Firebase Admin client and server credential. Users and Content additionally receive Cloudinary credentials. The gateway and frontend receive neither credential. Cloudinary mode does not require or accept a Firebase Storage bucket. Local mode continues to use Firestore and Firebase Storage emulators; changing providers does not migrate files or records.
 
 Local mode requires a `demo-*` project, loopback `FIRESTORE_EMULATOR_HOST` and `FIREBASE_STORAGE_EMULATOR_HOST`, and non-production mode. Partial or mixed cloud/emulator configuration fails closed. Run locally using [development instructions](development.md).
 
@@ -53,7 +53,7 @@ Integration tests temporarily own `_checks/test-<uuid>` records and Storage obje
 
 These collections belong exclusively to Users. Other services obtain identity/profile information over HTTP. Public JSON never includes password hashes, refresh digests or private email. Names are 2–80 characters, biographies at most 600, emails normalized and validated, and all write input schemas reject unknown fields. Role changes cannot be submitted through the profile endpoint.
 
-No compound index is required for M3's document-ID listing and direct lookups. `firestore.indexes.json` excludes password hashes, biographies and refresh digests from unnecessary indexes, and declares session expiration TTL for future cloud cleanup. Application expiration checks are immediate; TTL deletion is asynchronous and is not emulated or treated as authorization. TTL deployment and billed deletion behavior must be reviewed with the real-cloud setup.
+No compound index is required for M3's document-ID listing and direct lookups. `firestore.indexes.json` excludes password hashes, biographies and refresh digests from unnecessary indexes. Session expiry remains checked immediately by the application; there is no automatic TTL deletion in the Spark configuration because [TTL requires billing](https://firebase.google.com/docs/firestore/quotas). Expired session records remain stored pending separately authorized maintenance and count toward storage quotas.
 
 Registration is one atomic batch. Profile, permissions, password and avatar-reference changes revalidate identity inside a transaction. Refresh rotation uses `lastUpdateTime` as a compare-and-set precondition and bounded rereads; this avoids lock-upgrade contention while preserving logout/version checks. Storage and Firestore do not share one cross-product transaction: upload precedes reference attachment and failed attachment attempts cleanup of that new object.
 

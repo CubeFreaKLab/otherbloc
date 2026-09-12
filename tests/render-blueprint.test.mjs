@@ -7,6 +7,20 @@ const blueprint = JSON.parse(await readFile(new URL('../deploy/render.blueprint.
 const expected = [ ['otherbloc-users', 'users-service', 3001], ['otherbloc-content', 'content-service', 3002], ['otherbloc-interactions', 'interactions-service', 3003], ['otherbloc-gateway', 'api-gateway', 3000] ]
 const setting = (service, key) => service.envVars.find((item) => item.key === key)
 
+test('Spark deployment separates Firestore data from authenticated Cloudinary images without billed TTL', async () => {
+  for (const service of blueprint.services) {
+    assert.equal(setting(service, 'FIREBASE_STORAGE_BUCKET'), undefined)
+    const ownsImages = ['otherbloc-users', 'otherbloc-content'].includes(service.name)
+    for (const key of ['CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET']) {
+      assert.deepEqual(setting(service, key), ownsImages ? { key, sync: false } : undefined)
+    }
+    if (service.name !== 'otherbloc-gateway') assert.equal(setting(service, 'MEDIA_STORAGE_PROVIDER').value, 'cloudinary')
+    else assert.equal(setting(service, 'MEDIA_STORAGE_PROVIDER'), undefined)
+  }
+  const indexes = JSON.parse(await readFile(new URL('../firestore.indexes.json', import.meta.url), 'utf8'))
+  assert.ok(indexes.fieldOverrides.every((field) => field.ttl !== true), 'TTL deletion requires billing; application checks session expiry')
+})
+
 test('Blueprint preparation requires both explicit choices and changes only in-memory region/plan values', async () => {
   assert.deepEqual(parseBlueprintOptions(['--plan=free', '--region=oregon']), { plan: 'free', region: 'oregon' })
   assert.deepEqual(parseBlueprintOptions(['--region=virginia', '--plan=0.5c-512mb']), { region: 'virginia', plan: '0.5c-512mb' })

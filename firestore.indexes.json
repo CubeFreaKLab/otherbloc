@@ -523,6 +523,6 @@
     { "collectionGroup": "users", "fieldPath": "biography", "indexes": [] },
     { "collectionGroup": "userSessions", "fieldPath": "refreshHash", "indexes": [] },
     { "collectionGroup": "userSessions", "fieldPath": "previousHash", "indexes": [] },
-    { "collectionGroup": "userSessions", "fieldPath": "expiresAt", "ttl": true, "indexes": [] }
+    { "collectionGroup": "userSessions", "fieldPath": "expiresAt", "indexes": [] }
   ]
 }

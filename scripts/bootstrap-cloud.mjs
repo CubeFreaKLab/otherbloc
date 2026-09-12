@@ -12,7 +12,8 @@ try {
   assertDisposableCheckout(root)
   const git = (args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
   const config = readBootstrapConfig(process.env, options, { revision: git(['rev-parse', 'HEAD']), clean: git(['status', '--porcelain']) === '' })
-  console.log(JSON.stringify({ mode: config.mode, stage: config.stage, projectId: config.projectId, bucket: config.bucket,
+  console.log(JSON.stringify({ mode: config.mode, stage: config.stage, projectId: config.projectId, provider: config.provider,
+    bucket: config.bucket, cloudName: config.cloudName,
     revision: config.revision, gateway: config.gateway, planned: config.stage === 'users' ? '6 marked demo accounts, including first administrator' : '7 marked demo publications; existing records preserved' }))
   if (config.mode === 'plan') console.log('Offline plan only: no authentication, network requests or writes performed.')
   else {

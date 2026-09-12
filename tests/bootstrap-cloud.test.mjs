@@ -20,6 +20,27 @@ const options = { mode: 'apply', stage: 'users', confirmProject: source.FIREBASE
 const configuration = (changes = {}, changedOptions = options, changedCheckout = checkout) => readBootstrapConfig({ ...source, ...changes }, changedOptions, changedCheckout)
 const json = (value, status = 200) => new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json' } })
 
+test('Cloudinary bootstrap selects an explicit cloud destination without requiring Firebase Storage', () => {
+  const changes = { MEDIA_STORAGE_PROVIDER: 'cloudinary', FIREBASE_STORAGE_BUCKET: '', CLOUDINARY_CLOUD_NAME: 'fixture-cloud' }
+  const config = configuration(changes, { mode: 'plan', stage: 'users' })
+  assert.equal(config.provider, 'cloudinary')
+  assert.equal(config.cloudName, 'fixture-cloud')
+  for (const invalid of [{ CLOUDINARY_CLOUD_NAME: '' }, { CLOUDINARY_CLOUD_NAME: 'https://example.test' },
+    { FIREBASE_STORAGE_BUCKET: source.FIREBASE_STORAGE_BUCKET }, { MEDIA_STORAGE_PROVIDER: 'unknown' }]) {
+    assert.throws(() => configuration({ ...changes, ...invalid }))
+  }
+  const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 1024, privateKeyEncoding: { type: 'pkcs8', format: 'pem' }, publicKeyEncoding: { type: 'spki', format: 'pem' } })
+  const credential = { ...source, ...changes, FIREBASE_CLIENT_EMAIL: 'fixture-owner@otherbloc-fixture.iam.gserviceaccount.com',
+    FIREBASE_PRIVATE_KEY: privateKey, CLOUDINARY_API_KEY: '123456789', CLOUDINARY_API_SECRET: 'synthetic-secret' }
+  assert.doesNotThrow(() => validateBootstrapCredentials(credential, config))
+  for (const key of ['CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET']) {
+    assert.throws(() => validateBootstrapCredentials({ ...credential, [key]: '' }, config), /Cloudinary credentials/)
+  }
+  const isolated = ciEnvironment(credential, '/temporary', 'fixture-run')
+  assert.equal(isolated.CLOUDINARY_API_SECRET, undefined)
+  assert.equal(isolated.MEDIA_STORAGE_PROVIDER, undefined)
+})
+
 test('bootstrap requires explicit mode, stage and project confirmation without reset or deployment flags', () => {
   assert.deepEqual(parseBootstrapArgs(['--stage=users', '--apply', '--confirm-project=otherbloc-fixture']), options)
   assert.deepEqual(parseBootstrapArgs(['--plan', '--stage=content']), { mode: 'plan', stage: 'content' })

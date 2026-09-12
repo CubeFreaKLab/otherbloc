@@ -15,7 +15,10 @@
         { "key": "SERVICE_AUTH_SECRET", "generateValue": true },
         { "key": "ALLOWED_ORIGINS", "sync": false },
         { "key": "FIREBASE_PROJECT_ID", "sync": false },
-        { "key": "FIREBASE_STORAGE_BUCKET", "sync": false },
+        { "key": "MEDIA_STORAGE_PROVIDER", "value": "cloudinary" },
+        { "key": "CLOUDINARY_CLOUD_NAME", "sync": false },
+        { "key": "CLOUDINARY_API_KEY", "sync": false },
+        { "key": "CLOUDINARY_API_SECRET", "sync": false },
         { "key": "FIREBASE_CLIENT_EMAIL", "sync": false },
         { "key": "FIREBASE_PRIVATE_KEY", "sync": false }
       ]
@@ -34,7 +37,10 @@
         { "key": "JWT_SECRET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "JWT_SECRET" } },
         { "key": "SERVICE_AUTH_SECRET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "SERVICE_AUTH_SECRET" } },
         { "key": "FIREBASE_PROJECT_ID", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "FIREBASE_PROJECT_ID" } },
-        { "key": "FIREBASE_STORAGE_BUCKET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "FIREBASE_STORAGE_BUCKET" } },
+        { "key": "MEDIA_STORAGE_PROVIDER", "value": "cloudinary" },
+        { "key": "CLOUDINARY_CLOUD_NAME", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "CLOUDINARY_CLOUD_NAME" } },
+        { "key": "CLOUDINARY_API_KEY", "sync": false },
+        { "key": "CLOUDINARY_API_SECRET", "sync": false },
         { "key": "FIREBASE_CLIENT_EMAIL", "sync": false },
         { "key": "FIREBASE_PRIVATE_KEY", "sync": false },
         { "key": "USERS_SERVICE_URL", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "RENDER_EXTERNAL_URL" } }
@@ -54,7 +60,7 @@
         { "key": "JWT_SECRET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "JWT_SECRET" } },
         { "key": "SERVICE_AUTH_SECRET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "SERVICE_AUTH_SECRET" } },
         { "key": "FIREBASE_PROJECT_ID", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "FIREBASE_PROJECT_ID" } },
-        { "key": "FIREBASE_STORAGE_BUCKET", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "FIREBASE_STORAGE_BUCKET" } },
+        { "key": "MEDIA_STORAGE_PROVIDER", "value": "cloudinary" },
         { "key": "FIREBASE_CLIENT_EMAIL", "sync": false },
         { "key": "FIREBASE_PRIVATE_KEY", "sync": false },
         { "key": "USERS_SERVICE_URL", "fromService": { "type": "web", "name": "otherbloc-users", "envVarKey": "RENDER_EXTERNAL_URL" } },
