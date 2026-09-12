@@ -45,8 +45,13 @@ test('reading transitions do not scale thumbnails in either direction', async ({
     await page.evaluate(() => { window.pauseRouteMotion = true })
     await source.click()
     await expect(page).toHaveURL(/\/article\/leer-sin-prisa$/)
-    await expect.poll(() => page.evaluate(() => window.routeTransitions.at(-1)?.ready)).toBe(true)
-    const forward = await page.evaluate(() => window.routeTransitions.at(-1))
+    // Keep the same observation that satisfied readiness: React may begin a
+    // replacement transition between two separate browser reads.
+    let forward
+    await expect.poll(async () => {
+      forward = await page.evaluate(() => window.routeTransitions.at(-1))
+      return forward?.ready === true && forward.mode === 'reading'
+    }).toBe(true)
     expect(forward.mode).toBe('reading')
     expect(forward.before.covers).toHaveLength(0)
     expect(forward.after.covers).toHaveLength(1)
