@@ -193,8 +193,9 @@ test('thumbnail keyboard reveal keeps the grid fixed; touch rests in grey', asyn
   }
 })
 
-test('narrow phone and tablet breakpoints do not overflow', async ({ page }) => {
-  for (const width of [320, 768, 1024]) {
+// Each breakpoint gets its own test budget and a precise failure label.
+for (const width of [320, 768, 1024]) {
+  test(`phone and tablet breakpoint ${width}px does not overflow`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })
     for (const route of ['/', '/login', '/register', '/explore']) {
       await page.goto(route)
@@ -203,5 +204,5 @@ test('narrow phone and tablet breakpoints do not overflow', async ({ page }) => 
       await page.evaluate(() => document.fonts.ready)
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     }
-  }
-})
+  })
+}
