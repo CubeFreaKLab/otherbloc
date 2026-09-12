@@ -29,7 +29,7 @@ export function createCloudinaryBucket(source, { sdk = cloudinary, fetchImpl = f
           if (!Buffer.isBuffer(bytes) || !bytes.length || bytes.length > MAX_BYTES) throw unavailable()
           try {
             const result = await sdk.uploader.upload('data:image/webp;base64,' + bytes.toString('base64'),
-              { ...options, public_id: publicId, overwrite: false, unique_filename: false })
+              { ...options, public_id: publicId, asset_folder: 'otherbloc', overwrite: false, unique_filename: false })
             if (result.existing) throw unavailable()
             if (result.public_id !== publicId || result.type !== 'authenticated' || result.resource_type !== 'image' || result.format !== 'webp') throw unavailable()
             created.add(path)

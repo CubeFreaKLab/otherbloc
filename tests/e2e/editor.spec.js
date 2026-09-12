@@ -258,6 +258,7 @@ test('failed saves retain text; retry, selection, undo, redo, slash escape and p
     await page.keyboard.press('Enter')
     await page.getByLabel('Buscar opción').fill('sub')
     await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter')
+    expect(await prose(page).evaluate((node) => node === document.activeElement)).toBe(true)
     await page.keyboard.insertText('Subtítulo desde el teclado')
     await expect(prose(page).locator('h2')).toContainText('Subtítulo desde el teclado')
     await saved(page); await details(page)

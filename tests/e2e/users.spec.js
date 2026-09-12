@@ -65,7 +65,14 @@ test('real registration, live header avatar, profile persistence, immediate writ
   await page.reload()
   await expect(page.locator('.account-access img')).toHaveCount(0)
   for (const colorScheme of ['light', 'dark']) {
-    if (await page.locator('html').getAttribute('data-theme') !== colorScheme) await page.getByRole('button', { name: colorScheme === 'dark' ? 'Activar tema oscuro' : 'Activar tema claro' }).click()
+    if (await page.locator('html').getAttribute('data-theme') !== colorScheme) {
+      const themeButton = page.getByRole('button', { name: colorScheme === 'dark' ? 'Activar tema oscuro' : 'Activar tema claro' })
+      // A full-page capture may leave the compact header in its scroll-away interval.
+      // Keyboard focus must bring it back before activating the same real control.
+      await themeButton.focus()
+      await expect(themeButton).toBeInViewport()
+      await themeButton.press('Enter')
+    }
     await expect(page.locator('html')).toHaveAttribute('data-theme', colorScheme)
     expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([])
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)

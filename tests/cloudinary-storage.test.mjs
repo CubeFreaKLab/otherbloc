@@ -66,6 +66,7 @@ for (const [owner, createBucket] of [['avatars', usersBucket], ['publications', 
     assert.equal(kind, 'upload')
     assert.equal(input, 'data:image/webp;base64,' + bytes.toString('base64'))
     assert.equal(options.public_id, publicId)
+    assert.equal(options.asset_folder, 'otherbloc', 'Dynamic folders must not upload into the environment root')
     assert.equal(options.type, 'authenticated')
     assert.equal(options.overwrite, false)
     assert.equal(options.signature_algorithm, 'sha256')

@@ -69,7 +69,7 @@ function QuoteContent({ node, updateAttributes, editor }) {
 const WritingQuote = Blockquote.extend({ addNodeView() { return ReactNodeViewRenderer(QuoteContent) } })
 
 export default function WritingSurface({ blocks, onChange, publicationId, disabled, onBusyChange, revision = 0 }) {
-  const latest = useRef({ onChange, onBusyChange }), menuRef = useRef(null), firstFormat = useRef(null), linkReturn = useRef(null)
+  const latest = useRef({ onChange, onBusyChange }), menuRef = useRef(null), firstFormat = useRef(null), linkReturn = useRef(null), menuReturn = useRef(false)
   const [menu, setMenu] = useState(null), [link, setLink] = useState(null), [linkError, setLinkError] = useState('')
   useLayoutEffect(() => { latest.current = { onChange, onBusyChange } })
   const editor = useEditor({
@@ -109,6 +109,13 @@ export default function WritingSurface({ blocks, onChange, publicationId, disabl
   })
   useEffect(() => { editor?.setEditable(!disabled) }, [editor, disabled])
   useLayoutEffect(() => {
+    if (!menu && editor && menuReturn.current) {
+      menuReturn.current = false
+      // Restore focus after the search input unmounts, before the next keystroke.
+      editor.view.focus()
+    }
+  }, [menu, editor])
+  useLayoutEffect(() => {
     if (!link && editor && linkReturn.current !== null) {
       const position = linkReturn.current; linkReturn.current = null
       editor.commands.setTextSelection(position)
@@ -127,10 +134,11 @@ export default function WritingSurface({ blocks, onChange, publicationId, disabl
     const position = editor.state.selection.to
     const coordinates = editor.view.coordsAtPos(position)
     setMenu({ manual: true, query: '', items: choices, index: 0, clientRect: () => coordinates, command: (choice) => {
-      choice.run(editor.chain().focus().setTextSelection(position)).run(); setMenu(null)
+      choice.run(editor.chain().setTextSelection(position)).run()
+      menuReturn.current = true; setMenu(null)
     } })
   }
-  function closeChoices() { if (menu?.manual) { setMenu(null); editor.view.focus() } else { exitSuggestion(editor.view); editor.commands.focus() } }
+  function closeChoices() { if (menu?.manual) { menuReturn.current = true; setMenu(null) } else { exitSuggestion(editor.view); editor.commands.focus() } }
   function applyLink(event) {
     event.preventDefault()
     const href = link.href.trim()

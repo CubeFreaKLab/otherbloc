@@ -12,8 +12,10 @@ async function observeTransitions(page) {
     document.startViewTransition = (update) => {
       const record = { mode: document.documentElement.dataset.themeTransition ? 'theme' : document.documentElement.dataset.routeMotion, before: snapshot() }
       window.routeTransitions.push(record)
-      const transition = native(async () => { await update(); record.after = snapshot() })
+      const transition = native(update)
       transition.ready.then(() => {
+        // Inspect the committed DOM at the same readiness boundary as the animations.
+        record.after = snapshot()
         record.ready = true
         record.animations = document.getAnimations().filter((animation) => animation.effect?.pseudoElement?.startsWith('::view-transition')).map((animation) => ({ target: animation.effect.pseudoElement, duration: animation.effect.getTiming().duration }))
         if (window.pauseRouteMotion && record.mode === 'reading') {
