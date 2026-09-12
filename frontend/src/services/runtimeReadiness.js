@@ -1,6 +1,6 @@
 // Free Render instances sleep while idle. Probe safe health endpoints before
 // sending an operation, so writes (including login) are never blindly replayed.
-export function createRuntimeReadiness(apiUrl, { fetchImpl = fetch, now = Date.now, sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), budgetMs = 180000, enabled = /^https:\/\/[^/]+\.onrender\.com\/api$/.test(apiUrl) } = {}) {
+export function createRuntimeReadiness(apiUrl, { fetchImpl = fetch, now = Date.now, sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), budgetMs = 240000, enabled = /^https:\/\/[^/]+\.onrender\.com\/api$/.test(apiUrl) } = {}) {
   let flight = null, readyAt = -Infinity, waiting = false
   const listeners = new Set()
   const publish = (value) => { waiting = value; for (const listener of listeners) listener() }
@@ -11,10 +11,13 @@ export function createRuntimeReadiness(apiUrl, { fetchImpl = fetch, now = Date.n
       while (now() < deadline) {
         let response
         try {
-          response = await fetchImpl(apiUrl + '/ready', { method: 'GET', credentials: 'omit', cache: 'no-store', signal: AbortSignal.timeout(Math.max(1, Math.min(20000, deadline - now()))) })
+          response = await fetchImpl(apiUrl + '/ready', { method: 'GET', credentials: 'omit', cache: 'no-store', signal: AbortSignal.timeout(Math.max(1, Math.min(75000, deadline - now()))) })
         } catch { /* A sleeping gateway can time out before the first response. */ }
-        if (response?.ok && (await response.json()).ready === true) { readyAt = now(); return }
-        if (response && ![502, 503, 504].includes(response.status)) throw new Error('No se pudo comprobar la disponibilidad de otherbloc. Inténtalo de nuevo.')
+        if (response?.ok) {
+          // Hosting startup pages can be HTML with HTTP 200. Only the JSON
+          // readiness contract is success, and parsing belongs to this budget.
+          try { if ((await response.json()).ready === true) { readyAt = now(); return } } catch { /* Startup response, not application data. */ }
+        } else if (response && ![502, 503, 504].includes(response.status)) throw new Error('No se pudo comprobar la disponibilidad de otherbloc. Inténtalo de nuevo.')
         if (now() < deadline) await sleep(Math.min(2000, deadline - now()))
       }
       throw new Error('Los servidores tardaron demasiado en iniciar. Espera un momento y pulsa Reintentar.')

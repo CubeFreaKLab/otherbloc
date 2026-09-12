@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { createApp } from '../src/app.js'
 import { env } from '../src/config/env.js'
+import { readiness } from '../src/routes/readiness.js'
 
 test('readiness probes only the three configured health routes, shares requests and does not expose secrets', async () => {
   let calls = 0
@@ -26,4 +27,13 @@ test('a sleeping dependency returns 503 without changing readiness into a write'
     const response = await fetch('http://localhost:' + server.address().port + '/api/ready')
     assert.equal(response.status, 503); assert.deepEqual(await response.json(), { ready: false }); assert.equal(response.headers.get('retry-after'), '2')
   } finally { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)) }
+})
+
+test('cold dependency probes have a separate bounded startup timeout', async (t) => {
+  const timeouts = []
+  t.mock.method(AbortSignal, 'timeout', (ms) => { timeouts.push(ms); return new AbortController().signal })
+  const check = readiness({ usersServiceUrl: 'https://users.example', contentServiceUrl: 'https://content.example', interactionsServiceUrl: 'https://interactions.example' }, async () => Response.json({ status: 'ok' }))
+  const response = { set() {}, status(code) { assert.equal(code, 200); return this }, json(body) { assert.deepEqual(body, { ready: true }) } }
+  await check({}, response)
+  assert.deepEqual(timeouts, [60000, 60000, 60000])
 })

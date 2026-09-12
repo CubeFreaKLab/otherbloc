@@ -5,7 +5,9 @@ export function readiness(config, fetchImpl = fetch) {
     if (!flight && Date.now() - checkedAt >= 5000) {
       flight = Promise.all([config.usersServiceUrl, config.contentServiceUrl, config.interactionsServiceUrl].map(async (target) => {
         try {
-          const result = await fetchImpl(new URL('/health', target), { signal: AbortSignal.timeout(12000), redirect: 'error' })
+          // A cold Free instance can take longer than a normal API request.
+          // Keep this safe probe connected while Render starts the service.
+          const result = await fetchImpl(new URL('/health', target), { signal: AbortSignal.timeout(60000), redirect: 'error' })
           const healthy = result.ok && (await result.json()).status === 'ok'
           return healthy
         } catch { return false }

@@ -36,3 +36,29 @@ test('does not probe local development, reject navigation cancellation or retry 
   const bad = createRuntimeReadiness('https://example.onrender.com/api', { fetchImpl: async () => { count++; return new Response('', { status: 404 }) } })
   await assert.rejects(bad.ensure(), /disponibilidad/); assert.equal(count, 1)
 })
+
+test('startup HTML and a pending JSON contract are not mistaken for readiness or permanent failure', async () => {
+  let time = 0, calls = 0
+  const startup = createRuntimeReadiness('https://example.onrender.com/api', {
+    now: () => time, sleep: async (ms) => { time += ms },
+    fetchImpl: async () => {
+      calls++
+      if (calls === 1) return new Response('<html>Starting service</html>')
+      if (calls === 2) return Response.json({ ready: false })
+      return Response.json({ ready: true })
+    },
+  })
+  await startup.ensure()
+  assert.equal(calls, 3)
+  assert.equal(startup.getSnapshot(), false)
+})
+
+test('safe startup probe gives a cold dependency time to answer within the overall budget', async (t) => {
+  let timeout
+  t.mock.method(AbortSignal, 'timeout', (ms) => { timeout = ms; return new AbortController().signal })
+  const startup = createRuntimeReadiness('https://example.onrender.com/api', {
+    fetchImpl: async () => Response.json({ ready: true }),
+  })
+  await startup.ensure()
+  assert.equal(timeout, 75000)
+})
