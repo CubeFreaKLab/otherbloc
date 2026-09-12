@@ -66,8 +66,10 @@ export function createRenderClient(token, fetcher = fetch) {
 
 export async function preflightRender(config, request) {
   const blueprint = await request('/blueprints/' + config.blueprintId)
-  requireValue(blueprint?.id === config.blueprintId && blueprint.autoSync === false && blueprint.status === 'in_sync'
-    && sameRepo(blueprint.repo) && blueprint.branch === 'main' && blueprint.path === 'render.yaml', 'Blueprint must be in sync, target the approved repository/main/render.yaml and have Auto Sync disabled')
+  // Render also reports "paused" when automatic Blueprint syncing is disabled.
+  // This does not suspend the services; validate each owned runtime below.
+  requireValue(blueprint?.id === config.blueprintId && blueprint.autoSync === false && ['in_sync', 'paused'].includes(blueprint.status)
+    && sameRepo(blueprint.repo) && blueprint.branch === 'main' && blueprint.path === 'render.yaml', 'Blueprint must be in sync or paused, target the approved repository/main/render.yaml and have Auto Sync disabled')
   requireValue(Array.isArray(blueprint.resources) && blueprint.resources.length === 4 && config.services.every(({ id, name }) =>
     blueprint.resources.filter((resource) => resource.id === id && resource.name === name && resource.type === 'web_service').length === 1), 'Blueprint must own exactly the four approved web services')
   for (const service of config.services) {

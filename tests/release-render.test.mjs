@@ -65,6 +65,8 @@ test('Render preflight reads the Blueprint and every owned service before any de
 test('automatic sync, unexpected resources, service settings and active deploys fail before writes', async () => {
   for (const [kind, modify] of [
     ['blueprint', (value) => ({ ...value, autoSync: true })], ['blueprint', (value) => ({ ...value, status: 'syncing' })],
+    ...['created', 'error', 'unknown'].map((status) => ['blueprint', (value) => ({ ...value, status })]),
+    ['blueprint', (value) => ({ ...value, status: 'paused', autoSync: true })],
     ['blueprint', (value) => ({ ...value, resources: [...value.resources, value.resources[0]] })],
     ['blueprint', (value) => ({ ...value, resources: value.resources.map((resource) => ({ ...resource, id: 'srv-wrong' })) })],
     ['blueprint', (value) => ({ ...value, repo: 'https://github.com/someone/otherbloc' })],
@@ -78,6 +80,14 @@ test('automatic sync, unexpected resources, service settings and active deploys 
     await assert.rejects(deployRender(config, request, options))
     assert.equal(calls.some(({ method }) => method === 'POST'), false)
   }
+})
+
+test('paused Blueprint with Auto Sync off still validates all four owned runtimes', async () => {
+  const { request, calls } = fixture((value, kind) => kind === 'blueprint' ? { ...value, status: 'paused' } : value)
+  const result = await preflightRender(config, request)
+  assert.equal(result.services.length, 4)
+  assert.equal(calls.length, 9)
+  assert.ok(calls.every(({ method }) => method === undefined))
 })
 
 test('Render HTTP client uses a fixed API origin, private header, bounded calls and no redirects', async () => {
