@@ -8,7 +8,7 @@ test('readiness probes only the three configured health routes, shares requests 
   let calls = 0
   const config = { ...env, usersServiceUrl: 'https://users.example', contentServiceUrl: 'https://content.example', interactionsServiceUrl: 'https://interactions.example/graphql' }
   const server = createApp({ config, fetchImpl: async (url, options) => {
-    assert.equal(url.pathname, '/health'); assert.equal(options.headers, undefined)
+    assert.equal(url.pathname, '/health'); assert.deepEqual(options.headers, { Accept: 'application/json' })
     calls++; return Response.json({ status: 'ok' })
   } }).listen(0)
   await new Promise((resolve) => server.once('listening', resolve))
@@ -36,4 +36,22 @@ test('cold dependency probes have a separate bounded startup timeout', async (t)
   const response = { set() {}, status(code) { assert.equal(code, 200); return this }, json(body) { assert.deepEqual(body, { ready: true }) } }
   await check({}, response)
   assert.deepEqual(timeouts, [60000, 60000, 60000])
+})
+
+test('unready diagnostics expose only service labels and bounded categories', async () => {
+  const events = []
+  const check = readiness({ usersServiceUrl: 'https://users.example', contentServiceUrl: 'https://content.example', interactionsServiceUrl: 'https://interactions.example' }, async () => { throw new Error('private upstream detail') }, (event) => events.push(event))
+  await check({}, { set() {}, status(code) { assert.equal(code, 503); return this }, json() {} })
+  assert.deepEqual(events.map(({ service, reason }) => ({ service, reason })), ['users', 'content', 'interactions'].map((service) => ({ service, reason: 'network_error' })))
+  assert.equal(JSON.stringify(events).includes('private'), false)
+  for (const event of events) assert.deepEqual(Object.keys(event).sort(), ['elapsedMs', 'event', 'reason', 'service'])
+})
+
+test('a provider HTML response is diagnosed without logging its contents', async () => {
+  const events = []
+  const check = readiness({ usersServiceUrl: 'https://users.example', contentServiceUrl: 'https://content.example', interactionsServiceUrl: 'https://interactions.example' }, async () => new Response('<html>provider detail</html>'), (event) => events.push(event))
+  await check({}, { set() {}, status(code) { assert.equal(code, 503); return this }, json() {} })
+  assert.equal(events.length, 3)
+  for (const event of events) { assert.equal(event.reason, 'non_json'); assert.equal(event.status, 200) }
+  assert.equal(JSON.stringify(events).includes('provider detail'), false)
 })

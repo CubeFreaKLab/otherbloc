@@ -8,6 +8,7 @@ test('cold startup retries only safe probes, shares a flight and caches readines
     now: () => time, sleep: async (ms) => { time += ms },
     fetchImpl: async (url, options) => {
       assert.equal(url, 'https://example.onrender.com/api/ready'); assert.equal(options.method, 'GET'); assert.equal(options.credentials, 'omit')
+      assert.deepEqual(options.headers, { Accept: 'application/json' })
       if (++calls === 1) throw new Error('cold gateway')
       if (calls === 2) return new Response('{"ready":false}', { status: 503 })
       return new Response('{"ready":true}')

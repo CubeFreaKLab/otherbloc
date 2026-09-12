@@ -11,7 +11,7 @@ export function createRuntimeReadiness(apiUrl, { fetchImpl = fetch, now = Date.n
       while (now() < deadline) {
         let response
         try {
-          response = await fetchImpl(apiUrl + '/ready', { method: 'GET', credentials: 'omit', cache: 'no-store', signal: AbortSignal.timeout(Math.max(1, Math.min(75000, deadline - now()))) })
+          response = await fetchImpl(apiUrl + '/ready', { method: 'GET', headers: { Accept: 'application/json' }, credentials: 'omit', cache: 'no-store', signal: AbortSignal.timeout(Math.max(1, Math.min(75000, deadline - now()))) })
         } catch { /* A sleeping gateway can time out before the first response. */ }
         if (response?.ok) {
           // Hosting startup pages can be HTML with HTTP 200. Only the JSON
