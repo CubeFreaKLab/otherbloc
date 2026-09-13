@@ -205,6 +205,10 @@ test('late history cancellation retains the original entries and the new comment
   await page.getByRole('link', { name: 'Leer también es una forma de quedarse.', exact: true }).click()
   const comment = page.getByLabel('Tu comentario', { exact: true })
   await expect(comment).toHaveValue('')
+  // Model a completed scroll before Back. Cancelling that Back must not
+  // restore this older focus over the comment written while it was pending.
+  await page.locator('main').focus()
+  await page.evaluate(() => document.dispatchEvent(new Event('scrollend')))
   const original = await page.evaluate(() => ({ key: history.state.key, index: history.state.idx }))
   let release
   const gate = new Promise((resolve) => { release = resolve })

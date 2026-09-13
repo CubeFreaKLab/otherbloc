@@ -55,3 +55,10 @@ test('a provider HTML response is diagnosed without logging its contents', async
   for (const event of events) { assert.equal(event.reason, 'non_json'); assert.equal(event.status, 200) }
   assert.equal(JSON.stringify(events).includes('provider detail'), false)
 })
+
+test('unready response offers only configured public Render health URLs, not secrets or private hosts', async () => {
+  const check = readiness({ usersServiceUrl: 'https://otherbloc-users.onrender.com', contentServiceUrl: 'http://content.internal:3002', interactionsServiceUrl: 'https://secret:password@otherbloc-interactions.onrender.com/graphql' }, async () => Response.json({ status: 'starting' }), () => {})
+  await check({}, { set() {}, status(code) { assert.equal(code, 503); return this }, json(body) {
+    assert.deepEqual(body, { ready: false, wakeups: ['https://otherbloc-users.onrender.com/health'] })
+  } })
+})

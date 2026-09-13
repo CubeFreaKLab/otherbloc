@@ -6,6 +6,7 @@ export function createRuntimeReadiness(apiUrl, { fetchImpl = fetch, now = Date.n
   const publish = (value) => { waiting = value; for (const listener of listeners) listener() }
   async function probe() {
     const deadline = now() + budgetMs
+    const awakened = new Set()
     const notice = setTimeout(() => publish(true), 800)
     try {
       while (now() < deadline) {
@@ -13,10 +14,22 @@ export function createRuntimeReadiness(apiUrl, { fetchImpl = fetch, now = Date.n
         try {
           response = await fetchImpl(apiUrl + '/ready', { method: 'GET', headers: { Accept: 'application/json' }, credentials: 'omit', cache: 'no-store', signal: AbortSignal.timeout(Math.max(1, Math.min(75000, deadline - now()))) })
         } catch { /* A sleeping gateway can time out before the first response. */ }
-        if (response?.ok) {
+        if (response?.ok || response?.status === 503) {
           // Hosting startup pages can be HTML with HTTP 200. Only the JSON
           // readiness contract is success, and parsing belongs to this budget.
-          try { if ((await response.json()).ready === true) { readyAt = now(); return } } catch { /* Startup response, not application data. */ }
+          let data
+          try { data = await response.json() } catch { /* Startup response, not application data. */ }
+          if (response.ok && data?.ready === true) { readyAt = now(); return }
+          // Render-to-Render probes did not wake sleeping owners in the real
+          // deployment. An active visitor may send one credential-free GET to
+          // each public health URL. Opaque responses are NOT readiness: only
+          // the gateway's subsequent JSON contract permits business requests.
+          const wakeups = Array.isArray(data?.wakeups) ? [...new Set(data.wakeups)].filter((url) =>
+            typeof url === 'string' && /^https:\/\/[a-z0-9-]+\.onrender\.com\/health$/.test(url) && !awakened.has(url)).slice(0, 3 - awakened.size) : []
+          if (wakeups.length && now() < deadline) await Promise.allSettled(wakeups.map((url) => {
+            awakened.add(url)
+            return fetchImpl(url, { method: 'GET', mode: 'no-cors', credentials: 'omit', cache: 'no-store', redirect: 'error', referrerPolicy: 'no-referrer', signal: AbortSignal.timeout(Math.max(1, Math.min(65000, deadline - now()))) })
+          }))
         } else if (response && ![502, 503, 504].includes(response.status)) throw new Error('No se pudo comprobar la disponibilidad de otherbloc. Inténtalo de nuevo.')
         if (now() < deadline) await sleep(Math.min(2000, deadline - now()))
       }

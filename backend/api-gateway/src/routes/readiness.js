@@ -1,9 +1,17 @@
 // Requested only by an active visitor. No timer keeps free services awake.
 export function readiness(config, fetchImpl = fetch, report = (event) => console.warn(JSON.stringify(event))) {
   let flight = null, checkedAt = 0, ready = false
+  // Only public health URLs of this deployment can be used by an active
+  // visitor to wake Free instances. Never expose internal hosts or credentials.
+  const targets = [config.usersServiceUrl, config.contentServiceUrl, config.interactionsServiceUrl]
+  const wakeups = targets.flatMap((target) => {
+    const url = new URL(target)
+    return url.protocol === 'https:' && /^[a-z0-9-]+\.onrender\.com$/.test(url.hostname) && !url.port && !url.username && !url.password
+      ? [url.origin + '/health'] : []
+  })
   return async (_request, response) => {
     if (!flight && Date.now() - checkedAt >= 5000) {
-      flight = Promise.all([config.usersServiceUrl, config.contentServiceUrl, config.interactionsServiceUrl].map(async (target, index) => {
+      flight = Promise.all(targets.map(async (target, index) => {
         const started = Date.now()
         const diagnostic = { event: 'runtime_dependency_unready', service: ['users', 'content', 'interactions'][index] }
         try {
@@ -26,6 +34,6 @@ export function readiness(config, fetchImpl = fetch, report = (event) => console
     await flight
     response.set('Cache-Control', 'no-store')
     if (!ready) response.set('Retry-After', '2')
-    response.status(ready ? 200 : 503).json({ ready })
+    response.status(ready ? 200 : 503).json({ ready, ...(!ready && wakeups.length ? { wakeups } : {}) })
   }
 }

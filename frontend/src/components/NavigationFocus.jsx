@@ -1,6 +1,8 @@
 import { useLayoutEffect, useRef } from 'react'
 import { useLocation, useNavigation, useNavigationType } from 'react-router-dom'
 
+const interactionEvents = ['pointerdown', 'wheel', 'touchstart', 'keydown', 'input']
+
 function identify(element) {
   if (element?.id) return { id: element.id }
   const href = element?.getAttribute('href')
@@ -25,14 +27,16 @@ export default function NavigationFocus() {
     const marker = { key: navigation.location.key, interrupted: false }
     pendingInteraction.current = marker
     const interrupt = () => { marker.interrupted = true }
-    for (const name of ['pointerdown', 'wheel', 'touchstart', 'keydown']) document.addEventListener(name, interrupt, { passive: true })
-    return () => { for (const name of ['pointerdown', 'wheel', 'touchstart', 'keydown']) document.removeEventListener(name, interrupt) }
+    for (const name of interactionEvents) document.addEventListener(name, interrupt, { passive: true })
+    return () => { for (const name of interactionEvents) document.removeEventListener(name, interrupt) }
   }, [navigation.state, navigation.location?.key])
 
   useLayoutEffect(() => {
     const history = positions.current, last = previous.current
     const changedPath = last.pathname !== location.pathname
-    const saved = navigationType === 'POP' ? history.get(location.key) : null
+    // A cancelled Back returns to the already committed entry. It is not a
+    // completed history traversal and must not restore an older focus there.
+    const saved = navigationType === 'POP' && last.key !== location.key ? history.get(location.key) : null
     const preserveInteraction = pendingInteraction.current?.key === location.key && pendingInteraction.current.interrupted
     previous.current = location
     let frame = 0, stopped = false, fontsReady = document.fonts.status === 'loaded', observer, resize
@@ -75,13 +79,13 @@ export default function NavigationFocus() {
     document.addEventListener('click', remember, true)
     window.addEventListener('popstate', remember)
     document.addEventListener('scrollend', remember)
-    for (const name of ['pointerdown', 'wheel', 'touchstart', 'keydown']) document.addEventListener(name, interact, { passive: true })
+    for (const name of interactionEvents) document.addEventListener(name, interact, { passive: true })
     return () => {
       stop()
       document.removeEventListener('click', remember, true)
       window.removeEventListener('popstate', remember)
       document.removeEventListener('scrollend', remember)
-      for (const name of ['pointerdown', 'wheel', 'touchstart', 'keydown']) document.removeEventListener(name, interact)
+      for (const name of interactionEvents) document.removeEventListener(name, interact)
     }
   }, [location, navigationType])
   return null

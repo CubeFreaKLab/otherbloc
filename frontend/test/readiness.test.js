@@ -63,3 +63,38 @@ test('safe startup probe gives a cold dependency time to answer within the overa
   await startup.ensure()
   assert.equal(timeout, 75000)
 })
+
+test('an active visitor wakes only public health endpoints once, without treating opaque responses as readiness', async () => {
+  let time = 0, probes = 0
+  const wakes = []
+  const startup = createRuntimeReadiness('https://example.onrender.com/api', {
+    now: () => time, sleep: async (ms) => { time += ms },
+    fetchImpl: async (url, options) => {
+      if (url.endsWith('/ready')) {
+        if (++probes === 3) return Response.json({ ready: true })
+        return Response.json({ ready: false, wakeups: ['https://owner.onrender.com/health', 'https://owner.onrender.com/health', 'http://localhost/health', 'https://owner.onrender.com/api/users', 'https://bad.example/health'] }, { status: 503 })
+      }
+      assert.equal(options.method, 'GET'); assert.equal(options.credentials, 'omit')
+      assert.equal(options.mode, 'no-cors'); assert.equal(options.redirect, 'error')
+      assert.equal(options.referrerPolicy, 'no-referrer')
+      wakes.push(url)
+      return { type: 'opaque', status: 0 }
+    },
+  })
+  await Promise.all([startup.ensure(), startup.ensure()])
+  assert.deepEqual(wakes, ['https://owner.onrender.com/health'])
+  assert.equal(probes, 3)
+})
+
+test('failed visitor wake signals remain bounded and cannot make readiness succeed', async () => {
+  let time = 0, wakes = 0
+  const startup = createRuntimeReadiness('https://example.onrender.com/api', {
+    budgetMs: 4000, now: () => time, sleep: async (ms) => { time += ms },
+    fetchImpl: async (url) => {
+      if (url.endsWith('/ready')) return Response.json({ ready: false, wakeups: ['https://owner.onrender.com/health'] }, { status: 503 })
+      wakes++; throw new Error('network unavailable')
+    },
+  })
+  await assert.rejects(startup.ensure(), /tardaron demasiado/)
+  assert.equal(wakes, 1); assert.equal(time, 4000)
+})
