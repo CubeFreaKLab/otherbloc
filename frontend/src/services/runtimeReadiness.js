@@ -28,7 +28,9 @@ export function createRuntimeReadiness(apiUrl, { fetchImpl = fetch, now = Date.n
             typeof url === 'string' && /^https:\/\/[a-z0-9-]+\.onrender\.com\/health$/.test(url) && !awakened.has(url)).slice(0, 3 - awakened.size) : []
           if (wakeups.length && now() < deadline) await Promise.allSettled(wakeups.map((url) => {
             awakened.add(url)
-            return fetchImpl(url, { method: 'GET', mode: 'no-cors', credentials: 'omit', cache: 'no-store', redirect: 'error', referrerPolicy: 'no-referrer', signal: AbortSignal.timeout(Math.max(1, Math.min(65000, deadline - now()))) })
+            // Fetch requires follow for no-cors, even when the URL does not
+            // redirect. Credentials remain omitted throughout this safe GET.
+            return fetchImpl(url, { method: 'GET', mode: 'no-cors', credentials: 'omit', cache: 'no-store', redirect: 'follow', referrerPolicy: 'no-referrer', signal: AbortSignal.timeout(Math.max(1, Math.min(65000, deadline - now()))) })
           }))
         } else if (response && ![502, 503, 504].includes(response.status)) throw new Error('No se pudo comprobar la disponibilidad de otherbloc. Inténtalo de nuevo.')
         if (now() < deadline) await sleep(Math.min(2000, deadline - now()))

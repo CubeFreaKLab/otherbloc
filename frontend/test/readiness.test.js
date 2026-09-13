@@ -75,7 +75,7 @@ test('an active visitor wakes only public health endpoints once, without treatin
         return Response.json({ ready: false, wakeups: ['https://owner.onrender.com/health', 'https://owner.onrender.com/health', 'http://localhost/health', 'https://owner.onrender.com/api/users', 'https://bad.example/health'] }, { status: 503 })
       }
       assert.equal(options.method, 'GET'); assert.equal(options.credentials, 'omit')
-      assert.equal(options.mode, 'no-cors'); assert.equal(options.redirect, 'error')
+      assert.equal(options.mode, 'no-cors'); assert.equal(options.redirect, 'follow')
       assert.equal(options.referrerPolicy, 'no-referrer')
       wakes.push(url)
       return { type: 'opaque', status: 0 }
